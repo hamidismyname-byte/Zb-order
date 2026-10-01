@@ -259,7 +259,7 @@ const isEditing=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SE
 addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!isEditing()){pending=false;render()}},50));
 function renderHeader(){
   const rl=me.role==='waiter'?t('Service')+(me.name?' · '+esc(me.name):''):me.role==='kitchen'?STI[me.station]+' '+t(STN[me.station]):me.role==='admin'?t('Admin'):'';
-  $('#hdr').innerHTML=`<span class="brand">ZIRLERBERG</span>${rl?`<span class="role">${rl}</span>`:''}<span class="sp"></span>
+  $('#hdr').innerHTML=`<span class="brand">ZIRLERBERG <span style="font-size:10px;opacity:.5">v8</span></span>${rl?`<span class="role">${rl}</span>`:''}<span class="sp"></span>
    <span class="dot ${connected?'on':'off'}"></span>${me.role?`<button class="ico" data-a="settings">⚙︎</button>`:''}`}
 function render(){
   document.documentElement.lang=me.lang;document.documentElement.dir=me.lang==='fa'?'rtl':'ltr';document.body.classList.toggle('fa',me.lang==='fa');
@@ -543,7 +543,7 @@ function startData(){dataOn=true;
   Store.subCol('tables',null,null,l=>{tables={};for(const x of l)tables[x.id]=x;render()},showErr);
   subToday()}
 setInterval(()=>{if(!dataOn)return;if(Store&&dayKey()!==subDay)subToday();else if(!isEditing()&&!ui.sheet&&(me.role==='kitchen'||ui.wtab==='aktiv'))render()},30000);
-if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')r.update().catch(()=>{})})}).catch(()=>{});
 if(me.role==='kitchen'&&me.wake)wake(true);
 start();
 </script>
