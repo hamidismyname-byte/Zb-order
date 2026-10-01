@@ -16,9 +16,7 @@
 html{background:var(--bg)}
 html,body{margin:0;color:var(--tx);font:16px/1.5 Manrope,system-ui,sans-serif}
 body.fa{font-family:Vazirmatn,Manrope,system-ui,sans-serif}
-body::before{content:'';position:fixed;inset:0;z-index:-1;background:url(bg.jpg) center 40%/cover no-repeat;opacity:.17;pointer-events:none}
-body::after{content:'';position:fixed;inset:0;z-index:-1;background:radial-gradient(120% 80% at 50% 30%,rgba(10,20,48,0) 40%,rgba(10,20,48,.55) 100%);pointer-events:none}
-body{background:transparent;padding-bottom:calc(84px + env(safe-area-inset-bottom));overscroll-behavior-y:none}
+body{background:var(--bg);padding-bottom:calc(84px + env(safe-area-inset-bottom));overscroll-behavior-y:none}
 .serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;letter-spacing:.2px}
 body.fa .serif{font-family:Vazirmatn,sans-serif;font-weight:700;letter-spacing:0}
 button,.btn{font:inherit;color:inherit;border:0;background:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
@@ -29,6 +27,14 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold)}
 /* Hero */
 .hero{position:relative;min-height:max(440px,64vh);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:0 18px 34px;overflow:hidden}
 .hero video,.hero .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .poster{filter:saturate(.88) contrast(.92) brightness(.92);transform-origin:50% 30%;will-change:opacity,transform}
+.story{margin-top:14px;border:1px solid rgba(214,176,106,.35);border-radius:14px;background:rgba(214,176,106,.06)}
+.story summary{list-style:none;cursor:pointer;padding:12px 14px;color:var(--gold);font-weight:600;display:flex;justify-content:space-between}
+.story summary::-webkit-details-marker{display:none}
+.story summary:after{content:'+';font-size:20px;line-height:1}
+.story[open] summary:after{content:'–'}
+.story p{margin:0;padding:0 14px 14px;color:var(--tx);font-size:15px;line-height:1.65}
+.hint{font-size:12px;color:var(--mu);margin-top:6px}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,48,.35) 0%,rgba(10,20,48,.15) 35%,rgba(10,20,48,.8) 75%,rgba(10,20,48,.86) 100%)}
 .hero>*:not(video):not(.shade):not(.poster){position:relative}
 .langs{position:absolute!important;top:calc(14px + env(safe-area-inset-top));inset-inline-end:14px;display:flex;gap:4px;background:rgba(10,20,48,.55);backdrop-filter:blur(8px);border-radius:999px;padding:4px}
@@ -152,7 +158,7 @@ footer a{color:var(--gold);text-decoration:none}
 <div id="toast"></div>
 <script src="data.js"></script>
 <script type="module">
-import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace} from './store.js';
+import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift} from './store.js';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur=n=>'<bdi>'+(Math.round((+n||0)*100)/100).toFixed(2).replace('.',',')+' €</bdi>';
@@ -185,6 +191,11 @@ scanToOrder:['Zum Bestellen bitte den QR-Code auf Ihrem Tisch scannen.','To orde
 closedNow:['Bestellungen sind ab {t} Uhr möglich.','Orders are possible from {t}.','سفارش از ساعت {t} ممکنه.','Si può ordinare dalle {t}.'],
 add:['Hinzufügen','Add','افزودن','Aggiungi'],note:['Wunsch (z. B. ohne Zwiebel)','Request (e.g. no onion)','درخواست (مثلاً بدون پیاز)','Richiesta (es. senza cipolla)'],
 cart:['Ihre Bestellung','Your order','سفارش شما','Il tuo ordine'],cartBar:['Bestellung ansehen','View order','دیدن سفارش','Vedi ordine'],
+nameHint:['Freiwillig – mit Ihrem Namen findet Ihre Bestellung leichter zu Ihnen und die Rechnung ist einfacher.','Optional – with your name your order finds you more easily and the bill is simpler.','اختیاری – با نوشتن اسم، سفارش راحت‌تر به دستتون می‌رسه و حساب هم ساده‌تره.','Facoltativo – con il tuo nome l’ordine ti trova più facilmente e il conto è più semplice.'],
+story:['Die Geschichte dieses Gerichts','The story of this dish','داستان این غذا','La storia di questo piatto'],
+restDay:['Heute Ruhetag','Closed today','امروز تعطیل هستیم','Oggi giorno di riposo'],
+opensAt:['Wir öffnen {d} um {t} Uhr','We open {d} at {t}','{d} از ساعت {t} باز هستیم','Apriamo {d} alle {t}'],
+tomorrow:['morgen','tomorrow','فردا','domani'],todayW:['heute','today','امروز','oggi'],
 yourName:['Ihr Vorname (für den Service)','Your first name (for our staff)','نام شما (برای گارسون)','Il tuo nome (per il personale)'],
 send:['Bestellung senden','Send order','ارسال سفارش','Invia ordine'],total:['Summe','Total','جمع','Totale'],
 sent:['Danke! Der Service bestätigt Ihre Bestellung gleich.','Thank you! Our staff will confirm your order shortly.','ممنون! گارسون سفارشتون رو الان تأیید می‌کنه.','Grazie! Il personale confermerà a breve.'],
@@ -220,19 +231,22 @@ const catName=c=>CAT[c.id]?CAT[c.id][li()]:c.name;
 const descOf=it=>{const d=DATA.desc[it.id];if(d)return lang==='de'?d[0]:d[1];if(it.d||it.e)return lang==='de'?(it.d||it.e):(it.e||it.d);return ''};
 const alOf=it=>(DATA.desc[it.id]||[])[2]||'';
 const flOf=it=>(DATA.desc[it.id]||[])[3]||'';
+const WDN=[['Sonntag','Sunday','یکشنبه','domenica'],['Montag','Monday','دوشنبه','lunedì'],['Dienstag','Tuesday','سه‌شنبه','martedì'],['Mittwoch','Wednesday','چهارشنبه','mercoledì'],['Donnerstag','Thursday','پنجشنبه','giovedì'],['Freitag','Friday','جمعه','venerdì'],['Samstag','Saturday','شنبه','sabato']];
+function openMsg(){const n=nextOpen(conf);if(!n)return '';const d=n.inDays===0?tr('todayW'):n.inDays===1?tr('tomorrow'):(lang==='de'?'am ':lang==='it'?'':'')+WDN[n.d.getDay()][li()];return tr('opensAt',{d,t:n.o})}
+const storyOf=it=>{const s=DATA.story&&DATA.story[it.id];return s?s[li()]||s[1]:''};
 const cleanName=n=>String(n).replace(/\s*\(ca\. 30 Min\.\)/,'').replace(/\s*[🌱🌶★]/gu,'').trim();
 
 /* ============ State ============ */
 const GK='zbg:'+(T||'-');
 let G=LS.get(GK,{session:null,gid:null,name:'',had:false});
 const saveG=()=>LS.set(GK,G);
-let Store=null,conf=null,today=null,tableDoc=null,orders=[],unsubO=null,joinedS=null;
+let shifts=[];let Store=null,conf=null,today=null,tableDoc=null,orders=[],unsubO=null,joinedS=null;
 let cart=LS.get('zbg_cart:'+(T||'-'),[]);const saveCart=()=>LS.set('zbg_cart:'+(T||'-'),cart);
 const ui={view:'home',sheet:null,arg:null,flt:{v:false,s:false},thanks:false,cooldown:0,ageOk:false};
 
 const catOf=it=>conf.cats.find(c=>c.id===it.cat);
-const canOrder=()=>!!T&&isOpenNow(conf&&conf.hours);
-function blockReason(it){const c=catOf(it);if(!isAvail(it,c,today))return 'notToday';if(c&&c.st==='shisha'&&T&&!isTerrace(T))return 'terraceOnly';return null}
+const canOrder=()=>!!T&&!!conf&&isOpenNow(conf);
+function blockReason(it){const c=catOf(it);if(!isAvail(it,c,today))return 'notToday';if(c&&c.st==='shisha'&&T&&!isTerrace(T,conf))return 'terraceOnly';return null}
 
 /* ============ Icons ============ */
 const IC={
@@ -266,14 +280,14 @@ function renderNav(){
   $('#bar').innerHTML=n&&ui.view!=='home'&&!ui.sheet?`<div class="cartbar"><button data-a="openCart"><span>🧾 ${tr('cartBar')} · ${n}</span><span>${eur(sum)}</span></button></div>`:'';
 }
 function heroInner(){
-  const z=T?zoneOf(T):null,h=conf&&conf.hours,open=isOpenNow(h);
+  const z=T&&conf?zoneOf(T,conf):null,open=conf?isOpenNow(conf):true,ct=conf?closeToday(conf):null;
   return `<img class="poster" src="hero.jpg" alt="" fetchpriority="high"><div class="shade"></div>
   <div class="langs">${LANGS.map(l=>`<button data-a="lang" data-x="${l}" class="${l===lang?'act':''}">${l.toUpperCase()}</button>`).join('')}</div>
   <img class="logo" src="logo.png" alt="Zirlerberg">
   <h1 class="serif">${tr('welcome')}</h1><p class="sub">${tr('tag')}</p>
   ${T?`<div class="pill">${tr('table')} <b>${esc(T)}</b>${z?` · ${esc(zoneLabel(z))}`:''}</div>`:''}
-  ${h?`<div class="openst ${open?'':'closed'}"><i></i>${open?tr('openUntil')+' '+esc(h.close):tr('closedFrom')+' '+esc(h.open)}</div>`:''}`}
-function zoneLabel(z){const m={bar:['Bar','Bar','بار','Bar'],saal:['Hauptsaal','Main hall','سالن اصلی','Sala'],fenster:['Panorama-Fenster','Panorama window','کنار پنجره','Finestra panoramica'],neben:['Nebenraum','Side room','اتاق کناری','Saletta'],terr:['Dachterrasse','Roof terrace','تراس','Terrazza'],terr2:['Terrasse überdacht','Covered terrace','تراس سرپوشیده','Terrazza coperta'],togo:['To-go','To-go','بیرون‌بر','Asporto']};return (m[z.id]||[z.name])[li()]||z.name}
+  ${conf?`<div class="openst ${open?'':'closed'}"><i></i>${open?tr('openUntil')+' '+esc(ct||''):(!dayHours(conf)?tr('restDay')+' · ':'')+esc(openMsg())}</div>`:''}`}
+function zoneLabel(z){if(!z)return '';const m={bar:['Bar','Bar','بار','Bar'],saal:['Hauptsaal','Main hall','سالن اصلی','Sala'],fenster:['Panorama-Fenster','Panorama window','کنار پنجره','Finestra panoramica'],neben:['Nebenraum','Side room','اتاق کناری','Saletta'],terr:['Dachterrasse','Roof terrace','تراس','Terrazza'],terr2:['Terrasse überdacht','Covered terrace','تراس سرپوشیده','Terrazza coperta'],togo:['To-go','To-go','بیرون‌بر','Asporto']};return m[z.id]&&conf&&Array.isArray(conf.zones)&&z.name!==m[z.id][0]?z.name:(m[z.id]||[z.name])[li()]||z.name}
 function homeView(){
   const L=conf.links||{},w=conf.wifi||{};
   const hi=conf.items.filter(i=>DATA.photo[i.id]&&!blockReason(i)).sort((a,b)=>(flOf(b).includes('h')-flOf(a).includes('h'))).slice(0,8);
@@ -282,7 +296,7 @@ function homeView(){
   <div class="tiles">
    <button class="tile main" data-a="go" data-x="menu">${IC.menu}<div style="flex:1"><span class="serif" style="font-size:24px">${tr('menuOrder')}</span><br><small>${tr('menuSub')}</small></div><span style="color:var(--gold);font-size:22px">${lang==='fa'?'←':'→'}</span></button>
    ${T?`<button class="tile" data-a="callW" data-x="waiter">${IC.bell}<span>${tr('call')}</span></button><button class="tile" data-a="callW" data-x="bill">${IC.bill}<span>${tr('bill')}</span></button>`:''}
-   ${w.ssid?`<button class="tile" data-a="wifi">${IC.wifi}<span>${tr('wifi')}</span></button>`:''}
+   ${w.ssid&&w.show?`<button class="tile" data-a="wifi">${IC.wifi}<span>${tr('wifi')}</span></button>`:''}
    <a class="tile btn" href="${esc(L.google||'#')}" target="_blank" rel="noopener">${IC.star}<span>${tr('review')}</span></a>
    <a class="tile btn" href="${esc(L.insta||'#')}" target="_blank" rel="noopener">${IC.cam}<span>${tr('insta')}</span><small>@restaurantamzirlerberg</small></a>
   </div>
@@ -311,25 +325,26 @@ function rowItem(it){
 function visible(it){const f=flOf(it),n=it.name;if(ui.flt.v&&!(f.includes('v')||n.includes('🌱')))return false;if(ui.flt.s&&!(f.includes('s')||n.includes('🌶')))return false;return true}
 function menuView(){
   const cats=conf.cats.filter(c=>conf.items.some(i=>i.cat===c.id&&visible(i)));
-  const h=conf.hours||{};
   return `<div class="mhead"><div class="wrap"><div class="mtop"><h1 class="serif">${tr('menu')}</h1>
     <button class="chip flt ${ui.flt.v?'on':''}" data-a="flt" data-x="v">🌱 ${tr('veg')}</button><button class="chip flt ${ui.flt.s?'on':''}" data-a="flt" data-x="s">🌶</button></div>
     <div class="chips">${cats.map(c=>`<button class="chip" data-a="jump" data-x="${c.id}">${esc(catName(c))}</button>`).join('')}</div></div></div>
   <div class="wrap">
-  ${!T?`<div class="notice">📱 ${tr('scanToOrder')}</div>`:!isOpenNow(h)?`<div class="notice">🕙 ${tr('closedNow',{t:esc(h.open)})}</div>`:''}
+  ${!T?`<div class="notice">📱 ${tr('scanToOrder')}</div>`:!isOpenNow(conf)?`<div class="notice">🕙 ${!dayHours(conf)?tr('restDay')+' – ':''}${esc(openMsg())}</div>`:''}
   ${cats.map(c=>{const its=conf.items.filter(i=>i.cat===c.id&&visible(i));
     return `<section class="catsec" id="c-${c.id}"><h2 class="cath serif">${esc(catName(c))}</h2>${its.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}</section>`}).join('')}
   ${footer()}</div>`}
 function statusOf(o){if(o.cancelled)return['st_no','s-no'];if(o.status==='pending')return['st_pend','s-pend'];if(o.status==='declined')return['st_no','s-no'];
   const v=Object.values(o.st||{});if(v.length&&v.every(x=>x==='abgeholt'))return['st_done','s-done'];if(v.includes('fertig'))return['st_ready','s-ready'];if(v.includes('arbeit'))return['st_cook','s-cook'];return['st_ok','s-ok']}
 const allServed=o=>{const v=Object.values(o.st||{});return o.status==='ok'&&v.length&&v.every(x=>x==='abgeholt')};
+function guestNums(list){const m={};let n=0;for(const o of [...list].sort((a,b)=>a.createdMs-b.createdMs))if(o.source==='guest'&&o.guestId&&!(o.guestId in m))m[o.guestId]=++n;return m}
 function tableView(){
   const list=orders.filter(o=>!o.cancelled).sort((a,b)=>b.createdMs-a.createdMs);
   const valid=list.filter(o=>o.status!=='declined');
   const sum=valid.reduce((a,o)=>a+o.items.reduce((s,i)=>s+i.qty*i.price,0),0);
+  const gn=guestNums(orders);
   return `<div class="mhead"><div class="wrap"><div class="mtop" style="padding-bottom:12px"><h1 class="serif">${tr('ourTable')} · ${esc(T)}</h1></div></div></div><div class="wrap" style="padding-top:16px">
   ${!list.length?`<div class="notice">${tr('noOrders')}</div>`:list.map(o=>{const [k,c]=statusOf(o),mine=o.guestId===G.gid;
-    return `<div class="oc"><div class="oh"><span class="gname">👤 ${mine?tr('me_'):esc(o.guestName||(o.source==='staff'?tr('service'):tr('guest')))} · ${new Date(o.createdMs).toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'})}</span><span class="stb ${c}">${tr(k)}</span></div>
+    return `<div class="oc"><div class="oh"><span class="gname">👤 ${mine?tr('me_'):esc(o.guestName||(o.source==='staff'?tr('service'):tr('guest')+' '+(gn[o.guestId]||'')))} · ${new Date(o.createdMs).toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'})}</span><span class="stb ${c}">${tr(k)}</span></div>
     ${o.items.map(i=>`<div class="mini"><b>${i.qty}×</b><span style="flex:1">${esc(cleanName(i.name))}${i.note?` <span class="muted">(${esc(i.note)})</span>`:''}</span><span>${eur(i.qty*i.price)}</span></div>`).join('')}
     ${mine&&o.status==='pending'?`<button class="ghostbtn" style="padding:10px" data-a="cancelO" data-x="${o.id}">${tr('cancel')}</button>`:''}</div>`}).join('')}
   ${valid.length?`<div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div><p class="muted" style="color:var(--mu);font-size:13px">${tr('payInfo')}</p>`:''}
@@ -343,18 +358,19 @@ function sheetView(){
     <h2 class="serif" style="font-size:32px;margin:0">${esc(cleanName(it.name))}</h2>${fa?`<div class="fan" style="font-size:17px">${esc(fa)}</div>`:''}
     ${flagChips(it).length?`<div style="margin-top:6px;color:var(--gold);font-size:14px">${flagChips(it).join(' · ')}</div>`:''}
     ${descOf(it)?`<p class="ds" style="font-size:16px">${esc(descOf(it))}</p>`:''}
+    ${storyOf(it)?`<details class="story"><summary>📖 ${tr('story')}</summary><p>${esc(storyOf(it))}</p></details>`:''}
     ${al?`<div class="alist">${tr('allergens')}: ${al.split('').map(k=>k+' '+(AL[k]?AL[k][li()]:'')).join(' · ')}</div>`:''}
     <div class="tot"><span></span><span>${it.price?eur(it.price):''}</span></div>
     ${br?`<span class="offl">${tr(br)}</span>`:canOrder()?`<div class="row" style="border:0;cursor:default"><div class="f"></div><div class="qty"><button data-a="dq" data-x="-1">−</button><span>${ui.dq}</span><button data-a="dq" data-x="1">+</button></div></div>
     <input id="inote" placeholder="${esc(tr('note'))}" value="${esc(ui.dn||'')}">
-    <button class="bigbtn" data-a="addD">${tr('add')} · ${eur(it.price*ui.dq)}</button>`:`<div class="notice">${!T?tr('scanToOrder'):tr('closedNow',{t:esc((conf.hours||{}).open)})}</div>`}`}
+    <button class="bigbtn" data-a="addD">${tr('add')} · ${eur(it.price*ui.dq)}</button>`:`<div class="notice">${!T?tr('scanToOrder'):esc(openMsg())}</div>`}`}
   if(ui.sheet==='cart'){const sum=cart.reduce((a,l)=>a+l.qty*l.price,0);
     return `<div class="shh"><h2 class="serif">${tr('cart')}</h2><button class="x" data-a="close">✕</button></div>
     <div class="notice" style="margin-top:0">${tr('table')} <b>${esc(T)}</b> · ${tr('confirmInfo')}</div>
     ${cart.map(l=>`<div class="line"><div class="f"><b>${esc(cleanName(l.name))}</b>${l.note?`<div class="muted" style="color:var(--mu);font-size:13px">${esc(l.note)}</div>`:''}<div style="color:var(--gold);font-size:14px">${eur(l.price*l.qty)}</div></div>
       <div class="qty"><button data-a="cq" data-x="${l.key}:-1">−</button><span>${l.qty}</span><button data-a="cq" data-x="${l.key}:1">+</button></div></div>`).join('')}
     <div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div>
-    <label>${tr('yourName')}</label><input id="gname" value="${esc(G.name||'')}" autocomplete="given-name" maxlength="24">
+    <label>${tr('yourName')}</label><input id="gname" value="${esc(G.name||'')}" autocomplete="given-name" maxlength="24"><div class="hint">💡 ${tr('nameHint')}</div>
     <button class="bigbtn" data-a="sendO" ${cart.length&&canOrder()?'':'disabled'}>${tr('send')}</button>
     <p style="color:var(--mu);font-size:13px;text-align:center">${tr('payInfo')}</p>`}
   if(ui.sheet==='pair'){const its=ui.arg.map(id=>conf.items.find(i=>i.id===id)).filter(Boolean);
@@ -397,13 +413,13 @@ const A={
       const items=cart.map(({name,price,qty,note,st,itemId})=>({name,price,qty,note,st,itemId}));
       const o={id:uid(),day:dayKey(),createdMs:Date.now(),table:T,session:s,guestId:G.gid,guestName:name||'',source:'guest',status:'pending',note:'',cancelled:false,st:{},items,by:Store.authUid()};
       await Store.setDoc('orders/'+o.id,o);
-      push(cfg,cfg.topic+'-service','🧾 Gastbestellung – Tisch '+T,(name?name+': ':'')+items.map(i=>i.qty+'× '+i.name+(i.note?' ('+i.note+')':'')).join('\n'),['bell']);
+      pushShift(cfg,shifts,s=>s.role==='waiter',cfg.topic+'-service','🧾 Gastbestellung – Tisch '+T,(name?name+': ':'')+items.map(i=>i.qty+'× '+i.name+(i.note?' ('+i.note+')':'')).join('\n'),['bell']);
       cart=[];saveCart();ui.sheet=null;ui.view='table';render();scrollTo(0,0);toast('✓ '+tr('sent'),'',5000)}
     catch(e){console.error(e);toast(tr('err'),'err',6000);el.disabled=false;el.textContent=tr('send')}},
   cancelO(x){if(confirm(tr('reallyCancel')))Store.updDoc('orders/'+x,{cancelled:true}).catch(()=>toast(tr('err'),'err'))},
   async callW(x){if(!T)return;if(Date.now()<ui.cooldown){toast(tr('tooFast'));return}ui.cooldown=Date.now()+60000;
     try{const id=uid();await Store.setDoc('calls/'+id,{table:T,type:x,day:dayKey(),createdMs:Date.now(),done:false,session:G.session||null,by:Store.authUid()});
-      push(cfg,cfg.topic+'-service',(x==='bill'?'🧾 Rechnung':'🙋 Service')+' – Tisch '+T,'',['bell']);
+      pushShift(cfg,shifts,s=>s.role==='waiter',cfg.topic+'-service',(x==='bill'?'🧾 Rechnung':'🙋 Service')+' – Tisch '+T,'',['bell']);
       toast(x==='bill'?tr('billCalled'):tr('called'),'',5000)}catch(e){ui.cooldown=0;toast(tr('err'),'err')}},
   wifi(){ui.sheet='wifi';render()},
   copy(x){navigator.clipboard?.writeText(x).then(()=>toast(tr('copied'))).catch(()=>{})}
@@ -419,12 +435,15 @@ async function start(){render();
   try{await Store.init()}catch(e){console.error(e);toast(tr('err'),'err',8000);return}
   Store.subDoc('config/main',c=>{if(c){conf=c;render()}});
   Store.subDoc('config/today',d=>{if(d!==undefined){today=d;render()}});
+  Store.subCol('shift','day',dayKey(),l=>{shifts=l},()=>{});
   if(T)Store.subDoc('tables/'+T,d=>{if(d===undefined)return;tableDoc=d;const s=d&&d.session;
     if(s&&G.session===s)join(s);
     else if(G.session&&s!==G.session){ if(G.had)ui.thanks=true; G={session:null,gid:null,name:G.name,had:false};saveG();orders=[];joinedS=null;unsubO&&unsubO();unsubO=null}
     render()});
 }
 setInterval(()=>{if(!ui.sheet)renderNav()},60000);
+let fadeQ=false;addEventListener('scroll',()=>{if(fadeQ)return;fadeQ=true;requestAnimationFrame(()=>{fadeQ=false;const im=document.querySelector('.hero .poster');if(!im)return;
+  const h=im.parentElement.offsetHeight||500,p=Math.min(1,Math.max(0,scrollY/(h*.85)));im.style.opacity=String(1-p);im.style.transform='translateY('+(scrollY*.25)+'px) scale('+(1+p*.06)+')'})},{passive:true});
 start();
 </script>
 </body>

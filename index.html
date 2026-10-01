@@ -20,7 +20,9 @@ html,body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,
 body.fa{font-family:Vazirmatn,system-ui,sans-serif}
 body{padding-bottom:calc(150px + env(safe-area-inset-bottom));min-height:100vh;overscroll-behavior-y:none}
 header{position:sticky;top:0;z-index:8;background:var(--bg);display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--ln)}
-.brand{font-weight:800;letter-spacing:.5px;color:var(--gd)}
+.brand{font-weight:800;letter-spacing:.5px;color:var(--gd);display:flex;align-items:center;gap:6px}
+.hlogo{height:34px;width:auto;display:block}.ver{font-size:10px;opacity:.5}
+.sig{text-align:center;font-size:11px;color:var(--mu);opacity:.7;margin:26px 0 6px;font-style:italic;letter-spacing:.3px}
 .role{font-size:13px;color:var(--mu);background:var(--sf2);padding:3px 9px;border-radius:999px}
 .sp{flex:1}
 .dot{width:10px;height:10px;border-radius:50%;background:var(--mu)}.dot.on{background:var(--ok)}.dot.off{background:var(--er)}
@@ -122,6 +124,29 @@ table.stat{width:100%;border-collapse:collapse}table.stat td{padding:6px 4px;bor
 .avrow span{flex:1}
 .wd{display:flex;gap:6px;flex-wrap:wrap}.wd button{min-height:38px;padding:6px 12px}
 .wd button.act{background:var(--gd);color:#1a1406;font-weight:700}
+.schema{width:100%;max-width:420px;display:block;margin:4px auto 6px}.sl{font:600 11px system-ui;fill:#eef2ef}.ss{font:10px system-ui;fill:#93a39c}.sd{font:800 11px system-ui;fill:#1a1406}
+.stage{padding:6px 4px 18px}.stage.tilt{perspective:900px}
+.floor{position:relative;aspect-ratio:16/10;border-radius:18px;background:repeating-linear-gradient(45deg,#1b2622 0 14px,#1e2a26 14px 28px);border:1px solid var(--ln);touch-action:none}
+.stage.tilt .floor{transform:rotateX(34deg);transform-origin:50% 100%;box-shadow:0 26px 36px #000b}
+.floor .fl{position:absolute;left:12px;top:8px;font-size:12px;color:var(--mu)}
+.ptb{position:absolute;transform:translate(-50%,-50%);width:15%;min-width:44px;aspect-ratio:1;min-height:0;padding:0;border-radius:12px;background:#33443e;border:1px solid #4a5d56;box-shadow:0 7px 0 #0e1512,0 10px 14px #0008;font-weight:900;font-size:17px;flex-direction:column;gap:0;touch-action:none}
+.ptb small{font-size:9px;font-weight:700;color:#1a1406}
+.ptb.po{background:var(--gd);color:#1a1406}.ptb.pp{background:var(--wa);color:#2a1a00;animation:pul 1.2s infinite}.ptb.pc{background:var(--er);color:#fff;animation:pul .8s infinite}.ptb.pr{background:var(--ok);color:#06200f}
+.ptb.drag{outline:3px solid #fff;z-index:5}
+.ptb:active{transform:translate(-50%,-50%) scale(.94)}
+@keyframes pul{50%{filter:brightness(1.35)}}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--mu);margin-top:6px}.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-inline-end:5px;vertical-align:-1px}
+.legend .po{background:var(--gd)}.legend .pp{background:var(--wa)}.legend .pc{background:var(--er)}.legend .pr{background:var(--ok)}
+#alarm.on{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:24px;animation:abl 1s steps(1) infinite}
+#alarm.a-call{--ac:#b3121a}#alarm.a-new{--ac:#c76a00}#alarm.a-ready{--ac:#13843f}
+@keyframes abl{0%{background:var(--ac)}50%{background:#000}}
+.alw{width:100%;max-width:520px;text-align:center;color:#fff}
+.ali{background:rgba(0,0,0,.55);border-radius:16px;padding:16px;margin-bottom:12px}
+.alm{font-size:28px;font-weight:900;line-height:1.2}.alb{font-size:17px;margin-top:8px;opacity:.95}
+.alok{width:100%;min-height:76px;font-size:26px;font-weight:900;background:#fff;color:#000;border-radius:18px;margin-top:8px}
+.shiftc{max-width:520px;margin:30px auto;text-align:center}
+.shiftc .big{font-size:26px}
+.duty{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--ln)}.duty span{flex:1}
 </style>
 </head>
 <body>
@@ -131,8 +156,10 @@ table.stat{width:100%;border-collapse:collapse}table.stat td{padding:6px 4px;bor
 <nav id="tabs"></nav>
 <div id="sheet"></div>
 <div id="toast"></div>
+<div id="alarm"></div>
 <script type="module">
-import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,ZONES,zoneOf,isTerrace} from './store.js';
+import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,ZONES,zoneOf as zoneOf0,zonesOf,zonesFromLegacy,allTablesOf,DEFAULT_WEEK,weekOf,staffActive,nextOpen,dayHours,personalTopic,pushShift} from './store.js';
+const zoneOf=t=>zoneOf0(t,conf);
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur=n=>'<bdi>'+(Math.round((+n||0)*100)/100).toFixed(2).replace('.',',')+' €</bdi>';
@@ -169,11 +196,11 @@ const FA={
 'Öffnungszeiten':'ساعت کاری','von':'از','bis':'تا','Gäste-WLAN':'وای‌فای مهمان','Name (SSID)':'نام شبکه','Passwort':'رمز','Admin-PIN':'پین مدیریت','Kein Admin-Zugang auf diesem Gerät':'این گوشی دسترسی مدیریت ندارد','Gerät freischalten':'فعال‌سازی گوشی','Einmalig pro Handy: Zugangscode vom Chef eingeben.':'فقط یک بار برای هر گوشی: کد دسترسی را از مدیر بگیرید و وارد کنید.','Zugangscode':'کد دسترسی','Freischalten':'فعال‌سازی','Freigeschaltet':'فعال شد','Falscher Code':'کد اشتباه است','Freigeschaltete Geräte':'گوشی‌های فعال‌شده','Verlorenes Handy oder Ex-Mitarbeiter? Hier entfernen.':'گوشی گم شده یا همکار رفته؟ از اینجا حذف کنید.','dieses Gerät':'همین گوشی','Gerät entfernen?':'این گوشی حذف شود؟','Leer = kein PIN':'خالی = بدون پین',
 'Gast-Seite testen':'تست صفحه‌ی مهمان','Öffnen':'باز کردن','Falscher PIN':'پین اشتباه','+ Kategorie':'+ دسته','+ Artikel':'+ آیتم','Kategorie':'دسته','Löschen':'حذف',
 'Original-Speisekarte laden':'بارگذاری منوی اصلی','Tische (mit Komma getrennt)':'میزها (با کاما)','Anzahl Bestellungen':'تعداد سفارش','pro Kellner':'به تفکیک گارسون','Top-Artikel':'پرفروش‌ها',
-'Laden…':'در حال بارگذاری…','Fehler':'خطا','Verbindung trennen / neu einrichten':'قطع اتصال / راه‌اندازی دوباره','Sprache':'زبان','Gast':'مهمان',
+'Laden…':'در حال بارگذاری…','Liste':'لیست','Plan':'نقشه','Gesehen':'دیدم','wartet seit 2 Min.':'۲ دقیقه است منتظره','Geschlossen':'بسته است','Öffnet':'باز می‌شه','um':'ساعت','App aktiv ab':'اپ فعال از','Außerhalb der Arbeitszeit kommen keine Benachrichtigungen.':'خارج از ساعت کاری هیچ اعلانی نمیاد.','heute':'امروز','morgen':'فردا','Hallo':'سلام','Schicht beginnen':'شروع شیفت','Erst nach Schichtbeginn bekommst du Bestellungen und Alarme.':'فقط بعد از شروع شیفت سفارش و هشدار دریافت می‌کنی.','Schicht begonnen':'شیفت شروع شد','Schicht wirklich beenden?':'واقعاً شیفت تموم بشه؟','Schicht beendet':'شیفت تموم شد','Schicht beenden?':'شیفت تموم بشه؟','Schicht beenden':'پایان شیفت','Dein persönlicher Kanal – nur diesen in ntfy abonnieren':'کانال شخصی تو – فقط همین رو در ntfy دنبال کن','Getrennt zahlen':'جدا حساب کردن','Zahler antippen, dann Artikel antippen, um sie zuzuordnen. Wer zusammen zahlt, bekommt denselben Buchstaben.':'اول پرداخت‌کننده رو بزن، بعد آیتم‌ها رو تا بهش اختصاص داده بشن. کسایی که با هم حساب می‌کنن، یک حرف می‌گیرن.','Zahler':'پرداخت‌کننده','Nicht zugeordnet':'اختصاص داده نشده','Rest →':'بقیه ←','Bereiche & Tische':'بخش‌ها و میزها','Tisch antippen = entfernen. Nummern mit Komma trennen.':'زدن روی میز = حذف. شماره‌ها رو با کاما جدا کن.','Shisha erlaubt (Terrasse)':'قلیان مجاز (تراس)','z. B. 24, 25':'مثلاً 24, 25','Bereich':'بخش','Tischplan':'نقشه‌ی میزها','Plan bearbeiten':'ویرایش نقشه','Plan drucken':'چاپ نقشه','QR-Tischkarten (A6)':'کارت‌های QR میز (A6)','Untere 3 cm stecken im Ständer. Druck: A6, randlos / „Tatsächliche Größe“.':'۳ سانت پایین داخل پایه می‌ره. چاپ: A6، بدون حاشیه / «اندازه‌ی واقعی».','Rückseite mit WLAN-QR':'پشت کارت با QR وای‌فای','Alle Tische':'همه‌ی میزها','Personal-App aktiv: 30 Min. vor Öffnung bis 60 Min. nach Schluss.':'اپ کارکنان: از ۳۰ دقیقه قبل از باز شدن تا ۶۰ دقیقه بعد از بسته شدن فعاله.','Ruhetag':'تعطیل','Auf Gast-Seite anzeigen':'نمایش در صفحه‌ی مهمان','Neuer Bereich':'بخش جدید','Bereich mit Tischen löschen?':'بخش با میزهاش حذف بشه؟','Schon vorhanden':'از قبل هست','Im Dienst':'سر کار','seit':'از','Niemand im Dienst':'کسی سر کار نیست','Keine Tische':'میزی نیست','Tische mit dem Finger an die richtige Stelle ziehen.':'میزها رو با انگشت به جای درستشون بکش.','Automatisch anordnen':'چیدمان خودکار','besetzt':'پر','wartet':'منتظر','Ruf/Rechnung':'صدا/صورت‌حساب','abholbereit':'آماده‌ی تحویل','Neu laden':'بارگذاری دوباره','Fehler':'خطا','Verbindung trennen / neu einrichten':'قطع اتصال / راه‌اندازی دوباره','Sprache':'زبان','Gast':'مهمان',
 'Neue Bestellungen per Push (für Küche/Bar/Shisha in der ntfy-App abonnieren):':'سفارش جدید به صورت پوش (در اپ ntfy برای آشپزخانه/بار/قلیان مشترک شو):',
 'Demo testen (nur dieses Gerät)':'تست دمو (فقط همین گوشی)','frei':'خالی','Wird bestätigt':'منتظر تأیید','Mo':'دوشنبه','Di':'سه‌شنبه','Mi':'چهارشنبه','Do':'پنج‌شنبه','Fr':'جمعه','Sa':'شنبه','So':'یکشنبه'
 };
-let acc={checked:false,staff:false,admin:false},devs={staff:[],admins:[]},dataOn=false;
+let accC=LS.get('zb_acc',null),acc=accC?{checked:true,staff:!!accC.staff,admin:!!accC.admin}:{checked:false,staff:false,admin:false},devs={staff:[],admins:[]},dataOn=false;
 const C0=c=>{const {pin,id,...r}=c||{};return r};
 let me=LS.get('zb_me',{name:'',role:null,station:'kueche',lang:'de',alertAll:false,wake:true});
 const t=k=>me.lang==='fa'?(FA[k]??k):k;
@@ -184,7 +211,12 @@ const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
 const MENU={"cats":[{"id":"vor","name":"Vorspeisen","st":"kueche"},{"id":"sup","name":"Suppen","st":"kueche"},{"id":"sal","name":"Salate","st":"kueche"},{"id":"per","name":"Persisch & Afghanisch","st":"kueche"},{"id":"gri","name":"Vom Grill","st":"kueche"},{"id":"oes","name":"Österreichisch","st":"kueche"},{"id":"piz","name":"Pizza","st":"kueche"},{"id":"pas","name":"Pasta","st":"kueche"},{"id":"bur","name":"Burger (mit Pommes)","st":"kueche"},{"id":"bei","name":"Beilagen & Dips","st":"kueche"},{"id":"hei","name":"Heiße Getränke","st":"bar"},{"id":"alf","name":"Alkoholfrei","st":"bar"},{"id":"bie","name":"Bier & Radler","st":"bar"},{"id":"ape","name":"Aperitif & Prosecco","st":"bar"},{"id":"coc","name":"Cocktails & Longdrinks","st":"bar"},{"id":"wei","name":"Wein","st":"bar"},{"id":"sch","name":"Schnaps & Digestif","st":"bar"},{"id":"shi","name":"Shisha","st":"shisha"}],"items":[{"id":"m0","cat":"vor","name":"Kashke Bademjan","price":7.0},{"id":"m1","cat":"vor","name":"Bolani","price":7.9},{"id":"m2","cat":"vor","name":"Sambosa 4 Stk.","price":9.8},{"id":"m3","cat":"vor","name":"Bamieh 🌱","price":6.9},{"id":"m4","cat":"vor","name":"Bruschetta al Pomodoro","price":7.9},{"id":"m5","cat":"vor","name":"Caprese","price":12.9},{"id":"m6","cat":"vor","name":"Burrata mit Tomaten & Rucola","price":14.9},{"id":"m7","cat":"vor","name":"Carpaccio di Manzo","price":16.9},{"id":"m8","cat":"vor","name":"Antipasti-Teller","price":15.9},{"id":"m9","cat":"vor","name":"Focaccia","price":6.9},{"id":"m10","cat":"sup","name":"Frittatensuppe","price":5.5},{"id":"m11","cat":"sup","name":"Grießnockerlsuppe","price":5.5},{"id":"m12","cat":"sup","name":"Zirlerberg Spezial Suppe","price":7.8},{"id":"m13","cat":"sup","name":"Afghanische Suppe","price":6.5},{"id":"m14","cat":"sup","name":"Ash Reshteh","price":7.9},{"id":"m15","cat":"sal","name":"Gemischter Salat","price":5.5},{"id":"m16","cat":"sal","name":"Shirazi-Salat","price":4.5},{"id":"m17","cat":"sal","name":"Saisonsalat","price":4.5},{"id":"m18","cat":"sal","name":"Krautsalat","price":5.9},{"id":"m19","cat":"per","name":"Baqali Polo","price":25.9},{"id":"m20","cat":"per","name":"Sabzi Polo ba Mahi","price":25.9},{"id":"m21","cat":"per","name":"Shevid Polo ba Mahicheh","price":26.9},{"id":"m22","cat":"per","name":"Zereshk Polo","price":18.0},{"id":"m23","cat":"per","name":"Kabuli Palau","price":25.9},{"id":"m24","cat":"per","name":"Chicken Karahi (ca. 30 Min.)","price":21.9},{"id":"m25","cat":"per","name":"Lamm Karahi (ca. 30 Min.)","price":25.9},{"id":"m26","cat":"per","name":"Ashak","price":14.9},{"id":"m27","cat":"per","name":"Mantu","price":18.0},{"id":"m28","cat":"per","name":"Ghormeh Sabzi","price":15.9},{"id":"m29","cat":"per","name":"Gheimeh","price":13.9},{"id":"m30","cat":"per","name":"Portion Safranreis","price":6.9},{"id":"m31","cat":"gri","name":"Kabab Koobideh 2 Stk.","price":18.0},{"id":"m32","cat":"gri","name":"Joojeh Kabab 2 Stk.","price":18.9},{"id":"m33","cat":"gri","name":"Tikka Kabab","price":25.0},{"id":"m34","cat":"gri","name":"Grillteller","price":58.9},{"id":"m35","cat":"gri","name":"Mix Koobideh & Joojeh","price":22.0},{"id":"m36","cat":"oes","name":"Hühnerschnitzel Wiener Art","price":16.2},{"id":"m37","cat":"oes","name":"Schweineschnitzel Wiener Art","price":15.2},{"id":"m38","cat":"oes","name":"Hühner Cordon Bleu","price":18.2},{"id":"m39","cat":"oes","name":"Schweine Cordon Bleu","price":17.2},{"id":"m40","cat":"piz","name":"1. Margherita","price":13.4},{"id":"m41","cat":"piz","name":"2. Salami","price":15.4},{"id":"m42","cat":"piz","name":"3. Prosciutto","price":15.4},{"id":"m43","cat":"piz","name":"4. Funghi","price":15.0},{"id":"m44","cat":"piz","name":"5. Prosciutto e Funghi","price":16.4},{"id":"m45","cat":"piz","name":"6. Diavolo 🌶","price":17.0},{"id":"m46","cat":"piz","name":"7. Tonno","price":17.0},{"id":"m47","cat":"piz","name":"8. Hawaii","price":16.4},{"id":"m48","cat":"piz","name":"9. Quattro Formaggi","price":17.4},{"id":"m49","cat":"piz","name":"10. Vegetariana 🌱","price":16.4},{"id":"m50","cat":"piz","name":"11. Capricciosa","price":17.4},{"id":"m51","cat":"piz","name":"12. Quattro Stagioni","price":18.0},{"id":"m52","cat":"piz","name":"13. Frutti di Mare","price":19.4},{"id":"m53","cat":"piz","name":"14. Rucola","price":17.4},{"id":"m54","cat":"piz","name":"15. Pizza Zirlerberg ★","price":19.4},{"id":"m55","cat":"pas","name":"16. Spaghetti Bolognese","price":14.9},{"id":"m56","cat":"pas","name":"17. Spaghetti Carbonara","price":14.9},{"id":"m57","cat":"pas","name":"18. Aglio e Olio 🌶","price":12.9},{"id":"m58","cat":"pas","name":"19. Penne Arrabbiata 🌶","price":13.9},{"id":"m59","cat":"pas","name":"20. Spaghetti Napoli","price":12.9},{"id":"m60","cat":"pas","name":"21. Pasta al Pesto","price":14.5},{"id":"m61","cat":"pas","name":"22. Lasagne al Forno","price":15.9},{"id":"m62","cat":"pas","name":"23. Spaghetti alle Vongole","price":18.9},{"id":"m63","cat":"pas","name":"24. Spaghetti Frutti di Mare","price":19.9},{"id":"m64","cat":"pas","name":"25. Penne Quattro Formaggi","price":15.5},{"id":"m65","cat":"bur","name":"26. Classic Beef Burger","price":15.9},{"id":"m66","cat":"bur","name":"27. Cheeseburger","price":16.9},{"id":"m67","cat":"bur","name":"28. Crispy Chicken Burger","price":16.9},{"id":"m68","cat":"bur","name":"29. BBQ Bacon Burger","price":17.9},{"id":"m69","cat":"bur","name":"30. Zirlerberg Burger ★","price":18.9},{"id":"m70","cat":"bei","name":"Mast o Khiar","price":4.5},{"id":"m71","cat":"bei","name":"Mast o Musir","price":3.9},{"id":"m72","cat":"bei","name":"Torshi","price":3.9},{"id":"m73","cat":"bei","name":"Zeytoon Parvardeh","price":5.9},{"id":"m74","cat":"hei","name":"Espresso","price":3.9},{"id":"m75","cat":"hei","name":"Doppelter Espresso","price":5.3},{"id":"m76","cat":"hei","name":"Verlängerter","price":4.6},{"id":"m77","cat":"hei","name":"Cappuccino","price":5.7},{"id":"m78","cat":"hei","name":"Caffè Latte","price":5.9},{"id":"m79","cat":"hei","name":"Latte Macchiato","price":5.5},{"id":"m80","cat":"hei","name":"Heiße Schokolade","price":6.2},{"id":"m81","cat":"hei","name":"Tee","price":4.7},{"id":"m82","cat":"hei","name":"Persischer Safrantee","price":5.7},{"id":"m83","cat":"hei","name":"Afghanischer Chai","price":5.3},{"id":"m84","cat":"hei","name":"Affogato","price":6.9},{"id":"m85","cat":"alf","name":"Coca-Cola 0,3","price":4.2},{"id":"m86","cat":"alf","name":"Coca-Cola 0,5","price":5.2},{"id":"m87","cat":"alf","name":"Coca-Cola Zero 0,3","price":4.2},{"id":"m88","cat":"alf","name":"Coca-Cola Zero 0,5","price":5.2},{"id":"m89","cat":"alf","name":"Fanta 0,3","price":4.2},{"id":"m90","cat":"alf","name":"Fanta 0,5","price":5.2},{"id":"m91","cat":"alf","name":"Sprite 0,3","price":4.2},{"id":"m92","cat":"alf","name":"Sprite 0,5","price":5.2},{"id":"m93","cat":"alf","name":"Almdudler 0,3","price":4.2},{"id":"m94","cat":"alf","name":"Almdudler 0,5","price":5.2},{"id":"m95","cat":"alf","name":"Eistee Pfirsich 0,3","price":4.2},{"id":"m96","cat":"alf","name":"Eistee Pfirsich 0,5","price":5.2},{"id":"m97","cat":"alf","name":"Eistee Zitrone 0,3","price":4.2},{"id":"m98","cat":"alf","name":"Eistee Zitrone 0,5","price":5.2},{"id":"m99","cat":"alf","name":"Apfelsaft gespritzt 0,3","price":4.0},{"id":"m100","cat":"alf","name":"Apfelsaft gespritzt 0,5","price":4.9},{"id":"m101","cat":"alf","name":"Soda Zitrone 0,3","price":3.8},{"id":"m102","cat":"alf","name":"Soda Zitrone 0,5","price":4.5},{"id":"m103","cat":"alf","name":"Pago Fruchtsaft 0,2","price":4.5},{"id":"m104","cat":"alf","name":"Red Bull 0,25","price":5.2},{"id":"m105","cat":"alf","name":"Mineral still/prickelnd 0,33","price":3.9},{"id":"m106","cat":"bie","name":"Bier vom Fass 0,3","price":4.5},{"id":"m107","cat":"bie","name":"Bier vom Fass 0,5","price":5.5},{"id":"m108","cat":"bie","name":"Weizenbier 0,5","price":5.9},{"id":"m109","cat":"bie","name":"Alkoholfreies Bier 0,5","price":5.5},{"id":"m110","cat":"bie","name":"Alkoholfreies Weizen 0,5","price":5.9},{"id":"m111","cat":"bie","name":"Radler süß 0,3","price":4.5},{"id":"m112","cat":"bie","name":"Radler süß 0,5","price":5.5},{"id":"m113","cat":"bie","name":"Radler sauer 0,3","price":4.5},{"id":"m114","cat":"bie","name":"Radler sauer 0,5","price":5.5},{"id":"m115","cat":"ape","name":"Prosecco 0,1","price":5.8},{"id":"m116","cat":"ape","name":"Prosecco Flasche 0,75","price":29.9},{"id":"m117","cat":"ape","name":"Prosecco Orange","price":6.9},{"id":"m118","cat":"ape","name":"Sommerspritzer 1/4","price":5.8},{"id":"m119","cat":"ape","name":"Campari Soda","price":5.8},{"id":"m120","cat":"ape","name":"Campari Orange","price":6.9},{"id":"m121","cat":"ape","name":"Campari Spritz","price":8.9},{"id":"m122","cat":"ape","name":"Alkoholfreier Aperitif Spritz","price":7.9},{"id":"m123","cat":"coc","name":"Aperol Spritz","price":8.9},{"id":"m124","cat":"coc","name":"Hugo","price":8.9},{"id":"m125","cat":"coc","name":"Lillet Wild Berry","price":8.9},{"id":"m126","cat":"coc","name":"Limoncello Spritz","price":8.9},{"id":"m127","cat":"coc","name":"Mojito","price":9.5},{"id":"m128","cat":"coc","name":"Piña Colada","price":9.5},{"id":"m129","cat":"coc","name":"Gin Tonic","price":8.9},{"id":"m130","cat":"coc","name":"Vodka Lemon","price":8.9},{"id":"m131","cat":"coc","name":"Vodka Tonic","price":8.9},{"id":"m132","cat":"coc","name":"Vodka Red Bull","price":9.5},{"id":"m133","cat":"coc","name":"Cuba Libre","price":8.9},{"id":"m134","cat":"coc","name":"Whiskey Cola","price":8.9},{"id":"m135","cat":"coc","name":"Tequila Shot 2 cl","price":4.5},{"id":"m136","cat":"coc","name":"Tequila Shot doppelt 4 cl","price":8.8},{"id":"m137","cat":"coc","name":"Jägermeister 2 cl","price":4.5},{"id":"m138","cat":"wei","name":"Weißwein Grüner Veltliner 1/8","price":4.5},{"id":"m139","cat":"wei","name":"Weißwein Grüner Veltliner 1/4","price":8.5},{"id":"m140","cat":"wei","name":"Rotwein Zweigelt 1/8","price":4.5},{"id":"m141","cat":"wei","name":"Rotwein Zweigelt 1/4","price":8.5},{"id":"m142","cat":"wei","name":"Weißer Spritzer 1/4","price":4.5},{"id":"m143","cat":"wei","name":"Weißer Spritzer süß 1/4","price":4.5},{"id":"m144","cat":"wei","name":"Roter Spritzer 1/4","price":4.5},{"id":"m145","cat":"wei","name":"Hauswein weiß 1 l Flasche","price":24.9},{"id":"m146","cat":"wei","name":"Hauswein rot 1 l Flasche","price":24.9},{"id":"m147","cat":"wei","name":"Rotwein Zweigelt Flasche 0,75","price":26.9},{"id":"m148","cat":"sch","name":"Williams 2 cl","price":4.9},{"id":"m149","cat":"sch","name":"Birne 2 cl","price":4.9},{"id":"m150","cat":"sch","name":"Marille 2 cl","price":4.9},{"id":"m151","cat":"sch","name":"Obstler 2 cl","price":4.9},{"id":"m152","cat":"sch","name":"Ramazzotti 2 cl","price":4.8},{"id":"m153","cat":"sch","name":"Averna 2 cl","price":4.8},{"id":"m154","cat":"sch","name":"Whiskey 2 cl","price":4.9},{"id":"m155","cat":"sch","name":"Wodka 2 cl","price":4.5},{"id":"m156","cat":"sch","name":"Weißer Rum 2 cl","price":4.9},{"id":"m157","cat":"sch","name":"Limoncello 2 cl","price":4.8}]};
 const SHISHA=[['Love 66','Honigmelone, Wassermelone, Maracuja, Minze','Honeydew, watermelon, passion fruit, mint'],['LOV Hamburg','Beerenmix mit Melone','Berry mix with melon'],['I. KTZ','Kaktusfeige, eisig','Prickly pear, icy'],['Red Smash','Wassermelone','Watermelon'],['Crystal Yellow','Zitrone, eisig','Lemon, icy'],['The Double Crunch','Doppelapfel mit Anis','Double apple with aniseed']];
 function allTables(){const a=[];for(const z of ZONES)for(let i=z.from;i<=z.to;i++)a.push(String(i));return a}
-function migrate(c){if(c.v2)return null;const n=structuredClone(c);
+function migrate3(c){if(c.v3)return null;const n=structuredClone(c);
+  if(!n.week)n.week=structuredClone(DEFAULT_WEEK);
+  if(!Array.isArray(n.zones))n.zones=zonesFromLegacy(n.tables);
+  n.wifi={ssid:'',pass:'',show:false,...(n.wifi||{})};
+  n.plan=n.plan||{};n.v3=true;return n}
+function migrate(c){if(c.v2)return migrate3(c);const n=structuredClone(c);
   n.tables=allTables();
   if(!n.cats.some(x=>x.id==='shi'))n.cats.push({id:'shi',name:'Shisha',st:'shisha'});
   if(!n.items.some(i=>i.cat==='shi')){SHISHA.forEach(([nm,d,e],k)=>n.items.push({id:'sh'+(k+1),cat:'shi',name:'Shisha '+nm,price:25,d,e}));
@@ -192,14 +224,17 @@ function migrate(c){if(c.v2)return null;const n=structuredClone(c);
     n.items.push({id:'sh8',cat:'shi',name:'Kohle nachlegen',price:0,d:'Gratis',e:'Free'})}
   n.hours=n.hours||{open:'10:00',close:'21:00'};
   n.links=n.links||{google:'https://g.page/r/CZz7oHxM7ryiEBM/review',insta:'https://www.instagram.com/restaurantamzirlerberg/'};
-  n.wifi=n.wifi||{ssid:'',pass:''};n.v2=true;return n}
+  n.wifi=n.wifi||{ssid:'',pass:''};n.v2=true;return migrate3(n)||n}
 const SAMPLE={pin:'',cats:MENU.cats,items:MENU.items,tables:[]};
 
 /* ============ State ============ */
 let cfg=LS.get('zb_cfg',null)||DEFAULT_CFG;
 if(location.hash.startsWith('#setup=')){try{cfg=JSON.parse(b64d(location.hash.slice(7)));LS.set('zb_cfg',cfg)}catch(e){alert('Link ungültig')}history.replaceState(null,'',location.pathname+location.search)}
-let Store=null,conf=null,today=null,templates={},tables={},orders=[],calls=[],connected=false,pending=false;
-let prevO=null,prevC=null,unsubDay=[],subDay=null;
+let Store=null,conf=LS.get('zb_conf',null),today=LS.get('zb_today',null),templates={},tables={},orders=[],calls=[],connected=false,pending=false;
+let prevO=null,prevC=null,unsubDay=[],subDay=null,shifts=[],alarms=[],alarmT=null;
+const myUid=()=>Store&&Store.authUid?Store.authUid():null;
+const myShift=()=>shifts.find(s=>s.id===myUid()&&s.day===dayKey());
+const onShift=()=>!!myShift();
 let cart=LS.get('zb_cart',[]);
 const ui={wtab:'tische',order:LS.get('zb_order_table',null),cat:null,sheet:null,sheetArg:null,ktab:'open',atab:'heute',draft:null,adminOk:false,onote:'',seen:new Set(),wd:new Date().getDay(),deferredInstall:null};
 const saveMe=()=>LS.set('zb_me',me);
@@ -233,49 +268,82 @@ const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 async function notify(title,body){try{if(!('Notification' in window)||Notification.permission!=='granted'||document.visibilityState==='visible')return;
   const r=await navigator.serviceWorker?.getRegistration();if(r)r.showNotification(title,{body,tag:uid(),vibrate:[300,100,300],icon:'icon-192.png'});else new Notification(title,{body})}catch(e){}}
 function toast(msg,kind='',ms=4500){const d=document.createElement('div');d.className='toast '+kind;d.textContent=msg;d.onclick=()=>d.remove();$('#toast').appendChild(d);setTimeout(()=>d.remove(),ms)}
-function alert2(kind,msg,body,cls){sound(kind);vib(kind==='ready'?[400,150,400,150,700]:[200,100,200,100,200]);toast(msg,cls,8000);notify(msg,body||'')}
+function alert2(kind,msg,body,cls,key){if(!onShift())return;notify(msg,body||'');
+  const k=key||msg;if(!alarms.some(a=>a.k===k))alarms.push({k,kind,msg,body:body||'',at:Date.now()});ring();renderAlarm()}
+function ring(){if(!alarms.length){clearInterval(alarmT);alarmT=null;return}const k=alarms[alarms.length-1].kind;sound(k);vib(k==='ready'?[400,150,400,150,700]:[300,120,300,120,300]);
+  if(!alarmT)alarmT=setInterval(()=>{if(!alarms.length){clearInterval(alarmT);alarmT=null;return}const k=alarms[alarms.length-1].kind;sound(k);vib([300,120,300])},3000)}
+function renderAlarm(){const el=$('#alarm');if(!alarms.length){el.innerHTML='';el.className='';return}
+  const k=alarms.some(a=>a.kind==='call'||a.kind==='esc')?'a-call':alarms.some(a=>a.kind==='new')?'a-new':'a-ready';
+  el.className='on '+k;el.innerHTML=`<div class="alw">${alarms.slice(-5).reverse().map(a=>`<div class="ali"><div class="alm">${esc(a.msg)}</div>${a.body?`<div class="alb">${esc(a.body).replace(/\n/g,'<br>')}</div>`:''}</div>`).join('')}
+   ${alarms.length>5?`<div class="alb">+${alarms.length-5}</div>`:''}<button class="alok" data-a="seen">${t('Gesehen')} ✓</button></div>`}
 
 function onOrders(list){
   const first=prevO===null,np=new Map();
   for(const o of list){np.set(o.id,o);if(first)continue;const p=prevO.get(o.id);
     if(me.role==='kitchen'){const s=me.station;
       const nowNew=valid(o)&&o.st?.[s]==='neu', wasNew=p&&valid(p)&&p.st?.[s];
-      if(nowNew&&!wasNew){ui.seen.add(o.id);alert2('new','🔔 '+t('Neue Bestellung')+' – '+t('Tisch')+' '+o.table,itemsText(o,s),'info')}
+      if(nowNew&&!wasNew){ui.seen.add(o.id);alert2('new','🔔 '+t('Neue Bestellung')+' – '+t('Tisch')+' '+o.table,itemsText(o,s),'info','k'+o.id)}
       if(p&&!p.cancelled&&o.cancelled&&o.st?.[s])toast('✖ '+t('Tisch')+' '+o.table+' – '+t('Storniert'),'err',8000)}
     if(me.role==='waiter'){
-      if(o.status==='pending'&&!o.cancelled&&(!p||p.status!=='pending'))alert2('new','🧾 '+t('Neue Gastbestellung')+' – '+t('Tisch')+' '+o.table,itemsText(o),'info');
+      if(o.status==='pending'&&!o.cancelled&&(!p||p.status!=='pending'))alert2('new','🧾 '+t('Neue Gastbestellung')+' – '+t('Tisch')+' '+o.table,itemsText(o),'info','o'+o.id);
+      if(o.status==='pending'&&!o.cancelled&&o.escMs&&p&&!p.escMs)alert2('esc','⚠ '+t('Tisch')+' '+o.table+' '+t('wartet seit 2 Min.'),itemsText(o),'err','e'+o.id);
+      if(p&&p.status==='pending'&&o.status!=='pending')dropAlarm('o'+o.id,'e'+o.id);
       if(me.alertAll||norm(o.waiter)===norm(me.name))for(const s of Object.keys(o.st||{}))if(o.st[s]==='fertig'&&p?.st?.[s]!=='fertig')
-        alert2('ready','✅ '+t('Tisch')+' '+o.table+' – '+t(STN[s])+' '+t('fertig'),itemsText(o,s))}
+        alert2('ready','✅ '+t('Tisch')+' '+o.table+' – '+t(STN[s])+' '+t('fertig'),itemsText(o,s),'','r'+o.id+s)}
   }
   prevO=np;orders=list;render()}
 function onCalls(list){
   const first=prevC===null,np=new Map();
-  for(const c of list){np.set(c.id,c);if(!first&&me.role==='waiter'&&!c.done&&!prevC.has(c.id))
-    alert2('call',(c.type==='bill'?'🧾 ':'🙋 ')+t('Tisch')+' '+c.table+' – '+t(c.type==='bill'?'Rechnung gewünscht':'Kellner gerufen'),'','err')}
+  for(const c of list){np.set(c.id,c);if(first||me.role!=='waiter')continue;const p=prevC.get(c.id);
+    if(!c.done&&!p)alert2('call',(c.type==='bill'?'🧾 ':'🙋 ')+t('Tisch')+' '+c.table+' – '+t(c.type==='bill'?'Rechnung gewünscht':'Kellner gerufen'),'','err','c'+c.id);
+    if(!c.done&&c.escMs&&p&&!p.escMs)alert2('esc','⚠ '+t('Tisch')+' '+c.table+' '+t('wartet seit 2 Min.'),t(c.type==='bill'?'Rechnung gewünscht':'Kellner gerufen'),'err','ce'+c.id);
+    if(c.done&&p&&!p.done)dropAlarm('c'+c.id,'ce'+c.id)}
   prevC=np;calls=list;render()}
 
+function dropAlarm(...ks){const n=alarms.length;alarms=alarms.filter(a=>!ks.includes(a.k));if(alarms.length!==n){renderAlarm();if(!alarms.length)ring()}}
+/* Eskalation: nach 2 Min. unbestätigt -> alle Kellner */
+const ESC_MS=120000;
+function escalate(){if(me.role!=='waiter'||!onShift()||!Store)return;const now=Date.now();
+  for(const o of pendingOf())if(!o.escMs&&now-o.createdMs>ESC_MS){o.escMs=now;write(Store.updDoc('orders/'+o.id,{escMs:now}));
+    alert2('esc','⚠ '+t('Tisch')+' '+o.table+' '+t('wartet seit 2 Min.'),itemsText(o),'err','e'+o.id);
+    pushShift(cfg,shifts,s=>s.role==='waiter',topicService(),'⚠ Tisch '+o.table+' wartet seit 2 Min.','Gastbestellung noch nicht bestätigt',['warning'])}
+  for(const c of openCalls())if(!c.escMs&&now-c.createdMs>ESC_MS){c.escMs=now;write(Store.updDoc('calls/'+c.id,{escMs:now}));
+    alert2('esc','⚠ '+t('Tisch')+' '+c.table+' '+t('wartet seit 2 Min.'),t(c.type==='bill'?'Rechnung gewünscht':'Kellner gerufen'),'err','ce'+c.id);
+    pushShift(cfg,shifts,s=>s.role==='waiter',topicService(),'⚠ Tisch '+c.table+' wartet seit 2 Min.',c.type==='bill'?'Rechnung gewünscht':'Kellner gerufen',['warning'])}}
+setInterval(escalate,15000);
 /* ============ Rendering ============ */
 const isEditing=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.closest('#main,#sheet')};
 addEventListener('focusout',()=>setTimeout(()=>{if(pending&&!isEditing()){pending=false;render()}},50));
 function renderHeader(){
   const rl=me.role==='waiter'?t('Service')+(me.name?' · '+esc(me.name):''):me.role==='kitchen'?STI[me.station]+' '+t(STN[me.station]):me.role==='admin'?t('Admin'):'';
-  $('#hdr').innerHTML=`<span class="brand">ZIRLERBERG <span style="font-size:10px;opacity:.5">v8</span></span>${rl?`<span class="role">${rl}</span>`:''}<span class="sp"></span>
+  $('#hdr').innerHTML=`<span class="brand"><img src="logo.png" alt="Zirlerberg" class="hlogo"><span class="ver">v10</span></span>${rl?`<span class="role">${rl}</span>`:''}<span class="sp"></span>
    <span class="dot ${connected?'on':'off'}"></span>${me.role?`<button class="ico" data-a="settings">⚙︎</button>`:''}`}
 function render(){
   document.documentElement.lang=me.lang;document.documentElement.dir=me.lang==='fa'?'rtl':'ltr';document.body.classList.toggle('fa',me.lang==='fa');
   renderHeader();
   if(isEditing()){pending=true;return}
   let main='',tabs='',bar='';
-  if(cfg.mode==='fb'&&!acc.checked)main=`<p class="empty">${t('Laden…')}</p>`;
+  if(cfg.mode==='fb'&&!acc.checked)main=loadingView();
   else if(cfg.mode==='fb'&&!acc.staff&&!acc.admin)main=codeView();
   else if(!me.role||(me.role==='admin'&&cfg.mode==='fb'&&!acc.admin))main=roleView();
-  else if(!conf)main=`<p class="empty">${t('Laden…')}</p>`;
+  else if(!conf)main=loadingView();
+  else if((me.role==='waiter'||me.role==='kitchen')&&!staffActive(conf))main=closedView();
+  else if((me.role==='waiter'||me.role==='kitchen')&&!onShift())main=startShiftView();
   else if(me.role==='waiter')[main,tabs,bar]=waiterView();
   else if(me.role==='kitchen')[main,tabs]=kitchenView();
   else if(me.role==='admin')[main,tabs]=adminView();
   $('#main').innerHTML=main;$('#tabs').innerHTML=tabs;$('#cartbar').innerHTML=bar;
   $('#sheet').innerHTML=ui.sheet?`<div class="sheetbg" data-a="closeSheet"><div class="sheetc">${sheetView()}</div></div>`:'';
 }
+function closedView(){const n=nextOpen(conf);const wd=n?(n.inDays===0?t('heute'):n.inDays===1?t('morgen'):t(WD[n.d.getDay()])):'';
+  return `<div class="shiftc"><div style="font-size:60px">🌙</div><h2>${t('Geschlossen')}</h2>${n?`<p class="muted">${t('Öffnet')} ${esc(wd)} ${t('um')} ${esc(n.o)} · ${t('App aktiv ab')} ${esc(minus30(n.o))}</p>`:''}
+  <p class="muted sm">${t('Außerhalb der Arbeitszeit kommen keine Benachrichtigungen.')}</p></div>`}
+const minus30=s=>{let [a,b]=s.split(':').map(Number);let m=a*60+b-30;return String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0')};
+function startShiftView(){const r=me.role==='waiter'?'🧾 '+t('Service'):STI[me.station]+' '+t(STN[me.station]);
+  return `<div class="shiftc"><div style="font-size:56px">👋</div><h2>${t('Hallo')} ${esc(me.name||'')}</h2><p class="muted">${r}</p>
+  <button class="w pri big" style="min-height:84px;margin-top:16px" data-a="shiftStart">▶ ${t('Schicht beginnen')}</button>
+  <p class="muted sm" style="margin-top:14px">${t('Erst nach Schichtbeginn bekommst du Bestellungen und Alarme.')}</p>
+  <button class="w ghost" style="margin-top:20px" data-a="changeRole">${t('Rolle wechseln')}</button></div>`}
 function roleView(){return `<div class="stack" style="max-width:560px;margin:auto"><h2>${t('Wer bist du?')}</h2>
  <div class="seg"><button data-a="lang" data-x="de" class="${me.lang==='de'?'act':''}">Deutsch</button><button data-a="lang" data-x="fa" class="${me.lang==='fa'?'act':''}">فارسی</button></div>
  <label>${t('Dein Name')}</label><input id="nm" value="${esc(me.name)}" autocomplete="off">
@@ -283,7 +351,7 @@ function roleView(){return `<div class="stack" style="max-width:560px;margin:aut
  <div class="card"><label style="margin-top:0">${t('Station')}</label>
   <div class="grid" style="grid-template-columns:repeat(3,1fr)">${Object.keys(STN).map(s=>`<button class="big" style="min-height:70px" data-a="role" data-x="kitchen:${s}">${STI[s]}<br><span class="sm">${t(STN[s])}</span></button>`).join('')}</div></div>
  ${cfg.mode!=='fb'||acc.admin?`<button class="w ghost" data-a="role" data-x="admin">⚙︎ ${t('Admin')}</button>`:''}
- ${cfg.mode==='demo'?'<p class="muted sm">Demo</p>':`<button class="w ghost sm" data-a="demo">${t('Demo testen (nur dieses Gerät)')}</button>`}</div>`}
+ ${cfg.mode==='demo'?'<p class="muted sm">Demo</p>':`<button class="w ghost sm" data-a="demo">${t('Demo testen (nur dieses Gerät)')}</button>`}<p class="sig">This app was created and inspired by Hamid</p></div>`}
 
 /* ----- Service ----- */
 function waiterView(){
@@ -293,17 +361,17 @@ function waiterView(){
   if(ui.order)return orderView(tabs);
   if(ui.wtab==='aktiv')return [aktivView(),tabs,''];
   let m='';
-  for(const z of ZONES){const ts=conf.tables.filter(x=>zoneOf(x)===z);if(!ts.length)continue;
+  if(ui.tview==='plan')return [planView(false),tabs,''];
+  m+=`<div class="seg" style="margin-bottom:4px"><button data-a="tview" data-x="list" class="act">▦ ${t('Liste')}</button><button data-a="tview" data-x="plan">🗺 ${t('Plan')}</button></div>`;
+  for(const z of zonesOf(conf)){const ts=(z.tables||[]).map(String);if(!ts.length)continue;
     const zt=ts.reduce((a,x)=>a+tableTotal(x),0);
     m+=`<div class="zone"><span>${esc(z.name)}</span>${zt?`<span>${eur(zt)}</span>`:''}</div><div class="grid tables">${ts.map(x=>{const s=sessOf(x),sum=tableTotal(x),np=pendingOf(x).length,nc=openCalls(x).length,nr=tableOrders(x).filter(hasReady).length;
       return `<button class="tb ${s?'occ':''}" data-a="table" data-x="${x}">${esc(x)}${sum?`<span class="eur">${eurT(sum)}</span>`:''}<span class="bd">${np?`<i class="bp">${np}</i>`:''}${nc?`<i class="bc">!</i>`:''}${nr?`<i class="br">✓</i>`:''}</span></button>`}).join('')}</div>`}
-  const other=conf.tables.filter(x=>!zoneOf(x));
-  if(other.length)m+=`<div class="zone"><span>…</span></div><div class="grid tables">${other.map(x=>`<button class="tb" data-a="table" data-x="${esc(x)}">${esc(x)}</button>`).join('')}</div>`;
   return [m,tabs,''];
 }
 function orderLines(o,showSt=true){return o.items.map(i=>`<div class="li sm ${showSt&&o.st?.[i.st]==='abgeholt'?'strike':''}"><b>${i.qty}×</b><div class="f" style="flex:1">${esc(i.name)}${i.note?`<br><span class="note">${esc(i.note)}</span>`:''}</div><span class="muted">${eur(i.qty*i.price)}</span></div>`).join('')}
 function stChips(o){return `<div class="sts">${Object.entries(o.st||{}).map(([s,v])=>`<span class="st ${v}">${STI[s]} ${t(STN[s])}: ${t(STL[v])}</span>`).join('')}</div>`}
-function pendCard(o){return `<div class="card pend" style="margin-bottom:10px"><div class="ohd"><span class="tno">${t('Tisch')} ${esc(o.table)}</span><span class="meta">${hhmm(o.createdMs)} · 👤 ${esc(o.guestName||t('Gast'))}</span></div>
+function pendCard(o){return `<div class="card pend" style="margin-bottom:10px"><div class="ohd"><span class="tno">${t('Tisch')} ${esc(o.table)}</span><span class="meta">${hhmm(o.createdMs)} · 👤 ${esc(guestLabeler(tableOrders(o.table))(o))}</span></div>
   ${orderLines(o,false)}${o.note?`<span class="note">${esc(o.note)}</span>`:''}
   <div class="acts"><button class="er" data-a="decline" data-x="${o.id}">${t('Ablehnen')}</button><button class="ok" style="flex:2" data-a="confirm" data-x="${o.id}">✓ ${t('Bestätigen')}</button></div></div>`}
 function aktivView(){
@@ -325,17 +393,40 @@ function orderView(tabs){
    <div class="grid items">${conf.items.filter(i=>i.cat===ui.cat).map(i=>{const ok=avail(i);return `<button class="item ${ok?'':'off'}" data-a="add" data-x="${i.id}"><span>${esc(i.name)}</span><span class="p">${ok?eur(i.price):`<span class="off-l">${t('heute aus')}</span>`}</span>${q[i.id]?`<span class="q">${q[i.id]}</span>`:''}</button>`}).join('')}</div>`;
   const bar=n?`<button class="w pri" data-a="openCart">🧾 ${t('Warenkorb')} · ${n} ${t('Artikel')} · ${eur(sum)}</button>`:'';
   return [main,tabs,bar]}
+function guestLabeler(list){const num={};let n=0;for(const o of [...list].sort((a,b)=>a.createdMs-b.createdMs))if(o.source==='guest'&&!o.guestName&&o.guestId&&!(o.guestId in num))num[o.guestId]=++n;
+  return o=>o.guestName||(o.source==='guest'?t('Gast')+' '+(num[o.guestId]||''):t('Service'))}
 function tableSheet(tb){
   const z=zoneOf(tb),os=tableOrders(tb).filter(o=>!o.cancelled&&o.status!=='declined'),cl=openCalls(tb),pe=os.filter(o=>o.status==='pending'),ok=os.filter(o=>o.status!=='pending');
-  const groups={};for(const o of ok){const g=o.guestName||(o.source==='guest'?t('Gast'):t('Service'));(groups[g]??=[]).push(o)}
+  const gl=guestLabeler(os);const groups={};for(const o of ok){const g=gl(o);(groups[g]??=[]).push(o)}
   return `<div class="row"><h2 class="f">${t('Tisch')} ${esc(tb)} <span class="muted sm">${z?esc(z.name):''}</span></h2><button class="ico" data-a="closeSheet">✕</button></div>
   ${cl.map(c=>`<div class="card call row" style="margin-bottom:8px"><div class="f">${c.type==='bill'?'🧾 '+t('Rechnung gewünscht'):'🙋 '+t('Kellner gerufen')} · ${hhmm(c.createdMs)}</div><button class="ok" data-a="callDone" data-x="${c.id}">✓</button></div>`).join('')}
   ${pe.map(pendCard).join('')}
   ${Object.entries(groups).map(([g,list])=>`<div class="gst"><h4><span>👤 ${esc(g)}</span><span>${eur(list.reduce((a,o)=>a+tot(o),0))}</span></h4>${list.map(o=>stChips(o)+orderLines(o)).join('')}</div>`).join('')}
   ${!os.length?`<p class="muted">${t('frei')}</p>`:''}
   <div class="sum"><span>${t('Gesamt')}</span><span>${eur(tableTotal(tb))}</span></div>
-  <div class="acts"><button class="pri" style="flex:2" data-a="startOrder" data-x="${esc(tb)}">➕ ${t('Bestellung aufnehmen')}</button></div>
+  <div class="acts"><button class="pri" style="flex:2" data-a="startOrder" data-x="${esc(tb)}">➕ ${t('Bestellung aufnehmen')}</button>${ok.length?`<button data-a="splitOpen" data-x="${esc(tb)}">✂ ${t('Getrennt zahlen')}</button>`:''}</div>
   ${sessOf(tb)?`<button class="w ghost" style="margin-top:10px" data-a="closeTable" data-x="${esc(tb)}">💶 ${t('Tisch abschließen (bezahlt)')}</button>`:''}`}
+const PC=['#c9a45c','#4ea1ff','#2fbf71','#e5484d','#b07cff','#f0a92b','#3fd0c9','#ff7ab6'];
+const LET='ABCDEFGH';
+function splitUnits(tb){const os=tableOrders(tb).filter(valid).sort((a,b)=>a.createdMs-b.createdMs),gl=guestLabeler(tableOrders(tb));const u=[];
+  for(const o of os)o.items.forEach((i,ix)=>{for(let q=0;q<i.qty;q++)u.push({k:o.id+':'+ix+':'+q,name:i.name,price:+i.price,g:gl(o)})});return u}
+function splitInit(tb){const u=splitUnits(tb);const gs=[...new Set(u.map(x=>x.g))];const payers=gs.slice(0,8).map((g,i)=>({id:LET[i],label:g}));if(!payers.length)payers.push({id:'A',label:''});
+  const assign={};for(const x of u){const p=payers.find(p=>p.label===x.g);if(p)assign[x.k]=p.id}
+  ui.split={tb,payers,assign,active:payers[0].id}}
+function splitSheet(){const S=ui.split,u=splitUnits(S.tb);const col=id=>PC[LET.indexOf(id)%PC.length];
+  const sumOf=id=>u.filter(x=>S.assign[x.k]===id).reduce((a,x)=>a+x.price,0);const rest=u.filter(x=>!S.assign[x.k]);
+  return `<div class="row"><h2 class="f">✂ ${t('Getrennt zahlen')} · ${t('Tisch')} ${esc(S.tb)}</h2><button class="ico" data-a="splitBack">✕</button></div>
+  <p class="muted sm">${t('Zahler antippen, dann Artikel antippen, um sie zuzuordnen. Wer zusammen zahlt, bekommt denselben Buchstaben.')}</p>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(140px,1fr))">${S.payers.map(p=>`<button class="ghost" data-a="splitAct" data-x="${p.id}" style="flex-direction:column;align-items:stretch;border:2px solid ${S.active===p.id?col(p.id):'var(--ln)'};${S.active===p.id?'background:var(--sf2)':''}">
+    <span style="display:flex;justify-content:space-between"><b style="color:${col(p.id)};font-size:20px">${p.id}</b><b>${eur(sumOf(p.id))}</b></span><span class="muted sm" style="text-align:start">${esc(p.label||'')}</span></button>`).join('')}
+    ${S.payers.length<8?`<button class="ghost" data-a="splitAdd">＋ ${t('Zahler')}</button>`:''}</div>
+  <div class="card" style="margin-top:12px;padding:4px 12px">${u.map(x=>{const a=S.assign[x.k];return `<div class="avrow" data-a="splitTap" data-x="${esc(x.k)}" style="cursor:pointer">
+    <b style="min-width:30px;height:30px;border-radius:15px;display:grid;place-items:center;background:${a?col(a):'transparent'};color:#111;border:1px dashed ${a?'transparent':'var(--mu)'}">${a||''}</b>
+    <span>${esc(x.name)} <span class="muted sm">· ${esc(x.g)}</span></span><span>${eur(x.price)}</span></div>`}).join('')}</div>
+  ${rest.length?`<p class="muted" style="margin:10px 0">${t('Nicht zugeordnet')}: ${rest.length} · ${eur(rest.reduce((a,x)=>a+x.price,0))}</p>`:''}
+  <div class="acts"><button data-a="splitRest">${t('Rest →')} ${S.active}</button><button data-a="splitDel">🗑 ${t('Zahler')} ${S.active}</button><button data-a="splitReset">↺ ${t('Neu')}</button></div>
+  <div class="sum"><span>${t('Gesamt')}</span><span>${eur(u.reduce((a,x)=>a+x.price,0))}</span></div>
+  <button class="w pri" data-a="splitBack">✓ ${t('Fertig')}</button>`}
 function cartSheet(){const sum=cart.reduce((a,l)=>a+l.qty*l.price,0);
   return `<div class="row"><h2 class="f">${t('Tisch')} ${esc(ui.order)}</h2><button class="ico" data-a="closeSheet">✕</button></div>
   ${cart.map(l=>`<div class="card" style="margin-bottom:8px"><div class="row"><div class="f"><b>${esc(l.name)}</b><div class="muted sm">${STI[l.st]} ${eur(l.price)}</div></div>
@@ -369,7 +460,7 @@ function adminView(){
   const tabs=['heute','menu','tables','umsatz','setup'].map(x=>`<button data-a="atab" data-x="${x}" class="${ui.atab===x?'act':''}">${t({heute:'Heute',menu:'Menü',tables:'Tische',umsatz:'Umsatz',setup:'Einrichtung'}[x])}</button>`).join('');
   let m='';
   if(ui.atab==='heute'){const fresh=today&&today.day===dayKey();const on=fresh?(today.on||{}):{},off=fresh?(today.off||{}):{};
-    m=`<h2>${t('Heute verfügbar')} · ${dayKey()}</h2><p class="muted sm">${t('Küchengerichte sind nur bestellbar, wenn sie heute eingeschaltet sind. Getränke & Shisha sind immer an, außer du schaltest sie aus.')}</p>
+    m=`${dutyCard()}<h2>${t('Heute verfügbar')} · ${dayKey()}</h2><p class="muted sm">${t('Küchengerichte sind nur bestellbar, wenn sie heute eingeschaltet sind. Getränke & Shisha sind immer an, außer du schaltest sie aus.')}</p>
     <div class="card"><div class="wd">${[1,2,3,4,5,6,0].map(d=>`<button data-a="wd" data-x="${d}" class="${ui.wd===d?'act':''}">${t(WD[d])}${templates[d]?' •':''}</button>`).join('')}</div>
     <div class="acts"><button data-a="tplLoad" ${templates[ui.wd]?'':'disabled'}>📥 ${t('Vorlage laden')}</button><button data-a="tplSave">💾 ${t('Als Vorlage speichern')}</button></div></div>
     ${conf.cats.map(c=>{const its=conf.items.filter(i=>i.cat===c.id);if(!its.length)return '';const k=c.st==='kueche';
@@ -382,15 +473,31 @@ function adminView(){
       <button class="ghost w" style="margin-top:8px" data-a="addItem" data-x="${c.id}">${t('+ Artikel')}</button></div>`).join('')}
       <button class="ghost w" data-a="addCat">${t('+ Kategorie')}</button>
       <div class="acts" style="position:sticky;bottom:calc(72px + env(safe-area-inset-bottom))"><button class="ghost" data-a="dropDraft">${t('Verwerfen')}</button><button class="pri" style="flex:2" data-a="saveMenu">${t('Speichern')}</button></div>`}
-  if(ui.atab==='tables')m=`<h2>${t('Tische')}</h2><p class="muted sm">${ZONES.map(z=>esc(z.name)+': '+z.from+(z.to>z.from?'–'+z.to:'')).join(' · ')}</p><label>${t('Tische (mit Komma getrennt)')}</label><textarea id="tbl" rows="8">${esc(conf.tables.join(', '))}</textarea><button class="w pri" style="margin-top:10px" data-a="saveTables">${t('Speichern')}</button>`;
+  if(ui.atab==='tables'){if(ui.pedit)return [planView(true),tabs];
+    if(!ui.zdraft)ui.zdraft=structuredClone(zonesOf(conf));const Z=ui.zdraft;
+    m=`<h2>${t('Bereiche & Tische')}</h2><p class="muted sm">${t('Tisch antippen = entfernen. Nummern mit Komma trennen.')}</p>
+    ${Z.map((z,zi)=>`<div class="card" style="margin-bottom:12px"><div class="row"><input class="f" data-in="zname" data-x="${zi}" value="${esc(z.name)}"><button class="er" style="flex:none" data-a="zDel" data-x="${zi}">🗑</button></div>
+      <div class="avrow" style="border:0"><span>💨 ${t('Shisha erlaubt (Terrasse)')}</span><button class="sw ${z.shisha?'on':''}" data-a="zShisha" data-x="${zi}"></button></div>
+      <div class="wd">${(z.tables||[]).map(x=>`<button data-a="zRmT" data-x="${zi}:${esc(x)}">${esc(x)} ✕</button>`).join('')}</div>
+      <div class="row" style="margin-top:8px"><input class="f" id="zadd${zi}" placeholder="${t('z. B. 24, 25')}" inputmode="numeric"><button style="flex:none" data-a="zAddT" data-x="${zi}">＋</button></div></div>`).join('')}
+    <button class="ghost w" data-a="zAdd">＋ ${t('Bereich')}</button>
+    <div class="acts" style="position:sticky;bottom:calc(72px + env(safe-area-inset-bottom))"><button class="ghost" data-a="zDrop">${t('Verwerfen')}</button><button class="pri" style="flex:2" data-a="zSave">${t('Speichern')}</button></div>
+    <h3>🗺 ${t('Tischplan')}</h3><div class="acts" style="margin-top:0"><button data-a="pEdit">✏️ ${t('Plan bearbeiten')}</button><button data-a="printPlan">🖨 ${t('Plan drucken')}</button></div>
+    <h3>🔳 ${t('QR-Tischkarten (A6)')}</h3><p class="muted sm">${t('Untere 3 cm stecken im Ständer. Druck: A6, randlos / „Tatsächliche Größe“.')}</p>
+    ${conf.wifi&&conf.wifi.ssid?`<label class="row"><input type="checkbox" style="width:auto" id="qrw" ${ui.qrWifi?'checked':''} data-in="qrWifi"> <span class="f">${t('Rückseite mit WLAN-QR')}</span></label>`:''}
+    <div class="wd"><button class="pri" data-a="printCards" data-x="*">🖨 ${t('Alle Tische')}</button>${zonesOf(conf).filter(z=>(z.tables||[]).length).map((z,i)=>`<button data-a="printCards" data-x="${i}">${esc(z.name)}</button>`).join('')}</div>`}
   if(ui.atab==='umsatz'){const ok=orders.filter(valid);const top={},pw={};for(const o of ok){pw[o.waiter||'–']=(pw[o.waiter||'–']||0)+tot(o);for(const i of o.items)top[i.name]=(top[i.name]||0)+i.qty}
     m=`<h2>${t('Umsatz')} · ${dayKey()}</h2><div class="grid" style="grid-template-columns:1fr 1fr"><div class="card"><div class="muted sm">${t('Umsatz')}</div><div class="big">${eur(ok.reduce((a,o)=>a+tot(o),0))}</div></div><div class="card"><div class="muted sm">${t('Anzahl Bestellungen')}</div><div class="big">${ok.length}</div></div></div>
     <h3>${t('pro Kellner')}</h3><table class="stat">${Object.entries(pw).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${eur(v)}</td></tr>`).join('')}</table>
     <h3>${t('Top-Artikel')}</h3><table class="stat">${Object.entries(top).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v}×</td></tr>`).join('')}</table>`}
-  if(ui.atab==='setup'){const h=conf.hours||{},w=conf.wifi||{};
+  if(ui.atab==='setup'){const W=weekOf(conf),w=conf.wifi||{};
     m=`<h2>${t('Einrichtung')}</h2>
-    <div class="card"><b>${t('Öffnungszeiten')}</b><div class="row" style="margin-top:8px"><span>${t('von')}</span><input class="f" id="hopen" type="time" value="${esc(h.open||'10:00')}"><span>${t('bis')}</span><input class="f" id="hclose" type="time" value="${esc(h.close||'21:00')}"></div></div>
-    <div class="card" style="margin-top:12px"><b>📶 ${t('Gäste-WLAN')}</b><label>${t('Name (SSID)')}</label><input id="wssid" value="${esc(w.ssid||'')}"><label>${t('Passwort')}</label><input id="wpass" value="${esc(w.pass||'')}"></div>
+    <div class="card"><b>${t('Öffnungszeiten')}</b><p class="muted sm">${t('Personal-App aktiv: 30 Min. vor Öffnung bis 60 Min. nach Schluss.')}</p>
+    ${[1,2,3,4,5,6,0].map(d=>{const x=W[d];return `<div class="row" style="margin-top:8px"><span style="width:34px;flex:none">${t(WD[d])}</span>
+      <button class="sw ${x?'on':''}" data-a="dayOpen" data-x="${d}"></button>
+      ${x?`<input type="time" id="ho${d}" value="${esc(x.o)}" style="flex:1;min-width:0;padding:9px 6px"><span>–</span><input type="time" id="hc${d}" value="${esc(x.c)}" style="flex:1;min-width:0;padding:9px 6px">`:`<span class="f muted">${t('Ruhetag')}</span>`}</div>`}).join('')}</div>
+    <div class="card" style="margin-top:12px"><b>📶 ${t('Gäste-WLAN')}</b><label>${t('Name (SSID)')}</label><input id="wssid" value="${esc(w.ssid||'')}"><label>${t('Passwort')}</label><input id="wpass" value="${esc(w.pass||'')}">
+      <div class="avrow" style="border:0;margin-top:6px"><span>${t('Auf Gast-Seite anzeigen')}</span><button class="sw ${w.show?'on':''}" data-a="wifiShow"></button></div></div>
     <button class="w pri" style="margin-top:12px" data-a="saveSetup">${t('Speichern')}</button>
     ${devicesCard()}
     <div class="card" style="margin-top:12px"><b>🔗 ${t('Gast-Seite testen')}</b><div class="acts"><a class="btn" href="g.html?t=23" target="_blank">${t('Tisch')} 23</a><a class="btn" href="g.html?t=55" target="_blank">${t('Tisch')} 55 ☀️</a><a class="btn" href="g.html" target="_blank">ohne Tisch</a></div></div>
@@ -400,33 +507,82 @@ function adminView(){
     <button class="w er" style="margin-top:16px" data-a="reset">${t('Verbindung trennen / neu einrichten')}</button>`}
   return [m,tabs]}
 
+/* ----- Dienst & Tischplan ----- */
+function dutyCard(){if(cfg.mode!=='fb'&&!shifts.length)return '';const l=shifts.filter(s=>s.day===dayKey());
+  return `<div class="card" style="margin-bottom:12px"><b>🟢 ${t('Im Dienst')} (${l.length})</b>${l.length?l.map(s=>`<div class="duty"><span>${s.role==='waiter'?'🧾':STI[s.station]||''} ${esc(s.name||'–')} <span class="muted sm">· ${t('seit')} ${hhmm(s.since)}</span></span><button class="ghost sm" style="min-height:34px" data-a="endShiftOf" data-x="${s.id}">⏹</button></div>`).join(''):`<p class="muted sm">${t('Niemand im Dienst')}</p>`}</div>`}
+const SCHEMA=`<svg viewBox="0 0 340 200" class="schema" role="img" aria-label="Grundriss">
+ <text x="200" y="18" class="sl" text-anchor="middle">🅿 Parkplatz · Eingang</text>
+ <path d="M48 34 L300 34 A126 136 0 0 1 48 34 Z" fill="#1d2a26" stroke="#c9a45c" stroke-width="1.5"/>
+ <path d="M30 34 A145 158 0 0 0 318 34" fill="none" stroke="#4d6b5f" stroke-width="16" stroke-linecap="round" opacity=".55"/>
+ <path d="M30 34 A145 158 0 0 0 74 132" fill="none" stroke="#7f6a3a" stroke-width="16" opacity=".8"/>
+ <path d="M56 40 A118 128 0 0 0 292 40" fill="none" stroke="#9fd3ff" stroke-width="2.5" stroke-dasharray="6 4"/>
+ <rect x="18" y="20" width="62" height="30" rx="4" fill="#2d3b36" stroke="#93a39c"/><text x="49" y="40" class="sl" text-anchor="middle">Küche</text>
+ <text x="174" y="92" class="sl" text-anchor="middle">Restaurant</text>
+ <text x="174" y="128" class="ss" text-anchor="middle">Panorama-Fenster</text>
+ <text x="40" y="170" class="ss">Terrasse überdacht</text>
+ <text x="200" y="196" class="ss">Terrasse · Talblick</text>
+ <circle cx="312" cy="48" r="9" fill="#c9a45c"/><text x="312" y="52" class="sd" text-anchor="middle">D</text>
+ <text x="334" y="74" class="ss" text-anchor="end">Terrasse-Eingang</text><text x="334" y="86" class="ss" text-anchor="end">Bar ↓ (unten)</text></svg>`;
+const ptPos=(z,i,n)=>{const c=Math.max(1,Math.ceil(Math.sqrt(n*1.6))),r=Math.ceil(n/c);return {x:Math.round((i%c+.5)/c*100),y:Math.round((Math.floor(i/c)+.5)/r*100)}};
+function posOf(z,tb,i,n,src){const p=(src||{})[tb];return p&&p.x!=null?p:ptPos(z,i,n)}
+function planView(edit){const Z=zonesOf(conf).filter(z=>(z.tables||[]).length);if(!Z.length)return `<p class="empty">${t('Keine Tische')}</p>`;
+  if(ui.pz==null||ui.pz>=Z.length)ui.pz=0;const z=Z[ui.pz],ts=z.tables.map(String),src=edit?ui.pdraft:(conf.plan&&conf.plan.pos)||{};
+  const stat=x=>{if(edit)return '';if(openCalls(x).length)return 'pc';if(pendingOf(x).length)return 'pp';if(tableOrders(x).some(hasReady))return 'pr';if(sessOf(x))return 'po';return ''};
+  return `${edit?`<div class="row"><h2 class="f">✏️ ${t('Plan bearbeiten')}</h2></div><p class="muted sm">${t('Tische mit dem Finger an die richtige Stelle ziehen.')}</p>`
+    :`<div class="seg" style="margin-bottom:8px"><button data-a="tview" data-x="list">▦ ${t('Liste')}</button><button data-a="tview" data-x="plan" class="act">🗺 ${t('Plan')}</button></div>`}
+  ${edit?'':SCHEMA}
+  <div class="chips" style="position:static">${Z.map((x,i)=>`<button class="chip ${i===ui.pz?'act':''}" data-a="pZone" data-x="${i}">${esc(x.name)}</button>`).join('')}</div>
+  <div class="stage ${edit?'':'tilt'}"><div class="floor ${edit?'flat':''}" id="floor" data-zone="${esc(z.id)}"><span class="fl">${esc(z.name)}</span>
+   ${ts.map((x,i)=>{const p=posOf(z,x,i,ts.length,src);const s=sessOf(x),sum=edit?0:tableTotal(x);
+     return `<button class="ptb ${stat(x)}" ${edit?`data-drag="${esc(x)}"`:`data-a="table" data-x="${esc(x)}"`} style="left:${p.x}%;top:${p.y}%">${esc(x)}${sum?`<small>${eurT(sum)}</small>`:''}</button>`}).join('')}</div></div>
+  ${edit?`<div class="acts"><button class="ghost" data-a="pAuto">↺ ${t('Automatisch anordnen')}</button></div><div class="acts"><button class="ghost" data-a="pCancel">${t('Verwerfen')}</button><button class="pri" style="flex:2" data-a="pSave">${t('Speichern')}</button></div>`
+   :`<div class="legend"><span><i class="po"></i>${t('besetzt')}</span><span><i class="pp"></i>${t('wartet')}</span><span><i class="pc"></i>${t('Ruf/Rechnung')}</span><span><i class="pr"></i>${t('abholbereit')}</span></div>`}`}
+let drag=null;
+addEventListener('pointerdown',e=>{const b=e.target.closest('[data-drag]');if(!b)return;const f=$('#floor');if(!f)return;e.preventDefault();drag={el:b,t:b.dataset.drag,f:f.getBoundingClientRect()};b.setPointerCapture?.(e.pointerId);b.classList.add('drag')});
+addEventListener('pointermove',e=>{if(!drag)return;const r=drag.f;let x=(e.clientX-r.left)/r.width*100,y=(e.clientY-r.top)/r.height*100;x=Math.max(4,Math.min(96,x));y=Math.max(6,Math.min(94,y));
+  drag.el.style.left=x+'%';drag.el.style.top=y+'%';ui.pdraft[drag.t]={x:Math.round(x*10)/10,y:Math.round(y*10)/10}});
+addEventListener('pointerup',()=>{if(drag){drag.el.classList.remove('drag');drag=null}});
+function openPrint(html){const doc=html.replace('<head>','<head><base href="'+BASEURL+'">').replace('</body>','<div class="noprint" style="position:fixed;top:10px;right:10px;font:16px sans-serif"><button onclick="print()" style="padding:12px 18px;font-size:16px">🖨 Drucken / PDF</button></div><style>@media print{.noprint{display:none}}</style><script>setTimeout(()=>print(),900)<\/script></body>');
+  const url=URL.createObjectURL(new Blob([doc],{type:'text/html'}));const w=window.open(url,'_blank');if(!w)location.href=url}
+function loadQR(){return window.qrcode?Promise.resolve(window.qrcode):new Promise((ok,no)=>{const s=document.createElement('script');s.src='qr.js';s.onload=()=>ok(window.qrcode);s.onerror=no;document.head.appendChild(s)})}
+function planPrintHTML(){const Z=zonesOf(conf).filter(z=>(z.tables||[]).length),P=(conf.plan&&conf.plan.pos)||{};
+  return `<!doctype html><html><head><meta charset="utf-8"><title>Tischplan Zirlerberg</title><style>@page{size:A4 landscape;margin:10mm}body{font:13px sans-serif;color:#111}
+  h1{font-size:20px;margin:0 0 6px}.z{break-inside:avoid;margin:10px 0}.z h2{font-size:15px;margin:6px 0}.fl{position:relative;aspect-ratio:16/10;border:2px solid #333;border-radius:10px;max-width:260mm}
+  .t{position:absolute;transform:translate(-50%,-50%);width:13mm;height:13mm;border:2px solid #111;border-radius:3mm;display:grid;place-items:center;font-weight:800;font-size:14px;background:#f3e6c4}
+  .sc{max-width:120mm}.sl,.ss,.sd{font:11px sans-serif;fill:#111}</style></head><body><h1>Zirlerberg – Tischplan</h1><div class="sc">${SCHEMA.replace(/#1d2a26/g,'#eee').replace(/#2d3b36/g,'#ddd')}</div>
+  ${Z.map(z=>`<div class="z"><h2>${esc(z.name)}</h2><div class="fl">${z.tables.map((x,i)=>{const p=posOf(z,String(x),i,z.tables.length,P);return `<div class="t" style="left:${p.x}%;top:${p.y}%">${esc(x)}</div>`}).join('')}</div></div>`).join('')}</body></html>`}
 /* ----- Einstellungen ----- */
 function sheetView(){
   if(ui.sheet==='cart')return cartSheet();
   if(ui.sheet==='table')return tableSheet(ui.sheetArg);
+  if(ui.sheet==='split')return splitSheet();
   const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone;
   const perm='Notification' in window?Notification.permission:'n/a';
-  const topics=me.role==='waiter'?[[t('Persönlich (fertige Speisen)'),me.name?topicWaiter(me.name):null],[t('Alle Kellner (Gäste, Rufe)'),topicService()]]:me.role==='kitchen'?[[t(STN[me.station]),topicStation(me.station)]]:[];
+  const topics=me.role==='waiter'||me.role==='kitchen'?[[t('Dein persönlicher Kanal – nur diesen in ntfy abonnieren'),personalTopic(cfg,me.name||myUid()||'')]]:[];
   return `<div class="row"><h2 class="f">${t('Einstellungen')}</h2><button class="ico" data-a="closeSheet">✕</button></div>
   <div class="seg"><button data-a="lang" data-x="de" class="${me.lang==='de'?'act':''}">Deutsch</button><button data-a="lang" data-x="fa" class="${me.lang==='fa'?'act':''}">فارسی</button></div>
   ${me.role==='waiter'?`<label>${t('Dein Name')}</label><input data-in="name" value="${esc(me.name)}">
    <label class="row" style="margin-top:12px"><input type="checkbox" style="width:auto" data-in="alertAll" ${me.alertAll?'checked':''}> <span class="f">${t('Alarm für alle Bestellungen')}</span></label>`:''}
   ${me.role==='kitchen'?`<label class="row"><input type="checkbox" style="width:auto" data-in="wake" ${me.wake?'checked':''}> <span class="f">${t('Bildschirm anlassen')}</span></label>`:''}
   <div class="stack" style="margin-top:14px">
+  ${onShift()?`<button class="w er" style="min-height:60px;font-weight:800" data-a="shiftEnd">⏹ ${t('Schicht beenden')}</button>`:''}
   ${perm==='granted'?`<p class="muted">🔔 ${t('Benachrichtigungen aktiv')}</p>`:perm!=='n/a'&&perm!=='denied'?`<button class="w" data-a="perm">🔔 ${t('Benachrichtigungen erlauben')}</button>`:''}
   ${topics.filter(x=>x[1]).map(([lab,tp])=>`<div class="card"><b>📲 ${t('Push aufs gesperrte Handy (ntfy)')}</b><div class="muted sm" style="margin:6px 0">${esc(lab)}</div><code>${esc(tp)}</code>
    <div class="acts"><button data-a="copy" data-x="${esc(tp)}">${t('Kopieren')}</button><a class="btn" href="${esc((cfg.ntfy||'https://ntfy.sh')+'/'+tp)}" target="_blank" rel="noopener">${t('Abonnieren')}</a></div></div>`).join('')}
   ${!standalone?`<div class="card"><b>📱 ${t('App installieren')}</b><p class="muted sm">${t('Installieren: iPhone → Teilen → „Zum Home-Bildschirm“. Android → ⋮ → „App installieren“.')}</p>${ui.deferredInstall?`<button class="w pri" data-a="install">${t('App installieren')}</button>`:''}</div>`:''}
-  <button class="w ghost" data-a="changeRole">${t('Rolle wechseln')}</button></div>`}
+  <button class="w ghost" data-a="changeRole">${t('Rolle wechseln')}</button></div><p class="sig">This app was created and inspired by Hamid</p>`}
 
 /* ============ Aktionen ============ */
 function setToday(mut){const fresh=today&&today.day===dayKey();const d={day:dayKey(),on:{...(fresh?today.on:{})},off:{...(fresh?today.off:{})}};mut(d);today=d;render();write(Store.setDoc('config/today',d))}
+const T0=Date.now();
+function loadingView(){setTimeout(()=>{if(document.querySelector('.loadw'))render()},4000);
+  return `<div class="empty loadw">${t('Laden…')}${Date.now()-T0>8000?`<br><br><button class="pri" onclick="location.reload()">↻ ${t('Neu laden')}</button>`:''}</div>`}
 function codeView(){return `<div class="pinw stack"><h2>🔒 ${t('Gerät freischalten')}</h2>
  <p class="muted sm">${t('Einmalig pro Handy: Zugangscode vom Chef eingeben.')}</p>
  <div class="seg"><button data-a="lang" data-x="de" class="${me.lang==='de'?'act':''}">Deutsch</button><button data-a="lang" data-x="fa" class="${me.lang==='fa'?'act':''}">فارسی</button></div>
  <label>${t('Dein Name')}</label><input id="nm" value="${esc(me.name)}" autocomplete="off">
  <label>${t('Zugangscode')}</label><input id="acode" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:2px">
- <button class="w pri big" data-a="unlock">${t('Freischalten')}</button></div>`}
+ <button class="w pri big" data-a="unlock">${t('Freischalten')}</button><p class="sig">This app was created and inspired by Hamid</p></div>`}
 function devicesCard(){if(cfg.mode!=='fb')return '';
  const row=(d,k)=>`<div class="avrow"><span>${k==='admins'?'⚙︎':'🧾'} ${esc(d.name||'–')} <span class="muted sm">${d.at?new Date(d.at).toLocaleDateString('de-AT'):''}${d.id===Store.authUid()?' · '+t('dieses Gerät'):''}</span></span>${d.id===Store.authUid()?'':`<button class="ghost sm" data-a="delDev" data-x="${k}/${d.id}">✕</button>`}</div>`;
  return `<div class="card" style="margin-top:12px"><b>🔒 ${t('Freigeschaltete Geräte')}</b><p class="muted sm">${t('Verlorenes Handy oder Ex-Mitarbeiter? Hier entfernen.')}</p>
@@ -437,10 +593,36 @@ const A={
   role(x){const nm=$('#nm').value.trim();me.name=nm;
     if(x==='waiter'&&!nm){toast(t('Bitte Namen eingeben'),'err');$('#nm').focus();return}
     if(x.startsWith('kitchen')){me.role='kitchen';me.station=x.split(':')[1];ui.ktab='open'}else me.role=x;
-    saveMe();prevO=null;prevC=null;render();if(me.role==='kitchen'&&me.wake)wake(true)},
+    saveMe();render();if(me.role==='kitchen'&&me.wake)wake(true)},
   settings(){ui.sheet='settings';render()},
+  async shiftStart(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){}
+    const u=myUid();const d={name:me.name||'',role:me.role,station:me.role==='kitchen'?me.station:'',since:Date.now(),day:dayKey(),topic:personalTopic(cfg,me.name||u)};
+    shifts=[...shifts.filter(s=>s.id!==u),{...d,id:u}];render();
+    await write(Store.setDoc('shift/'+u,d));toast('▶ '+t('Schicht begonnen'),'info',2000);if(me.role==='kitchen'&&me.wake)wake(true)},
+  shiftEnd(x){if(x!=='auto'&&!confirm(t('Schicht wirklich beenden?')))return;const u=myUid();shifts=shifts.filter(s=>s.id!==u);alarms=[];renderAlarm();ring();ui.sheet=null;
+    write(Store.delDoc('shift/'+u));wake(false);render();if(x!=='auto')toast('⏹ '+t('Schicht beendet'),'info',2500)},
+  endShiftOf(x){if(confirm(t('Schicht beenden?')))write(Store.delDoc('shift/'+x))},
+  seen(){alarms=[];renderAlarm();ring()},
+  pZone(x){ui.pz=+x;render()},
+  pEdit(){ui.pedit=true;ui.pdraft=structuredClone((conf.plan&&conf.plan.pos)||{});ui.pz=0;render();scrollTo(0,0)},
+  pCancel(){ui.pedit=false;ui.pdraft=null;render()},
+  pAuto(){const z=zonesOf(conf).filter(z=>(z.tables||[]).length)[ui.pz];if(z)for(const x of z.tables)delete ui.pdraft[String(x)];render()},
+  pSave(){write(Store.setDoc('config/main',{...C0(conf),plan:{...(conf.plan||{}),pos:ui.pdraft}}).then(()=>toast(t('Gespeichert'),'info',1500)));ui.pedit=false;ui.pdraft=null;render()},
+  printPlan(){openPrint(planPrintHTML())},
+  async printCards(x){try{const qr=await loadQR();const {cardsHTML}=await import('./cards.js');const Z=zonesOf(conf);
+    const zs=x==='*'?Z:[Z.filter(z=>(z.tables||[]).length)[+x]];const list=zs.flatMap(z=>(z.tables||[]).map(tb=>({t:String(tb),zone:z.name})));
+    openPrint(cardsHTML(list,{base:BASEURL+'g.html',qr,wifi:ui.qrWifi&&conf.wifi&&conf.wifi.ssid?conf.wifi:null}))}catch(e){showErr(e)}},
+  splitOpen(x){if(!ui.split||ui.split.tb!==x)splitInit(x);ui.sheet='split';render()},
+  splitBack(){ui.sheet='table';ui.sheetArg=ui.split.tb;render()},
+  splitAct(x){ui.split.active=x;render()},
+  splitAdd(){const S=ui.split;const id=[...LET].find(c=>!S.payers.some(p=>p.id===c));if(!id)return;S.payers.push({id,label:''});S.active=id;render()},
+  splitTap(x){const S=ui.split;if(S.assign[x]===S.active)delete S.assign[x];else S.assign[x]=S.active;render()},
+  splitRest(){const S=ui.split;for(const u of splitUnits(S.tb))if(!S.assign[u.k])S.assign[u.k]=S.active;render()},
+  splitDel(){const S=ui.split;if(S.payers.length<2)return;for(const k in S.assign)if(S.assign[k]===S.active)delete S.assign[k];S.payers=S.payers.filter(p=>p.id!==S.active);S.active=S.payers[0].id;render()},
+  splitReset(){const S=ui.split;ui.split={tb:S.tb,payers:[{id:'A',label:''}],assign:{},active:'A'};render()},
+  tview(x){ui.tview=x;render()},
   closeSheet(){ui.sheet=null;render()},
-  changeRole(){me.role=null;saveMe();ui.sheet=null;ui.adminOk=false;wake(false);render()},
+  changeRole(){if(onShift())A.shiftEnd('auto');me.role=null;saveMe();ui.sheet=null;ui.adminOk=false;wake(false);render()},
   async perm(){try{await Notification.requestPermission()}catch(e){}render()},
   async install(){ui.deferredInstall?.prompt();ui.deferredInstall=null;render()},
   copy(x){navigator.clipboard?.writeText(x).then(()=>toast(t('Kopiert'),'info',1500)).catch(()=>prompt('',x))},
@@ -461,22 +643,23 @@ const A={
     try{const session=await Store.claimSession(tb);
       const o={id:uid(),day:dayKey(),createdMs:Date.now(),confirmedMs:Date.now(),table:tb,session,waiter:me.name,source:'staff',status:'ok',note,cancelled:false,st,items};
       await Store.setDoc('orders/'+o.id,o);
-      for(const s of Object.keys(st))push(cfg,topicStation(s),'🔔 '+t('Neue Bestellung')+' – '+t('Tisch')+' '+tb,itemsText(o,s)+(note?'\n⚠ '+note:''),['bell']);
+      for(const s of Object.keys(st))pushShift(cfg,shifts,x=>x.role==='kitchen'&&x.station===s,topicStation(s),'🔔 Neue Bestellung – Tisch '+tb,itemsText(o,s)+(note?'\n⚠ '+note:''),['bell']);
       toast('📤 '+t('Gesendet')+' – '+t('Tisch')+' '+tb,'info',2500)}catch(e){showErr(e)}},
   async confirm(x){const o=orders.find(o=>o.id===x);if(!o)return;
     const items=o.items.map(i=>{const m=conf.items.find(m=>m.id===i.itemId);if(!m)return i;const c=conf.cats.find(c=>c.id===m.cat);return {...i,price:+m.price,st:(c&&c.st)||i.st}});
     o.items=items;const st={};for(const i of items)st[i.st]='neu';
     await write(Store.updDoc('orders/'+x,{status:'ok',st,items,waiter:me.name,confirmedMs:Date.now()}));
-    for(const s of Object.keys(st))push(cfg,topicStation(s),'🔔 '+t('Neue Bestellung')+' – '+t('Tisch')+' '+o.table,itemsText(o,s),['bell'])},
+    for(const s of Object.keys(st))pushShift(cfg,shifts,x=>x.role==='kitchen'&&x.station===s,topicStation(s),'🔔 Neue Bestellung – Tisch '+o.table,itemsText(o,s),['bell'])},
   decline(x){if(confirm(t('Ablehnen')+'?'))write(Store.updDoc('orders/'+x,{status:'declined',waiter:me.name}))},
   callDone(x){write(Store.updDoc('calls/'+x,{done:true,doneBy:me.name}))},
   pickup(x){const [id,s]=x.split(':');write(Store.updDoc('orders/'+id,{['st.'+s]:'abgeholt'}))},
   closeTable(x){if(!confirm(t('Tisch wirklich abschließen?')))return;const s=sessOf(x);
     const list=[['tables/'+x,{session:null,closedMs:Date.now()}],...orders.filter(o=>o.session===s).map(o=>['orders/'+o.id,{paid:true}]),...openCalls(x).map(c=>['calls/'+c.id,{done:true}])];
-    write(Store.batchUpd(list).then(()=>toast('💶 '+t('Tisch abgeschlossen'),'info',2500)));ui.sheet=null;render()},
+    write(Store.batchUpd(list).then(()=>toast('💶 '+t('Tisch abgeschlossen'),'info',2500)));ui.sheet=null;if(ui.split&&ui.split.tb===x)ui.split=null;render()},
   ktab(x){ui.ktab=x;render()},
   kst(x){const [id,v]=x.split(':');const o=orders.find(o=>o.id===id);write(Store.updDoc('orders/'+id,{['st.'+me.station]:v}));
-    if(v==='fertig'&&o&&o.waiter)push(cfg,topicWaiter(o.waiter),'✅ '+t('Tisch')+' '+o.table+' – '+t(STN[me.station])+' '+t('fertig'),itemsText(o,me.station),['white_check_mark'])},
+    if(v==='fertig'&&o){const ws=shifts.filter(s=>s.role==='waiter'&&o.waiter&&norm(s.name)===norm(o.waiter));
+      pushShift(cfg,ws.length?ws:shifts,s=>s.role==='waiter',o.waiter?topicWaiter(o.waiter):topicService(),'✅ Tisch '+o.table+' – '+STN[me.station]+' fertig',itemsText(o,me.station),['white_check_mark'])}},
   async unlock(){const code=$('#acode').value.trim().toUpperCase().replace(/\s+/g,''),nm=$('#nm').value.trim();if(!code)return;me.name=nm||me.name;saveMe();
     const d={code,name:me.name||'',at:Date.now()},u=Store.authUid();
     try{await Store.setDoc('admins/'+u,d);toast('✅ Admin','info',2000);return}catch(e){}
@@ -494,8 +677,20 @@ const A={
   delItem(x){ui.draft.items=ui.draft.items.filter(i=>i.id!==x);render()},
   dropDraft(){ui.draft=null;render()},
   saveMenu(){const d=ui.draft;d.items=d.items.filter(i=>i.name.trim());write(Store.setDoc('config/main',{...C0(conf),cats:d.cats,items:d.items}).then(()=>toast(t('Gespeichert'),'info',1500)));ui.draft=null},
-  saveTables(){const tb=$('#tbl').value.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);write(Store.setDoc('config/main',{...C0(conf),tables:tb}).then(()=>toast(t('Gespeichert'),'info',1500)))},
-  saveSetup(){write(Store.setDoc('config/main',{...C0(conf),hours:{open:$('#hopen').value,close:$('#hclose').value},wifi:{ssid:$('#wssid').value.trim(),pass:$('#wpass').value.trim()}}).then(()=>toast(t('Gespeichert'),'info',1500)))},
+  _unusedSaveTables(){const tb=$('#tbl').value.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);write(Store.setDoc('config/main',{...C0(conf),tables:tb}).then(()=>toast(t('Gespeichert'),'info',1500)))},
+  saveSetup(){const W=structuredClone(weekOf(conf));for(const d of [0,1,2,3,4,5,6])if(W[d]){const o=$('#ho'+d)?.value,c=$('#hc'+d)?.value;if(o&&c)W[d]={o,c}}
+    write(Store.setDoc('config/main',{...C0(conf),week:W,wifi:{...(conf.wifi||{}),ssid:$('#wssid').value.trim(),pass:$('#wpass').value.trim()}}).then(()=>toast(t('Gespeichert'),'info',1500)))},
+  dayOpen(x){const W=structuredClone(weekOf(conf));W[x]=W[x]?null:{o:'10:30',c:'21:00'};conf={...conf,week:W};write(Store.setDoc('config/main',{...C0(conf)}))},
+  wifiShow(){conf={...conf,wifi:{...(conf.wifi||{}),show:!(conf.wifi&&conf.wifi.show)}};write(Store.setDoc('config/main',{...C0(conf)}))},
+  zAdd(){ui.zdraft.push({id:uid(),name:t('Neuer Bereich'),shisha:false,tables:[]});render()},
+  zDel(x){const z=ui.zdraft[x];if(z.tables.length&&!confirm(t('Bereich mit Tischen löschen?')))return;ui.zdraft.splice(+x,1);render()},
+  zShisha(x){ui.zdraft[x].shisha=!ui.zdraft[x].shisha;render()},
+  zRmT(x){const [zi,tb]=x.split(':');const z=ui.zdraft[zi];z.tables=z.tables.filter(v=>v!==tb);render()},
+  zAddT(x){const el=$('#zadd'+x);const add=(el.value||'').split(/[,;\s]+/).map(s=>s.trim()).filter(Boolean);const all=ui.zdraft.flatMap(z=>z.tables);
+    const dup=add.filter(v=>all.includes(v));if(dup.length)toast(t('Schon vorhanden')+': '+dup.join(', '),'err');
+    const z=ui.zdraft[x];z.tables=[...z.tables,...add.filter(v=>!all.includes(v))];z.tables.sort((a,b)=>(+a||0)-(+b||0)||String(a).localeCompare(b));el.value='';render()},
+  zDrop(){ui.zdraft=null;render()},
+  zSave(){const Z=ui.zdraft.filter(z=>z.name.trim());write(Store.setDoc('config/main',{...C0(conf),zones:Z,tables:Z.flatMap(z=>z.tables)}).then(()=>toast(t('Gespeichert'),'info',1500)));ui.zdraft=null},
   reset(){if(!confirm('?'))return;LS.del('zb_cfg');location.reload()}
 };
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;
@@ -511,6 +706,8 @@ const IN={
   cname(x,v){const c=ui.draft.cats.find(c=>c.id===x);if(c)c.name=v},
   cst(x,v){const c=ui.draft.cats.find(c=>c.id===x);if(c)c.st=v},
   iname(x,v){const i=ui.draft.items.find(i=>i.id===x);if(i)i.name=v},
+  zname(x,v){if(ui.zdraft&&ui.zdraft[x])ui.zdraft[x].name=v},
+  qrWifi(x,v,el){ui.qrWifi=el.checked},
   iprice(x,v){const i=ui.draft.items.find(i=>i.id===x);if(i)i.price=parseFloat(v.replace(',','.'))||0}
 };
 document.addEventListener('input',e=>{const el=e.target.closest('[data-in]');if(el)IN[el.dataset.in]?.(el.dataset.x,el.value,el)});
@@ -521,13 +718,15 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();ui.deferredInstall
 
 /* ============ Start ============ */
 function subToday(){unsubDay.forEach(u=>u&&u());prevO=null;prevC=null;subDay=dayKey();
-  unsubDay=[Store.subCol('orders','day',subDay,onOrders,showErr),Store.subCol('calls','day',subDay,onCalls,showErr)]}
+  unsubDay=[Store.subCol('orders','day',subDay,onOrders,showErr),Store.subCol('calls','day',subDay,onCalls,showErr),Store.subCol('shift','day',subDay,l=>{shifts=l;render()},showErr)]}
 async function start(){render();
   Store=makeStore(cfg);
   try{await Store.init()}catch(e){showErr(e);return}
   setConn(true);addEventListener('online',()=>setConn(true));addEventListener('offline',()=>setConn(false));
   if(cfg.mode!=='fb'){acc={checked:true,staff:true,admin:true};startData();return}
-  const u=Store.authUid(),seen={};const upd=()=>{if(!('a' in seen&&'s' in seen))return;acc.checked=true;
+  const u=Store.authUid(),seen={};
+  if(accC&&accC.uid===u&&(acc.staff||acc.admin))startData();else if(accC&&accC.uid!==u){acc={checked:false,staff:false,admin:false};render()}
+  const upd=()=>{if(!('a' in seen&&'s' in seen))return;acc.checked=true;LS.set('zb_acc',{uid:u,staff:acc.staff,admin:acc.admin});
     if((acc.staff||acc.admin)&&!dataOn)startData();
     if(acc.admin&&!devs.on){devs.on=true;Store.subCol('admins',null,null,l=>{devs.admins=l;render()});Store.subCol('staff',null,null,l=>{devs.staff=l;render()})}
     render()};
@@ -537,12 +736,12 @@ async function start(){render();
 function startData(){dataOn=true;
   Store.subDoc('config/main',c=>{if(c===undefined)return;
     if(c===null){Store.setDoc('config/main',migrate(structuredClone(SAMPLE)));return}
-    const mg=migrate(c);if(mg){write(Store.setDoc('config/main',C0(mg)));conf=mg}else{conf=c;if(acc.admin&&c.pin!==undefined)write(Store.setDoc('config/main',C0(c)))}render()},showErr);
-  Store.subDoc('config/today',d=>{if(d===undefined)return;today=d;render()},showErr);
+    const mg=migrate(c);if(mg){if(acc.admin)write(Store.setDoc('config/main',C0(mg)));conf=mg;LS.set('zb_conf',C0(mg))}else{conf=c;LS.set('zb_conf',C0(c));if(acc.admin&&c.pin!==undefined)write(Store.setDoc('config/main',C0(c)))}render()},showErr);
+  Store.subDoc('config/today',d=>{if(d===undefined)return;today=d;LS.set('zb_today',d);render()},showErr);
   Store.subDoc('config/templates',d=>{if(d===undefined)return;templates=d||{};render()},showErr);
   Store.subCol('tables',null,null,l=>{tables={};for(const x of l)tables[x.id]=x;render()},showErr);
   subToday()}
-setInterval(()=>{if(!dataOn)return;if(Store&&dayKey()!==subDay)subToday();else if(!isEditing()&&!ui.sheet&&(me.role==='kitchen'||ui.wtab==='aktiv'))render()},30000);
+setInterval(()=>{if(!dataOn)return;if(onShift()&&conf&&!staffActive(conf))A.shiftEnd('auto');if(Store&&dayKey()!==subDay)subToday();else if(!isEditing()&&!ui.sheet&&(me.role==='kitchen'||ui.wtab==='aktiv'))render()},30000);
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')r.update().catch(()=>{})})}).catch(()=>{});
 if(me.role==='kitchen'&&me.wake)wake(true);
 start();

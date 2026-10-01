@@ -17,7 +17,7 @@ function demo(){
   const sub=s=>{subs.push(s);setTimeout(()=>emit(s.col));return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}};
   return{
     mode:'demo',async init(){},
-    authUid(){let u=LS.get('zbd_uid',null);if(!u){u='demo-'+uid();LS.set('zbd_uid',u)}return u},
+    authUid(){let u=null;try{u=sessionStorage.getItem('zbd_uid')}catch(e){}if(!u){u='demo-'+uid();try{sessionStorage.setItem('zbd_uid',u)}catch(e){}}return u},
     async delDoc(path){const [col,id]=path.split('/');const o=getCol(col);delete o[id];putCol(col,o);emit(col)},
     subDoc(path,cb){const [col,id]=path.split('/');return sub({col,id,cb})},
     subCol(col,field,value,cb){return sub({col,field,value,cb})},
@@ -60,9 +60,42 @@ export function push(cfg,topic,title,message,tags){if(!cfg||!cfg.topic)return;
 export function isAvail(item,cat,today){const fresh=today&&today.day===dayKey();
   if(cat&&cat.st==='kueche')return !!(fresh&&today.on&&today.on[item.id]);
   return !(fresh&&today.off&&today.off[item.id])}
-export function isOpenNow(hours,d=new Date()){if(!hours||!hours.open||!hours.close)return true;
-  const m=d.getHours()*60+d.getMinutes(),[oh,om]=hours.open.split(':').map(Number),[ch,cm]=hours.close.split(':').map(Number);
-  const o=oh*60+om,c=ch*60+cm;return c>o?(m>=o&&m<c):(m>=o||m<c)}
-export const ZONES=[{id:'bar',name:'Bar & Eingang',from:1,to:9},{id:'saal',name:'Hauptsaal',from:11,to:29},{id:'fenster',name:'Panorama-Fenster',from:31,to:39},{id:'neben',name:'Nebenraum',from:41,to:49},{id:'terr',name:'Dachterrasse',from:51,to:69},{id:'terr2',name:'Terrasse überdacht',from:71,to:79},{id:'togo',name:'To-go / Theke',from:99,to:99}];
-export const zoneOf=t=>ZONES.find(z=>+t>=z.from&&+t<=z.to);
-export const isTerrace=t=>{const z=zoneOf(t);return !!z&&(z.id==='terr'||z.id==='terr2')};
+// ---------- Öffnungszeiten pro Wochentag ----------
+// conf.week = {0:{o:'10:30',c:'23:00'}, 1:null (Ruhetag), ...}  (0=So … 6=Sa)
+export const DEFAULT_WEEK={0:{o:'10:30',c:'23:00'},1:null,2:{o:'10:30',c:'21:00'},3:{o:'10:30',c:'21:00'},4:{o:'10:30',c:'21:00'},5:{o:'10:30',c:'23:00'},6:{o:'10:30',c:'23:00'}};
+const hm=s=>{const [h,m]=String(s||'0:0').split(':').map(Number);return h*60+(m||0)};
+export function weekOf(conf){if(conf&&conf.week)return conf.week;const h=conf&&conf.hours;if(h&&h.open){const d={o:h.open,c:h.close};return {0:d,1:d,2:d,3:d,4:d,5:d,6:d}}return DEFAULT_WEEK}
+export function dayHours(conf,d=new Date()){const w=weekOf(conf)[d.getDay()];return w&&w.o&&w.c?w:null}
+// Zeitfenster eines Tages in Minuten (Schluss nach Mitternacht -> +1440)
+function win(w,pre=0,post=0){const o=hm(w.o),c0=hm(w.c),c=c0<=o?c0+1440:c0;return [o-pre,c+post]}
+function inWin(conf,d,pre,post){const m=d.getHours()*60+d.getMinutes();
+  const t=dayHours(conf,d);if(t){const [a,b]=win(t,pre,post);if(m>=a&&m<b)return true}
+  const y=new Date(d);y.setDate(d.getDate()-1);const p=dayHours(conf,y);if(p){const [a,b]=win(p,pre,post);if(b>1440&&m<b-1440)return true}
+  return false}
+export function isOpenNow(conf,d=new Date()){return inWin(conf,d,0,0)}
+// Personal-App aktiv: 30 Min vor Öffnung bis 60 Min nach Schluss
+export const PRE=30,POST=60;
+export function staffActive(conf,d=new Date()){return inWin(conf,d,PRE,POST)}
+// nächste Öffnung ab jetzt: {d:Date(Tag), o:'10:30', today:bool}
+export function nextOpen(conf,d=new Date()){const m=d.getHours()*60+d.getMinutes();
+  for(let i=0;i<8;i++){const x=new Date(d);x.setDate(d.getDate()+i);const t=dayHours(conf,x);if(!t)continue;if(i===0&&hm(t.o)<=m)continue;return {d:x,o:t.o,today:i===0,inDays:i}}return null}
+export function closeToday(conf,d=new Date()){const t=dayHours(conf,d);return t?t.c:null}
+
+// ---------- Bereiche & Tische ----------
+export const ZONES=[{id:'bar',name:'Bar & Eingang',from:1,to:9},{id:'saal',name:'Hauptsaal',from:11,to:29},{id:'fenster',name:'Panorama-Fenster',from:31,to:39},{id:'neben',name:'Nebenraum',from:41,to:49},{id:'terr',name:'Dachterrasse',from:51,to:69,shisha:true},{id:'terr2',name:'Terrasse überdacht',from:71,to:79,shisha:true},{id:'togo',name:'To-go / Theke',from:99,to:99}];
+// conf.zones = [{id,name,shisha,tables:['1','2',…]}]
+export function zonesFromLegacy(tables){const tb=(tables||[]).map(String);const zs=ZONES.map(z=>({id:z.id,name:z.name,shisha:!!z.shisha,tables:tb.filter(t=>+t>=z.from&&+t<=z.to)}));
+  const rest=tb.filter(t=>!zs.some(z=>z.tables.includes(t)));if(rest.length)zs.push({id:'misc',name:'Weitere',shisha:false,tables:rest});return zs}
+export function zonesOf(conf){return conf&&Array.isArray(conf.zones)?conf.zones:zonesFromLegacy(conf&&conf.tables)}
+export function zoneOf(t,conf){if(conf&&Array.isArray(conf.zones))return conf.zones.find(z=>(z.tables||[]).map(String).includes(String(t)))||null;
+  return ZONES.find(z=>+t>=z.from&&+t<=z.to)||null}
+export function allTablesOf(conf){return zonesOf(conf).flatMap(z=>(z.tables||[]).map(String))}
+export const isTerrace=(t,conf)=>{const z=zoneOf(t,conf);return !!z&&(z.shisha===true||(!conf||!conf.zones)&&(z.id==='terr'||z.id==='terr2'))};
+
+// ---------- Schicht & persönliche Push-Kanäle ----------
+const hash=s=>{let h=5381;for(const c of String(s))h=(((h<<5)+h)^c.codePointAt(0))>>>0;return h.toString(36)};
+export const personalTopic=(cfg,name)=>cfg.topic+'-p-'+hash(String(name||'').trim().toLowerCase());
+// Push an alle Eingeloggten einer Rolle/Station; wenn niemand im Dienst: Sammel-Topic als Reserve
+export function pushShift(cfg,shifts,filter,fallback,title,msg,tags){if(!cfg||!cfg.topic)return;
+  const tps=[...new Set((shifts||[]).filter(filter).map(s=>s.topic).filter(Boolean))];
+  if(!tps.length&&fallback)tps.push(fallback);for(const tp of tps)push(cfg,tp,title,msg,tags)}
