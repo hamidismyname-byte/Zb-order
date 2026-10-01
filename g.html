@@ -395,14 +395,14 @@ const A={
     el.disabled=true;el.textContent=tr('wait');
     try{const s=await Store.claimSession(T);if(G.session!==s){G.session=s;G.gid=uid()}G.had=true;saveG();join(s);
       const items=cart.map(({name,price,qty,note,st,itemId})=>({name,price,qty,note,st,itemId}));
-      const o={id:uid(),day:dayKey(),createdMs:Date.now(),table:T,session:s,guestId:G.gid,guestName:name||'',source:'guest',status:'pending',note:'',cancelled:false,st:{},items};
+      const o={id:uid(),day:dayKey(),createdMs:Date.now(),table:T,session:s,guestId:G.gid,guestName:name||'',source:'guest',status:'pending',note:'',cancelled:false,st:{},items,by:Store.authUid()};
       await Store.setDoc('orders/'+o.id,o);
       push(cfg,cfg.topic+'-service','🧾 Gastbestellung – Tisch '+T,(name?name+': ':'')+items.map(i=>i.qty+'× '+i.name+(i.note?' ('+i.note+')':'')).join('\n'),['bell']);
       cart=[];saveCart();ui.sheet=null;ui.view='table';render();scrollTo(0,0);toast('✓ '+tr('sent'),'',5000)}
     catch(e){console.error(e);toast(tr('err'),'err',6000);el.disabled=false;el.textContent=tr('send')}},
   cancelO(x){if(confirm(tr('reallyCancel')))Store.updDoc('orders/'+x,{cancelled:true}).catch(()=>toast(tr('err'),'err'))},
   async callW(x){if(!T)return;if(Date.now()<ui.cooldown){toast(tr('tooFast'));return}ui.cooldown=Date.now()+60000;
-    try{const id=uid();await Store.setDoc('calls/'+id,{table:T,type:x,day:dayKey(),createdMs:Date.now(),done:false,session:G.session||null});
+    try{const id=uid();await Store.setDoc('calls/'+id,{table:T,type:x,day:dayKey(),createdMs:Date.now(),done:false,session:G.session||null,by:Store.authUid()});
       push(cfg,cfg.topic+'-service',(x==='bill'?'🧾 Rechnung':'🙋 Service')+' – Tisch '+T,'',['bell']);
       toast(x==='bill'?tr('billCalled'):tr('called'),'',5000)}catch(e){ui.cooldown=0;toast(tr('err'),'err')}},
   wifi(){ui.sheet='wifi';render()},

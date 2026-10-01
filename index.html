@@ -166,13 +166,15 @@ const FA={
 'Heute':'امروز','Menü':'منو','Umsatz':'فروش','Einrichtung':'راه‌اندازی','Speichern':'ذخیره','Verwerfen':'لغو تغییرات','Gespeichert':'ذخیره شد',
 'Heute verfügbar':'موجود امروز','Vorlage laden':'بارگذاری الگو','Als Vorlage speichern':'ذخیره به عنوان الگو','Alle an':'همه روشن','Alle aus':'همه خاموش',
 'Küchengerichte sind nur bestellbar, wenn sie heute eingeschaltet sind. Getränke & Shisha sind immer an, außer du schaltest sie aus.':'غذاهای آشپزخانه فقط وقتی امروز روشن باشن قابل سفارش‌ان. نوشیدنی و قلیان همیشه روشنن، مگه خاموششون کنی.',
-'Öffnungszeiten':'ساعت کاری','von':'از','bis':'تا','Gäste-WLAN':'وای‌فای مهمان','Name (SSID)':'نام شبکه','Passwort':'رمز','Admin-PIN':'پین مدیریت','Leer = kein PIN':'خالی = بدون پین',
+'Öffnungszeiten':'ساعت کاری','von':'از','bis':'تا','Gäste-WLAN':'وای‌فای مهمان','Name (SSID)':'نام شبکه','Passwort':'رمز','Admin-PIN':'پین مدیریت','Kein Admin-Zugang auf diesem Gerät':'این گوشی دسترسی مدیریت ندارد','Gerät freischalten':'فعال‌سازی گوشی','Einmalig pro Handy: Zugangscode vom Chef eingeben.':'فقط یک بار برای هر گوشی: کد دسترسی را از مدیر بگیرید و وارد کنید.','Zugangscode':'کد دسترسی','Freischalten':'فعال‌سازی','Freigeschaltet':'فعال شد','Falscher Code':'کد اشتباه است','Freigeschaltete Geräte':'گوشی‌های فعال‌شده','Verlorenes Handy oder Ex-Mitarbeiter? Hier entfernen.':'گوشی گم شده یا همکار رفته؟ از اینجا حذف کنید.','dieses Gerät':'همین گوشی','Gerät entfernen?':'این گوشی حذف شود؟','Leer = kein PIN':'خالی = بدون پین',
 'Gast-Seite testen':'تست صفحه‌ی مهمان','Öffnen':'باز کردن','Falscher PIN':'پین اشتباه','+ Kategorie':'+ دسته','+ Artikel':'+ آیتم','Kategorie':'دسته','Löschen':'حذف',
 'Original-Speisekarte laden':'بارگذاری منوی اصلی','Tische (mit Komma getrennt)':'میزها (با کاما)','Anzahl Bestellungen':'تعداد سفارش','pro Kellner':'به تفکیک گارسون','Top-Artikel':'پرفروش‌ها',
 'Laden…':'در حال بارگذاری…','Fehler':'خطا','Verbindung trennen / neu einrichten':'قطع اتصال / راه‌اندازی دوباره','Sprache':'زبان','Gast':'مهمان',
 'Neue Bestellungen per Push (für Küche/Bar/Shisha in der ntfy-App abonnieren):':'سفارش جدید به صورت پوش (در اپ ntfy برای آشپزخانه/بار/قلیان مشترک شو):',
 'Demo testen (nur dieses Gerät)':'تست دمو (فقط همین گوشی)','frei':'خالی','Wird bestätigt':'منتظر تأیید','Mo':'دوشنبه','Di':'سه‌شنبه','Mi':'چهارشنبه','Do':'پنج‌شنبه','Fr':'جمعه','Sa':'شنبه','So':'یکشنبه'
 };
+let acc={checked:false,staff:false,admin:false},devs={staff:[],admins:[]},dataOn=false;
+const C0=c=>{const {pin,id,...r}=c||{};return r};
 let me=LS.get('zb_me',{name:'',role:null,station:'kueche',lang:'de',alertAll:false,wake:true});
 const t=k=>me.lang==='fa'?(FA[k]??k):k;
 const STN={kueche:'Küche',bar:'Bar',shisha:'Shisha'},STI={kueche:'🍳',bar:'🍹',shisha:'💨'},STL={neu:'Neu',arbeit:'In Arbeit',fertig:'Fertig',abgeholt:'Abgeholt'};
@@ -264,7 +266,9 @@ function render(){
   renderHeader();
   if(isEditing()){pending=true;return}
   let main='',tabs='',bar='';
-  if(!me.role)main=roleView();
+  if(cfg.mode==='fb'&&!acc.checked)main=`<p class="empty">${t('Laden…')}</p>`;
+  else if(cfg.mode==='fb'&&!acc.staff&&!acc.admin)main=codeView();
+  else if(!me.role||(me.role==='admin'&&cfg.mode==='fb'&&!acc.admin))main=roleView();
   else if(!conf)main=`<p class="empty">${t('Laden…')}</p>`;
   else if(me.role==='waiter')[main,tabs,bar]=waiterView();
   else if(me.role==='kitchen')[main,tabs]=kitchenView();
@@ -278,7 +282,7 @@ function roleView(){return `<div class="stack" style="max-width:560px;margin:aut
  <button class="w pri big" style="min-height:70px" data-a="role" data-x="waiter">🧾 ${t('Service')}</button>
  <div class="card"><label style="margin-top:0">${t('Station')}</label>
   <div class="grid" style="grid-template-columns:repeat(3,1fr)">${Object.keys(STN).map(s=>`<button class="big" style="min-height:70px" data-a="role" data-x="kitchen:${s}">${STI[s]}<br><span class="sm">${t(STN[s])}</span></button>`).join('')}</div></div>
- <button class="w ghost" data-a="role" data-x="admin">⚙︎ ${t('Admin')}</button>
+ ${cfg.mode!=='fb'||acc.admin?`<button class="w ghost" data-a="role" data-x="admin">⚙︎ ${t('Admin')}</button>`:''}
  ${cfg.mode==='demo'?'<p class="muted sm">Demo</p>':`<button class="w ghost sm" data-a="demo">${t('Demo testen (nur dieses Gerät)')}</button>`}</div>`}
 
 /* ----- Service ----- */
@@ -361,7 +365,7 @@ function kitchenView(){const s=me.station;
 
 /* ----- Admin ----- */
 function adminView(){
-  if(conf.pin&&!ui.adminOk)return [`<div class="pinw stack"><h2>${t('Admin-PIN')}</h2><input id="pin" type="password" inputmode="numeric"><button class="w pri" data-a="pin">${t('Öffnen')}</button></div>`,''];
+  if(cfg.mode==='fb'&&!acc.admin)return [`<p class="empty">${t('Kein Admin-Zugang auf diesem Gerät')}</p>`,''];
   const tabs=['heute','menu','tables','umsatz','setup'].map(x=>`<button data-a="atab" data-x="${x}" class="${ui.atab===x?'act':''}">${t({heute:'Heute',menu:'Menü',tables:'Tische',umsatz:'Umsatz',setup:'Einrichtung'}[x])}</button>`).join('');
   let m='';
   if(ui.atab==='heute'){const fresh=today&&today.day===dayKey();const on=fresh?(today.on||{}):{},off=fresh?(today.off||{}):{};
@@ -387,8 +391,8 @@ function adminView(){
     m=`<h2>${t('Einrichtung')}</h2>
     <div class="card"><b>${t('Öffnungszeiten')}</b><div class="row" style="margin-top:8px"><span>${t('von')}</span><input class="f" id="hopen" type="time" value="${esc(h.open||'10:00')}"><span>${t('bis')}</span><input class="f" id="hclose" type="time" value="${esc(h.close||'21:00')}"></div></div>
     <div class="card" style="margin-top:12px"><b>📶 ${t('Gäste-WLAN')}</b><label>${t('Name (SSID)')}</label><input id="wssid" value="${esc(w.ssid||'')}"><label>${t('Passwort')}</label><input id="wpass" value="${esc(w.pass||'')}"></div>
-    <div class="card" style="margin-top:12px"><label style="margin-top:0">${t('Admin-PIN')} <span class="sm">(${t('Leer = kein PIN')})</span></label><input id="newpin" inputmode="numeric" value="${esc(conf.pin||'')}"></div>
     <button class="w pri" style="margin-top:12px" data-a="saveSetup">${t('Speichern')}</button>
+    ${devicesCard()}
     <div class="card" style="margin-top:12px"><b>🔗 ${t('Gast-Seite testen')}</b><div class="acts"><a class="btn" href="g.html?t=23" target="_blank">${t('Tisch')} 23</a><a class="btn" href="g.html?t=55" target="_blank">${t('Tisch')} 55 ☀️</a><a class="btn" href="g.html" target="_blank">ohne Tisch</a></div></div>
     <div class="card" style="margin-top:12px"><b>ntfy</b><p class="muted sm">${t('Neue Bestellungen per Push (für Küche/Bar/Shisha in der ntfy-App abonnieren):')}</p>
       ${Object.keys(STN).map(s=>`<div class="row" style="margin-top:6px"><span>${STI[s]}</span><code class="f">${esc(topicStation(s))}</code></div>`).join('')}
@@ -417,6 +421,16 @@ function sheetView(){
 
 /* ============ Aktionen ============ */
 function setToday(mut){const fresh=today&&today.day===dayKey();const d={day:dayKey(),on:{...(fresh?today.on:{})},off:{...(fresh?today.off:{})}};mut(d);today=d;render();write(Store.setDoc('config/today',d))}
+function codeView(){return `<div class="pinw stack"><h2>🔒 ${t('Gerät freischalten')}</h2>
+ <p class="muted sm">${t('Einmalig pro Handy: Zugangscode vom Chef eingeben.')}</p>
+ <div class="seg"><button data-a="lang" data-x="de" class="${me.lang==='de'?'act':''}">Deutsch</button><button data-a="lang" data-x="fa" class="${me.lang==='fa'?'act':''}">فارسی</button></div>
+ <label>${t('Dein Name')}</label><input id="nm" value="${esc(me.name)}" autocomplete="off">
+ <label>${t('Zugangscode')}</label><input id="acode" autocomplete="off" autocapitalize="characters" style="text-transform:uppercase;letter-spacing:2px">
+ <button class="w pri big" data-a="unlock">${t('Freischalten')}</button></div>`}
+function devicesCard(){if(cfg.mode!=='fb')return '';
+ const row=(d,k)=>`<div class="avrow"><span>${k==='admins'?'⚙︎':'🧾'} ${esc(d.name||'–')} <span class="muted sm">${d.at?new Date(d.at).toLocaleDateString('de-AT'):''}${d.id===Store.authUid()?' · '+t('dieses Gerät'):''}</span></span>${d.id===Store.authUid()?'':`<button class="ghost sm" data-a="delDev" data-x="${k}/${d.id}">✕</button>`}</div>`;
+ return `<div class="card" style="margin-top:12px"><b>🔒 ${t('Freigeschaltete Geräte')}</b><p class="muted sm">${t('Verlorenes Handy oder Ex-Mitarbeiter? Hier entfernen.')}</p>
+ ${devs.admins.map(d=>row(d,'admins')).join('')}${devs.staff.map(d=>row(d,'staff')).join('')}</div>`}
 const A={
   lang(x){me.lang=x;saveMe();render()},
   demo(){cfg={mode:'demo',topic:'',ntfy:'https://ntfy.sh'};LS.set('zb_cfg',cfg);location.reload()},
@@ -449,8 +463,10 @@ const A={
       await Store.setDoc('orders/'+o.id,o);
       for(const s of Object.keys(st))push(cfg,topicStation(s),'🔔 '+t('Neue Bestellung')+' – '+t('Tisch')+' '+tb,itemsText(o,s)+(note?'\n⚠ '+note:''),['bell']);
       toast('📤 '+t('Gesendet')+' – '+t('Tisch')+' '+tb,'info',2500)}catch(e){showErr(e)}},
-  async confirm(x){const o=orders.find(o=>o.id===x);if(!o)return;const st={};for(const i of o.items)st[i.st]='neu';
-    await write(Store.updDoc('orders/'+x,{status:'ok',st,waiter:me.name,confirmedMs:Date.now()}));
+  async confirm(x){const o=orders.find(o=>o.id===x);if(!o)return;
+    const items=o.items.map(i=>{const m=conf.items.find(m=>m.id===i.itemId);if(!m)return i;const c=conf.cats.find(c=>c.id===m.cat);return {...i,price:+m.price,st:(c&&c.st)||i.st}});
+    o.items=items;const st={};for(const i of items)st[i.st]='neu';
+    await write(Store.updDoc('orders/'+x,{status:'ok',st,items,waiter:me.name,confirmedMs:Date.now()}));
     for(const s of Object.keys(st))push(cfg,topicStation(s),'🔔 '+t('Neue Bestellung')+' – '+t('Tisch')+' '+o.table,itemsText(o,s),['bell'])},
   decline(x){if(confirm(t('Ablehnen')+'?'))write(Store.updDoc('orders/'+x,{status:'declined',waiter:me.name}))},
   callDone(x){write(Store.updDoc('calls/'+x,{done:true,doneBy:me.name}))},
@@ -461,7 +477,11 @@ const A={
   ktab(x){ui.ktab=x;render()},
   kst(x){const [id,v]=x.split(':');const o=orders.find(o=>o.id===id);write(Store.updDoc('orders/'+id,{['st.'+me.station]:v}));
     if(v==='fertig'&&o&&o.waiter)push(cfg,topicWaiter(o.waiter),'✅ '+t('Tisch')+' '+o.table+' – '+t(STN[me.station])+' '+t('fertig'),itemsText(o,me.station),['white_check_mark'])},
-  pin(){if($('#pin').value===String(conf.pin)){ui.adminOk=true;render()}else toast(t('Falscher PIN'),'err')},
+  async unlock(){const code=$('#acode').value.trim().toUpperCase().replace(/\s+/g,''),nm=$('#nm').value.trim();if(!code)return;me.name=nm||me.name;saveMe();
+    const d={code,name:me.name||'',at:Date.now()},u=Store.authUid();
+    try{await Store.setDoc('admins/'+u,d);toast('✅ Admin','info',2000);return}catch(e){}
+    try{await Store.setDoc('staff/'+u,d);toast('✅ '+t('Freigeschaltet'),'info',2000)}catch(e){toast(t('Falscher Code'),'err')}},
+  delDev(x){if(confirm(t('Gerät entfernen?')))write(Store.delDoc(x))},
   atab(x){ui.atab=x;render();scrollTo(0,0)},
   wd(x){ui.wd=+x;render()},
   av(x){const it=conf.items.find(i=>i.id===x);const k=catOf(it)?.st==='kueche';setToday(d=>{if(k){if(d.on[x])delete d.on[x];else d.on[x]=true}else{if(d.off[x])delete d.off[x];else d.off[x]=true}})},
@@ -473,9 +493,9 @@ const A={
   addItem(x){ui.draft.items.push({id:uid(),cat:x,name:'',price:0});render()},
   delItem(x){ui.draft.items=ui.draft.items.filter(i=>i.id!==x);render()},
   dropDraft(){ui.draft=null;render()},
-  saveMenu(){const d=ui.draft;d.items=d.items.filter(i=>i.name.trim());write(Store.setDoc('config/main',{...conf,cats:d.cats,items:d.items}).then(()=>toast(t('Gespeichert'),'info',1500)));ui.draft=null},
-  saveTables(){const tb=$('#tbl').value.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);write(Store.setDoc('config/main',{...conf,tables:tb}).then(()=>toast(t('Gespeichert'),'info',1500)))},
-  saveSetup(){write(Store.setDoc('config/main',{...conf,hours:{open:$('#hopen').value,close:$('#hclose').value},wifi:{ssid:$('#wssid').value.trim(),pass:$('#wpass').value.trim()},pin:$('#newpin').value.trim()}).then(()=>toast(t('Gespeichert'),'info',1500)))},
+  saveMenu(){const d=ui.draft;d.items=d.items.filter(i=>i.name.trim());write(Store.setDoc('config/main',{...C0(conf),cats:d.cats,items:d.items}).then(()=>toast(t('Gespeichert'),'info',1500)));ui.draft=null},
+  saveTables(){const tb=$('#tbl').value.split(/[,\n;]+/).map(s=>s.trim()).filter(Boolean);write(Store.setDoc('config/main',{...C0(conf),tables:tb}).then(()=>toast(t('Gespeichert'),'info',1500)))},
+  saveSetup(){write(Store.setDoc('config/main',{...C0(conf),hours:{open:$('#hopen').value,close:$('#hclose').value},wifi:{ssid:$('#wssid').value.trim(),pass:$('#wpass').value.trim()}}).then(()=>toast(t('Gespeichert'),'info',1500)))},
   reset(){if(!confirm('?'))return;LS.del('zb_cfg');location.reload()}
 };
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;
@@ -506,14 +526,23 @@ async function start(){render();
   Store=makeStore(cfg);
   try{await Store.init()}catch(e){showErr(e);return}
   setConn(true);addEventListener('online',()=>setConn(true));addEventListener('offline',()=>setConn(false));
+  if(cfg.mode!=='fb'){acc={checked:true,staff:true,admin:true};startData();return}
+  const u=Store.authUid(),seen={};const upd=()=>{if(!('a' in seen&&'s' in seen))return;acc.checked=true;
+    if((acc.staff||acc.admin)&&!dataOn)startData();
+    if(acc.admin&&!devs.on){devs.on=true;Store.subCol('admins',null,null,l=>{devs.admins=l;render()});Store.subCol('staff',null,null,l=>{devs.staff=l;render()})}
+    render()};
+  Store.subDoc('admins/'+u,d=>{if(d===undefined)return;seen.a=1;acc.admin=!!d;upd()},()=>{seen.a=1;upd()});
+  Store.subDoc('staff/'+u,d=>{if(d===undefined)return;seen.s=1;acc.staff=!!d;upd()},()=>{seen.s=1;upd()});
+}
+function startData(){dataOn=true;
   Store.subDoc('config/main',c=>{if(c===undefined)return;
     if(c===null){Store.setDoc('config/main',migrate(structuredClone(SAMPLE)));return}
-    const mg=migrate(c);if(mg){write(Store.setDoc('config/main',mg));conf=mg}else conf=c;render()},showErr);
+    const mg=migrate(c);if(mg){write(Store.setDoc('config/main',C0(mg)));conf=mg}else{conf=c;if(acc.admin&&c.pin!==undefined)write(Store.setDoc('config/main',C0(c)))}render()},showErr);
   Store.subDoc('config/today',d=>{if(d===undefined)return;today=d;render()},showErr);
   Store.subDoc('config/templates',d=>{if(d===undefined)return;templates=d||{};render()},showErr);
   Store.subCol('tables',null,null,l=>{tables={};for(const x of l)tables[x.id]=x;render()},showErr);
   subToday()}
-setInterval(()=>{if(Store&&dayKey()!==subDay)subToday();else if(!isEditing()&&!ui.sheet&&(me.role==='kitchen'||ui.wtab==='aktiv'))render()},30000);
+setInterval(()=>{if(!dataOn)return;if(Store&&dayKey()!==subDay)subToday();else if(!isEditing()&&!ui.sheet&&(me.role==='kitchen'||ui.wtab==='aktiv'))render()},30000);
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 if(me.role==='kitchen'&&me.wake)wake(true);
 start();

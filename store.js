@@ -17,6 +17,8 @@ function demo(){
   const sub=s=>{subs.push(s);setTimeout(()=>emit(s.col));return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}};
   return{
     mode:'demo',async init(){},
+    authUid(){let u=LS.get('zbd_uid',null);if(!u){u='demo-'+uid();LS.set('zbd_uid',u)}return u},
+    async delDoc(path){const [col,id]=path.split('/');const o=getCol(col);delete o[id];putCol(col,o);emit(col)},
     subDoc(path,cb){const [col,id]=path.split('/');return sub({col,id,cb})},
     subCol(col,field,value,cb){return sub({col,field,value,cb})},
     async setDoc(path,data,merge){const [col,id]=path.split('/');const o=getCol(col);o[id]=merge?{...(o[id]||{}),...data}:data;putCol(col,o);emit(col)},
@@ -27,7 +29,7 @@ function demo(){
 }
 
 function fb(cfg){
-  let f,db;
+  let f,db,au;
   return{
     mode:'fb',
     async init(){
@@ -35,9 +37,11 @@ function fb(cfg){
       const [A,Au,fs]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
       f=fs;const app=A.initializeApp(cfg.fb);
       try{db=fs.initializeFirestore(app,{localCache:fs.persistentLocalCache({tabManager:fs.persistentMultipleTabManager()})})}catch(e){db=fs.getFirestore(app)}
-      await Au.signInAnonymously(Au.getAuth(app));
+      au=Au.getAuth(app);await Au.signInAnonymously(au);
     },
     // cb(null) = existiert sicher nicht; undefined = noch unbekannt (Cache)
+    authUid(){return au&&au.currentUser?au.currentUser.uid:null},
+    delDoc(path){return f.deleteDoc(f.doc(db,path))},
     subDoc(path,cb,err){return f.onSnapshot(f.doc(db,path),s=>cb(s.exists()?{...s.data(),id:s.id}:(s.metadata.fromCache?undefined:null)),err)},
     subCol(col,field,value,cb,err){const q=field?f.query(f.collection(db,col),f.where(field,'==',value)):f.collection(db,col);return f.onSnapshot(q,s=>cb(s.docs.map(d=>({...d.data(),id:d.id}))),err)},
     setDoc(path,data,merge){return f.setDoc(f.doc(db,path),data,merge?{merge:true}:{})},
