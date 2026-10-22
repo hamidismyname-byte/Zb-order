@@ -18,6 +18,13 @@ function demo(){
   return{
     mode:'demo',async init(){},
     authUid(){let u=null;try{u=sessionStorage.getItem('zbd_uid')}catch(e){}if(!u){u='demo-'+uid();try{sessionStorage.setItem('zbd_uid',u)}catch(e){}}return u},
+    isAnon(){return false},authEmail(){return null},
+    async login(){throw new Error('Demo')},async logout(){},async linkAccount(){return this.authUid()},
+    async createAccount(){return 'demo-'+uid()},async changePassword(){},
+    async getDoc(path){const [col,id]=path.split('/');const o=getCol(col);return o[id]?{...o[id],id}:null},
+    async query(col,conds){const ops={'==':(a,b)=>a===b,'>=':(a,b)=>a>=b,'<=':(a,b)=>a<=b,'>':(a,b)=>a>b,'<':(a,b)=>a<b};
+      return Object.entries(getCol(col)).map(([id,d])=>({...d,id})).filter(d=>(conds||[]).every(([a,o,v])=>ops[o](d[a],v)))},
+    async batchSet(list){const cols=new Set();for(const [path,d] of list){const [col,id]=path.split('/');const o=getCol(col);o[id]=d;putCol(col,o);cols.add(col)}cols.forEach(emit)},
     async delDoc(path){const [col,id]=path.split('/');const o=getCol(col);delete o[id];putCol(col,o);emit(col)},
     subDoc(path,cb){const [col,id]=path.split('/');return sub({col,id,cb})},
     subCol(col,field,value,cb){return sub({col,field,value,cb})},
@@ -28,38 +35,65 @@ function demo(){
   };
 }
 
-function fb(cfg){
-  let f,db,au;
+function fb(cfg,opt){
+  let f,db,au,A0,Au0,app;
   return{
     mode:'fb',
     async init(){
       const B='https://www.gstatic.com/firebasejs/10.12.2/';
       const [A,Au,fs]=await Promise.all([import(B+'firebase-app.js'),import(B+'firebase-auth.js'),import(B+'firebase-firestore.js')]);
-      f=fs;const app=A.initializeApp(cfg.fb);
+      f=fs;A0=A;Au0=Au;
+      // Gast-Seite eigene Firebase-Instanz -> eigenes (anonymes) Login, stört das Personal-Login auf demselben Handy nicht
+      app=opt.app==='guest'?A.initializeApp(cfg.fb,'guest'):A.initializeApp(cfg.fb);
       try{db=fs.initializeFirestore(app,{localCache:fs.persistentLocalCache({tabManager:fs.persistentMultipleTabManager()})})}catch(e){db=fs.getFirestore(app)}
-      au=Au.getAuth(app);await Au.signInAnonymously(au);
+      au=Au.getAuth(app);
+      try{await au.authStateReady()}catch(e){await new Promise(r=>{const un=Au.onAuthStateChanged(au,()=>{un();r()})})}
+      if(!au.currentUser)await Au.signInAnonymously(au);
     },
     // cb(null) = existiert sicher nicht; undefined = noch unbekannt (Cache)
     authUid(){return au&&au.currentUser?au.currentUser.uid:null},
+    isAnon(){return !au||!au.currentUser||au.currentUser.isAnonymous},
+    authEmail(){return au&&au.currentUser?au.currentUser.email:null},
+    async login(email,pass){await Au0.signInWithEmailAndPassword(au,email,pass);return au.currentUser.uid},
+    async logout(){await Au0.signOut(au);await Au0.signInAnonymously(au)},
+    async linkAccount(email,pass){const c=Au0.EmailAuthProvider.credential(email,pass);await Au0.linkWithCredential(au.currentUser,c);return au.currentUser.uid},
+    // neues Konto anlegen, ohne den Admin abzumelden (zweite, flüchtige Instanz)
+    async createAccount(email,pass){const a2=A0.initializeApp(cfg.fb,'mk'+Date.now());const x=Au0.initializeAuth(a2,{persistence:Au0.inMemoryPersistence});
+      try{const r=await Au0.createUserWithEmailAndPassword(x,email,pass);return r.user.uid}finally{try{await Au0.signOut(x)}catch(e){}try{await A0.deleteApp(a2)}catch(e){}}},
+    async changePassword(oldP,newP){const u=au.currentUser;await Au0.reauthenticateWithCredential(u,Au0.EmailAuthProvider.credential(u.email,oldP));await Au0.updatePassword(u,newP)},
+    async getDoc(path){const s=await f.getDoc(f.doc(db,path));return s.exists()?{...s.data(),id:s.id}:null},
+    // einmalige Abfrage: conds=[[feld,op,wert],…]
+    async query(col,conds,o){const q=f.query(f.collection(db,col),...(conds||[]).map(([a,o,v])=>f.where(a,o,v)));const s=await (o&&o.server?f.getDocsFromServer(q):f.getDocs(q));return s.docs.map(d=>({...d.data(),id:d.id}))},
     delDoc(path){return f.deleteDoc(f.doc(db,path))},
     subDoc(path,cb,err){return f.onSnapshot(f.doc(db,path),s=>cb(s.exists()?{...s.data(),id:s.id}:(s.metadata.fromCache?undefined:null)),err)},
     subCol(col,field,value,cb,err){const q=field?f.query(f.collection(db,col),f.where(field,'==',value)):f.collection(db,col);return f.onSnapshot(q,s=>cb(s.docs.map(d=>({...d.data(),id:d.id}))),err)},
     setDoc(path,data,merge){return f.setDoc(f.doc(db,path),data,merge?{merge:true}:{})},
     updDoc(path,patch){return f.updateDoc(f.doc(db,path),patch)},
     batchUpd(list){const b=f.writeBatch(db);for(const [p,patch] of list)b.update(f.doc(db,p),patch);return b.commit()},
+    batchSet(list){const b=f.writeBatch(db);for(const [p,d] of list)b.set(f.doc(db,p),d);return b.commit()},
     claimSession(t){const ref=f.doc(db,'tables/'+t);return f.runTransaction(db,async tx=>{const s=await tx.get(ref);if(s.exists()&&s.data().session)return s.data().session;const ns=uid();tx.set(ref,{session:ns,openedMs:Date.now()},{merge:true});return ns})}
   };
 }
-export function makeStore(cfg){return cfg&&cfg.mode==='fb'?fb(cfg):demo()}
+export function makeStore(cfg,opt={}){return cfg&&cfg.mode==='fb'?fb(cfg,opt):demo()}
 
 // ntfy-Push (kostenlos, ohne Konto)
 export function push(cfg,topic,title,message,tags){if(!cfg||!cfg.topic)return;
   fetch((cfg.ntfy||'https://ntfy.sh').replace(/\/$/,'')+'/',{method:'POST',body:JSON.stringify({topic,title,message,tags,priority:5,click:location.origin+location.pathname.replace(/[^/]*$/,'')})}).catch(()=>{})}
 
+// Stationen: zwei Küchen (Persisch/Afghanisch = 'kueche', Italienisch/Österreichisch = 'ital'), Bar, Shisha
+export const KST=['kueche','ital'];
+export const isKitchenSt=s=>KST.includes(s);
+// Station eines Artikels: eigene Zuordnung am Artikel, sonst die der Kategorie
+export const stOf=(item,cat)=>(item&&item.st)||(cat&&cat.st)||'kueche';
+export const isShishaCat=c=>!!c&&(c.id==='shi'||c.shisha===true||c.st==='shisha');
 // Verfügbarkeit: Küchen-Gerichte nur wenn heute aktiviert; Bar/Shisha standardmäßig verfügbar (außer heute deaktiviert)
-export function isAvail(item,cat,today){const fresh=today&&today.day===dayKey();
-  if(cat&&cat.st==='kueche')return !!(fresh&&today.on&&today.on[item.id]);
+export function isAvail(item,cat,today,perm){if(perm&&perm[item.id])return false;const fresh=today&&today.day===dayKey();
+  if(isKitchenSt(stOf(item,cat)))return !!(fresh&&today.on&&today.on[item.id]);
   return !(fresh&&today.off&&today.off[item.id])}
+// Küche ab (Standard 12:00): vorher sind Küchengerichte sichtbar, aber nicht bestellbar
+export const kitchenFrom=conf=>(conf&&conf.kitchenFrom)||'12:00';
+export function kitchenWaiting(conf,d=new Date()){const kf=kitchenFrom(conf);if(!kf)return false;const m=d.getHours()*60+d.getMinutes();
+  return m>=300&&m<hm(kf)}
 // ---------- Öffnungszeiten pro Wochentag ----------
 // conf.week = {0:{o:'10:30',c:'23:00'}, 1:null (Ruhetag), ...}  (0=So … 6=Sa)
 export const DEFAULT_WEEK={0:{o:'10:30',c:'23:00'},1:null,2:{o:'10:30',c:'21:00'},3:{o:'10:30',c:'21:00'},4:{o:'10:30',c:'21:00'},5:{o:'10:30',c:'23:00'},6:{o:'10:30',c:'23:00'}};
@@ -99,3 +133,14 @@ export const personalTopic=(cfg,name)=>cfg.topic+'-p-'+hash(String(name||'').tri
 export function pushShift(cfg,shifts,filter,fallback,title,msg,tags){if(!cfg||!cfg.topic)return;
   const tps=[...new Set((shifts||[]).filter(filter).map(s=>s.topic).filter(Boolean))];
   if(!tps.length&&fallback)tps.push(fallback);for(const tp of tps)push(cfg,tp,title,msg,tags)}
+
+// ---------- Arbeitszeit ----------
+export const hmToMin=s=>{const [h,m]=String(s||'0:0').split(':').map(Number);return h*60+(m||0)};
+// Datum (lokal, 00:00) eines Geschäftstags 'YYYY-MM-DD'
+export const dateOfDay=day=>{const [y,m,d]=day.split('-').map(Number);return new Date(y,m-1,d)};
+// automatisches Gehen: Schluss des Tages + 60 Min. (ohne Öffnungszeit: Kommen + 10 Std.)
+export function autoOutMs(conf,day,inMs){const d=dateOfDay(day);const t=dayHours(conf,d);
+  if(!t)return inMs+10*3600e3;let o=hmToMin(t.o),c=hmToMin(t.c);if(c<=o)c+=1440;const a=d.getTime()+(c+POST)*60000;return a>inMs?a:inMs+10*3600e3}
+// Minuten einer Zeitbuchung (offen = bis jetzt)
+export const entryMin=(e,now=Date.now())=>e.deleted?0:Math.max(0,Math.round(((e.outMs||now)-e.inMs)/60000)-(+e.breakMin||0));
+export const fmtMin=m=>{m=Math.round(m);const h=Math.floor(m/60);return h+':'+String(m%60).padStart(2,'0')};

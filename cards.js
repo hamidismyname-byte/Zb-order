@@ -1,5 +1,5 @@
 // Zirlerberg – druckfertige QR-Tischkarten (A6, untere 3 cm stecken im Ständer)
-export function cardsHTML(list,{base,qr,wifi}){
+export function cardsHTML(list,{base,qr,wifi,wifiOnly,a4}){
   // list: [{t:'23', zone:'Hauptsaal'}]; base: '…/g.html'; qr: qrcode-generator-Funktion
   const svg=txt=>{const q=qr(0,'M');q.addData(txt);q.make();return q.createSvgTag({cellSize:4,margin:0,scalable:true})};
   const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -17,11 +17,17 @@ export function cardsHTML(list,{base,qr,wifi}){
     <div class="scan">SCAN · CONNECT</div>
     <div class="zn" style="margin-top:3mm">${esc(wifi.ssid)}</div>
   </div><div class="stand"></div></section>`;
-  const pages=list.map(x=>front(x)+(wifi&&wifi.ssid?back():'')).join('');
+  let pages;
+  if(!a4)pages=wifiOnly?(wifi&&wifi.ssid?back():''):list.map(x=>front(x)+(wifi&&wifi.ssid?back():'')).join('');
+  else{ // Sammeldruck: 4 Karten A6 auf A4 (2×2), Rückseiten gespiegelt für beidseitigen Druck (lange Kante)
+    const fr=wifiOnly?Array.from({length:Math.max(1,list.length)},()=>back()):list.map(front);const bk=!wifiOnly&&wifi&&wifi.ssid;pages='';
+    for(let i=0;i<fr.length;i+=4){const g=fr.slice(i,i+4);while(g.length<4)g.push('<section class="card empty"></section>');
+      pages+=`<div class="a4">${g.join('')}<i class="cut v"></i><i class="cut h"></i></div>`;
+      if(bk){const n=Math.min(4,fr.length-i),b=[0,1,2,3].map(k=>k<n?back():'<section class="card empty"></section>');pages+=`<div class="a4">${[b[1],b[0],b[3],b[2]].join('')}<i class="cut v"></i><i class="cut h"></i></div>`}}}
   return `<!doctype html><html><head><meta charset="utf-8"><title>Zirlerberg QR-Karten</title><style>
 @font-face{font-family:CG;src:url(font-cg600.woff2) format('woff2');font-weight:600}
 @font-face{font-family:MR;src:url(font-mr600.woff2) format('woff2');font-weight:600}
-@page{size:105mm 148mm;margin:0}
+@page{size:${a4?'210mm 297mm':'105mm 148mm'};margin:0}
 *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 html,body{margin:0;padding:0;background:#555}
 .card{width:105mm;height:148mm;background:#0a1430;color:#f4efe4;position:relative;overflow:hidden;page-break-after:always;break-after:page;margin:0 auto}
@@ -37,4 +43,10 @@ html,body{margin:0;padding:0;background:#555}
 .zn{font:600 7pt MR,sans-serif;letter-spacing:1.2pt;color:rgba(244,239,228,.7);margin-top:1mm;text-transform:uppercase}
 .wt{font:600 20pt/1 CG,Georgia,serif;color:#d6b06a;margin-top:4mm}
 .stand{height:30mm;background:#0a1430}
+.a4{width:210mm;height:297mm;display:grid;grid-template-columns:105mm 105mm;grid-template-rows:148mm 148mm;position:relative;page-break-after:always;break-after:page;background:#fff;margin:0 auto}
+.a4 .card{margin:0!important;box-shadow:none!important;page-break-after:auto;break-after:auto}
+.a4 .card.empty{background:#fff}.a4 .card.empty:before{display:none}
+.cut{position:absolute;background:repeating-linear-gradient(90deg,#999 0 3mm,transparent 3mm 5mm);pointer-events:none}
+.cut.h{left:0;right:0;top:148mm;height:.2mm}.cut.v{top:0;bottom:0;left:105mm;width:.2mm;background:repeating-linear-gradient(180deg,#999 0 3mm,transparent 3mm 5mm)}
+@media screen{.a4{margin:6mm auto;box-shadow:0 4px 20px #0008}}
 </style></head><body>${pages}</body></html>`}

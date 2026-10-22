@@ -35,6 +35,9 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .story[open] summary:after{content:'–'}
 .story p{margin:0;padding:0 14px 14px;color:var(--tx);font-size:15px;line-height:1.65}
 .hint{font-size:12px;color:var(--mu);margin-top:6px}
+.chip.dim{opacity:.5}
+.nahd{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin:18px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
+.nalist .row{padding:8px 0}.nalist .row .nm{font-size:16px}.nalist .ds,.nalist .al,.nalist .offl,.nalist .add{display:none}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,48,.35) 0%,rgba(10,20,48,.15) 35%,rgba(10,20,48,.8) 75%,rgba(10,20,48,.86) 100%)}
 .hero>*:not(video):not(.shade):not(.poster){position:relative}
 .langs{position:absolute!important;top:calc(14px + env(safe-area-inset-top));inset-inline-end:14px;display:flex;gap:4px;background:rgba(10,20,48,.55);backdrop-filter:blur(8px);border-radius:999px;padding:4px}
@@ -137,9 +140,14 @@ label{display:block;color:var(--mu);font-size:13px;margin:12px 0 6px}
 .s-ready{background:rgba(95,211,154,.18);color:var(--ok)}.s-done{background:rgba(167,175,198,.12);color:var(--mu)}.s-no{background:rgba(239,123,123,.15);color:var(--er)}
 .gname{font-size:14px;color:var(--mu)}
 .mini{font-size:14px;display:flex;gap:8px;padding:3px 0}.mini b{color:var(--gold);min-width:26px}
-.thx{text-align:center;padding:26px 18px;background:linear-gradient(135deg,#1b2d5e,#13224a);border:1px solid rgba(214,176,106,.5);border-radius:var(--r);margin:22px 0}
+.thx{text-align:center;padding:30px 18px;background:linear-gradient(180deg,rgba(10,20,48,.55),rgba(10,20,48,.9)),url('s-panorama.webp') center/cover;border:1px solid rgba(214,176,106,.5);border-radius:var(--r);margin:22px 0}
 .thx h2{font-size:30px;margin:0 0 6px}
 .stars{font-size:30px;color:var(--gold);letter-spacing:4px;margin:8px 0}
+/* v12 */
+.cban{height:150px;border-radius:18px;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:12px 16px;margin:30px 0 14px;box-shadow:inset 0 -90px 70px -30px rgba(10,20,48,.95);border:1px solid var(--line)}
+.cban .cath{margin:0;text-shadow:0 2px 12px rgba(0,0,0,.6)}.cban .cath:after{display:none}
+.kban{background:rgba(214,176,106,.12);border:1px solid rgba(214,176,106,.55);color:var(--gold);border-radius:14px;padding:12px 14px;margin:16px 0 0;font-weight:600;font-size:15px;text-align:center}
+.langs button{padding:6px 8px}
 footer{color:var(--mu);font-size:13px;text-align:center;padding:30px 0 20px}
 footer a{color:var(--gold);text-decoration:none}
 .leg{font-size:12px;line-height:1.7;color:var(--mu);margin-top:26px;border-top:1px solid var(--line);padding-top:16px}
@@ -158,7 +166,7 @@ footer a{color:var(--gold);text-decoration:none}
 <div id="toast"></div>
 <script src="data.js"></script>
 <script type="module">
-import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift} from './store.js';
+import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift,stOf,isKitchenSt,isShishaCat,kitchenFrom,kitchenWaiting} from './store.js';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur=n=>'<bdi>'+(Math.round((+n||0)*100)/100).toFixed(2).replace('.',',')+' €</bdi>';
@@ -169,69 +177,97 @@ const T=(P.get('t')||'').replace(/[^0-9A-Za-z-]/g,'')||null;
 const cfg=LS.get('zb_cfg',null)||DEFAULT_CFG;
 
 /* ============ Sprachen ============ */
-const LANGS=['de','en','fa','it'];
+const LANGS=['de','en','fa','it','ar'];const RTL=['fa','ar'];
 const I={
-welcome:['Willkommen','Welcome','خوش آمدید','Benvenuti'],
-tag:['Restaurant · Shisha · Terrassenbar','Restaurant · Shisha · Terrace bar','رستوران · قلیان · بار تراس','Ristorante · Shisha · Terrazza'],
-table:['Tisch','Table','میز','Tavolo'],
-openUntil:['Geöffnet · bis','Open · until','باز است · تا','Aperto · fino alle'],
-closedFrom:['Geschlossen · ab','Closed · opens','بسته است · از ساعت','Chiuso · apre alle'],
-menu:['Speisekarte','Menu','منو','Menù'],menuOrder:['Speisekarte & Bestellen','Menu & order','منو و سفارش','Menù & ordina'],
-menuSub:['Wählen, bestellen, genießen','Choose, order, enjoy','انتخاب کن، سفارش بده، لذت ببر','Scegli, ordina, gusta'],
-call:['Service rufen','Call waiter','صدا زدن گارسون','Chiama il cameriere'],bill:['Rechnung bitte','Bill, please','صورت‌حساب لطفاً','Il conto, per favore'],
-wifi:['Gäste-WLAN','Guest Wi-Fi','وای‌فای مهمان','Wi-Fi ospiti'],review:['Bewerten Sie uns','Rate us','به ما امتیاز بدید','Valutaci'],insta:['Instagram','Instagram','اینستاگرام','Instagram'],
-start:['Start','Home','خانه','Home'],ourTable:['Unser Tisch','Our table','میز ما','Il nostro tavolo'],
-highlights:['Empfehlungen von heute','Today’s recommendations','پیشنهادهای امروز','Consigli di oggi'],highSub:['Frisch aus unserer Küche','Fresh from our kitchen','تازه از آشپزخانه‌ی ما','Freschi dalla nostra cucina'],
-veg:['Vegetarisch','Vegetarian','گیاهی','Vegetariano'],spicy:['Scharf','Spicy','تند','Piccante'],house:['Hausspezialität','House speciality','مخصوص سرآشپز','Specialità della casa'],
-min30:['ca. 30 Min.','approx. 30 min','حدود ۳۰ دقیقه','circa 30 min'],
-sym:['Symbolfoto','Illustrative photo','عکس نمادین','Foto illustrativa'],
-notToday:['Heute nicht verfügbar','Not available today','امروز موجود نیست','Non disponibile oggi'],
-terraceOnly:['Nur auf der Terrasse','Terrace only','فقط روی تراس','Solo in terrazza'],
-scanToOrder:['Zum Bestellen bitte den QR-Code auf Ihrem Tisch scannen.','To order, please scan the QR code on your table.','برای سفارش، QR روی میزتون رو اسکن کنید.','Per ordinare, scansiona il QR code sul tavolo.'],
-closedNow:['Bestellungen sind ab {t} Uhr möglich.','Orders are possible from {t}.','سفارش از ساعت {t} ممکنه.','Si può ordinare dalle {t}.'],
-add:['Hinzufügen','Add','افزودن','Aggiungi'],note:['Wunsch (z. B. ohne Zwiebel)','Request (e.g. no onion)','درخواست (مثلاً بدون پیاز)','Richiesta (es. senza cipolla)'],
-cart:['Ihre Bestellung','Your order','سفارش شما','Il tuo ordine'],cartBar:['Bestellung ansehen','View order','دیدن سفارش','Vedi ordine'],
-nameHint:['Freiwillig – mit Ihrem Namen findet Ihre Bestellung leichter zu Ihnen und die Rechnung ist einfacher.','Optional – with your name your order finds you more easily and the bill is simpler.','اختیاری – با نوشتن اسم، سفارش راحت‌تر به دستتون می‌رسه و حساب هم ساده‌تره.','Facoltativo – con il tuo nome l’ordine ti trova più facilmente e il conto è più semplice.'],
-story:['Die Geschichte dieses Gerichts','The story of this dish','داستان این غذا','La storia di questo piatto'],
-restDay:['Heute Ruhetag','Closed today','امروز تعطیل هستیم','Oggi giorno di riposo'],
-opensAt:['Wir öffnen {d} um {t} Uhr','We open {d} at {t}','{d} از ساعت {t} باز هستیم','Apriamo {d} alle {t}'],
-tomorrow:['morgen','tomorrow','فردا','domani'],todayW:['heute','today','امروز','oggi'],
-yourName:['Ihr Vorname (für den Service)','Your first name (for our staff)','نام شما (برای گارسون)','Il tuo nome (per il personale)'],
-send:['Bestellung senden','Send order','ارسال سفارش','Invia ordine'],total:['Summe','Total','جمع','Totale'],
-sent:['Danke! Der Service bestätigt Ihre Bestellung gleich.','Thank you! Our staff will confirm your order shortly.','ممنون! گارسون سفارشتون رو الان تأیید می‌کنه.','Grazie! Il personale confermerà a breve.'],
-confirmInfo:['Ihre Bestellung wird vom Service bestätigt und geht dann direkt in die Küche.','Your order is confirmed by our staff and then goes straight to the kitchen.','سفارش شما توسط گارسون تأیید می‌شه و مستقیم به آشپزخانه می‌ره.','Il tuo ordine viene confermato dal personale e va subito in cucina.'],
-payInfo:['Bezahlt wird wie gewohnt beim Service.','Payment as usual with our staff.','پرداخت مثل همیشه با گارسون.','Il pagamento avviene come sempre al personale.'],
-st_pend:['Wird bestätigt…','Being confirmed…','در انتظار تأیید…','In conferma…'],st_ok:['Bestätigt','Confirmed','تأیید شد','Confermato'],
-st_cook:['In Zubereitung','Being prepared','در حال آماده‌سازی','In preparazione'],st_ready:['Kommt gleich!','Coming right up!','الان میاد!','Arriva subito!'],
-st_done:['Serviert','Served','سرو شد','Servito'],st_no:['Bitte Service fragen','Please ask our staff','لطفاً از گارسون بپرسید','Chiedi al personale'],
-cancel:['Stornieren','Cancel','لغو','Annulla'],reallyCancel:['Bestellung stornieren?','Cancel this order?','سفارش لغو بشه؟','Annullare l’ordine?'],
-noOrders:['Noch keine Bestellung an diesem Tisch.','No orders at this table yet.','هنوز سفارشی برای این میز نیست.','Ancora nessun ordine a questo tavolo.'],
-me_:['Sie','You','شما','Tu'],guest:['Gast','Guest','مهمان','Ospite'],service:['Service','Service','گارسون','Servizio'],
-called:['Der Service kommt gleich zu Ihnen.','Our staff will be with you shortly.','گارسون الان میاد.','Il personale arriva subito.'],
-billCalled:['Die Rechnung kommt gleich.','Your bill is on its way.','صورت‌حساب الان میاد.','Il conto arriva subito.'],
-wait:['Bitte einen Moment …','One moment please …','یک لحظه لطفاً …','Un momento …'],
-pairs:['Dazu passt perfekt','Goes perfectly with','عالی کنارش می‌چسبه','Perfetto insieme a'],noThanks:['Nein, danke','No, thanks','نه، ممنون','No, grazie'],
-age:['Ich bestätige, dass ich mindestens 18 Jahre alt bin.','I confirm that I am at least 18 years old.','تأیید می‌کنم که حداقل ۱۸ سال دارم.','Confermo di avere almeno 18 anni.'],
-ageT:['Shisha nur ab 18','Shisha 18+ only','قلیان فقط بالای ۱۸ سال','Shisha solo per maggiorenni'],ok:['OK','OK','باشه','OK'],
-thanks:['Danke für Ihren Besuch!','Thank you for your visit!','ممنون از حضورتون!','Grazie della visita!'],
-thanksSub:['Hat es Ihnen geschmeckt? Ihre Bewertung hilft uns sehr.','Did you enjoy it? Your review helps us a lot.','خوشتون اومد؟ نظرتون خیلی به ما کمک می‌کنه.','Ti è piaciuto? La tua recensione ci aiuta molto.'],
-rateGoogle:['Auf Google bewerten','Review on Google','امتیاز در گوگل','Recensisci su Google'],
-copy:['Kopieren','Copy','کپی','Copia'],copied:['Kopiert','Copied','کپی شد','Copiato'],net:['Netzwerk','Network','شبکه','Rete'],pw:['Passwort','Password','رمز','Password'],
-allergens:['Allergene','Allergens','آلرژن‌ها','Allergeni'],legend:['Allergene: ','Allergens: ','آلرژن‌ها: ','Allergeni: '],
-taxes:['Alle Preise in Euro inkl. Steuern.','All prices in euro incl. taxes.','همه‌ی قیمت‌ها به یورو و با مالیات.','Tutti i prezzi in euro IVA inclusa.'],
-items:['Artikel','items','آیتم','articoli'],tooFast:['Bitte kurz warten – der Service ist schon informiert.','Please wait a moment – our staff has been notified.','کمی صبر کنید – گارسون خبر داره.','Attendi un attimo – il personale è già avvisato.'],
-err:['Leider ein Fehler – bitte Service fragen.','Sorry, something went wrong – please ask our staff.','متأسفانه خطایی پیش اومد – از گارسون بپرسید.','Errore – chiedi al personale.']
-};
-const CAT={vor:['Vorspeisen','Starters','پیش‌غذا','Antipasti'],sup:['Suppen','Soups','سوپ‌ها','Zuppe'],sal:['Salate','Salads','سالادها','Insalate'],per:['Persisch & Afghanisch','Persian & Afghan','ایرانی و افغانی','Persiano & Afghano'],gri:['Vom Grill','From the grill','کباب‌ها','Dalla griglia'],oes:['Österreichisch','Austrian','اتریشی','Austriaco'],piz:['Pizza','Pizza','پیتزا','Pizza'],pas:['Pasta','Pasta','پاستا','Pasta'],bur:['Burger','Burgers','برگر','Burger'],bei:['Beilagen & Dips','Sides & dips','مخلفات','Contorni & salse'],hei:['Heiße Getränke','Hot drinks','نوشیدنی گرم','Bevande calde'],alf:['Alkoholfrei','Soft drinks','نوشیدنی بدون الکل','Analcolici'],bie:['Bier & Radler','Beer & shandy','آبجو و رادلر','Birra & Radler'],ape:['Aperitif & Prosecco','Aperitif & prosecco','آپریتیف و پروسکو','Aperitivo & prosecco'],coc:['Cocktails & Longdrinks','Cocktails & long drinks','کوکتل','Cocktail & long drink'],wei:['Wein','Wine','شراب','Vino'],sch:['Schnaps & Digestif','Schnapps & digestif','عرق و دیژستیف','Grappe & digestivi'],shi:['Shisha','Shisha','قلیان','Shisha']};
-const AL={A:['Gluten','gluten','گلوتن','glutine'],B:['Krebstiere','crustaceans','سخت‌پوستان','crostacei'],C:['Eier','eggs','تخم‌مرغ','uova'],D:['Fisch','fish','ماهی','pesce'],G:['Milch/Laktose','milk/lactose','شیر/لاکتوز','latte/lattosio'],H:['Schalenfrüchte','nuts','مغزها','frutta a guscio'],L:['Sellerie','celery','کرفس','sedano'],M:['Senf','mustard','خردل','senape'],O:['Sulfite','sulphites','سولفیت','solfiti'],R:['Weichtiere','molluscs','نرم‌تنان','molluschi']};
+welcome:["Willkommen","Welcome","خوش آمدید","Benvenuti","أهلاً وسهلاً"],
+tag:["Restaurant · Shisha · Terrassenbar","Restaurant · Shisha · Terrace bar","رستوران · قلیان · بار تراس","Ristorante · Shisha · Terrazza","مطعم · شيشة · بار التراس"],
+table:["Tisch","Table","میز","Tavolo","طاولة"],
+openUntil:["Geöffnet · bis","Open · until","باز است · تا","Aperto · fino alle","مفتوح · حتى"],
+closedFrom:["Geschlossen · ab","Closed · opens","بسته است · از ساعت","Chiuso · apre alle","مغلق · نفتح الساعة"],
+menu:["Speisekarte","Menu","منو","Menù","قائمة الطعام"],
+menuOrder:["Speisekarte & Bestellen","Menu & order","منو و سفارش","Menù & ordina","القائمة والطلب"],
+menuSub:["Wählen, bestellen, genießen","Choose, order, enjoy","انتخاب کن، سفارش بده، لذت ببر","Scegli, ordina, gusta","اختر، اطلب، استمتع"],
+call:["Service rufen","Call waiter","صدا زدن گارسون","Chiama il cameriere","نداء النادل"],
+bill:["Rechnung bitte","Bill, please","صورت‌حساب لطفاً","Il conto, per favore","الحساب من فضلك"],
+wifi:["Gäste-WLAN","Guest Wi-Fi","وای‌فای مهمان","Wi-Fi ospiti","واي فاي للضيوف"],
+review:["Bewerten Sie uns","Rate us","به ما امتیاز بدید","Valutaci","قيّمونا"],
+insta:["Instagram","Instagram","اینستاگرام","Instagram","إنستغرام"],
+start:["Start","Home","خانه","Home","الرئيسية"],
+ourTable:["Unser Tisch","Our table","میز ما","Il nostro tavolo","طاولتنا"],
+highlights:["Empfehlungen von heute","Today’s recommendations","پیشنهادهای امروز","Consigli di oggi","توصيات اليوم"],
+highSub:["Frisch aus unserer Küche","Fresh from our kitchen","تازه از آشپزخانه‌ی ما","Freschi dalla nostra cucina","طازجة من مطبخنا"],
+veg:["Vegetarisch","Vegetarian","گیاهی","Vegetariano","نباتي"],
+spicy:["Scharf","Spicy","تند","Piccante","حار"],
+house:["Hausspezialität","House speciality","مخصوص سرآشپز","Specialità della casa","طبق البيت المميّز"],
+min30:["ca. 30 Min.","approx. 30 min","حدود ۳۰ دقیقه","circa 30 min","حوالي 30 دقيقة"],
+sym:["Symbolfoto","Illustrative photo","عکس نمادین","Foto illustrativa","صورة توضيحية"],
+notToday:["Heute nicht verfügbar","Not available today","امروز موجود نیست","Non disponibile oggi","غير متوفر اليوم"],
+terraceOnly:["Nur auf der Terrasse","Terrace only","فقط روی تراس","Solo in terrazza","على التراس فقط"],
+scanToOrder:["Zum Bestellen bitte den QR-Code auf Ihrem Tisch scannen.","To order, please scan the QR code on your table.","برای سفارش، QR روی میزتون رو اسکن کنید.","Per ordinare, scansiona il QR code sul tavolo.","للطلب، يرجى مسح رمز QR الموجود على طاولتكم."],
+closedNow:["Bestellungen sind ab {t} Uhr möglich.","Orders are possible from {t}.","سفارش از ساعت {t} ممکنه.","Si può ordinare dalle {t}.","يمكن الطلب ابتداءً من الساعة {t}."],
+add:["Hinzufügen","Add","افزودن","Aggiungi","إضافة"],
+note:["Wunsch (z. B. ohne Zwiebel)","Request (e.g. no onion)","درخواست (مثلاً بدون پیاز)","Richiesta (es. senza cipolla)","طلب خاص (مثلاً بدون بصل)"],
+cart:["Ihre Bestellung","Your order","سفارش شما","Il tuo ordine","طلبكم"],
+cartBar:["Bestellung ansehen","View order","دیدن سفارش","Vedi ordine","عرض الطلب"],
+todayFor:["Heute für Sie","Today for you","امروز برای شما","Oggi per voi","اليوم لكم"],
+todaySub:["Frisch zubereitet – heute bestellbar","Freshly made – available today","تازه آماده می‌شه – امروز قابل سفارش","Preparati freschi – ordinabili oggi","محضّرة طازجة – متوفرة اليوم"],
+nameHint:["Freiwillig – mit Ihrem Namen findet Ihre Bestellung leichter zu Ihnen und die Rechnung ist einfacher.","Optional – with your name your order finds you more easily and the bill is simpler.","اختیاری – با نوشتن اسم، سفارش راحت‌تر به دستتون می‌رسه و حساب هم ساده‌تره.","Facoltativo – con il tuo nome l’ordine ti trova più facilmente e il conto è più semplice.","اختياري – باسمكم يصلكم طلبكم بسهولة أكبر ويكون الحساب أبسط."],
+story:["Die Geschichte dieses Gerichts","The story of this dish","داستان این غذا","La storia di questo piatto","قصة هذا الطبق"],
+restDay:["Heute Ruhetag","Closed today","امروز تعطیل هستیم","Oggi giorno di riposo","اليوم يوم عطلة"],
+opensAt:["Wir öffnen {d} um {t} Uhr","We open {d} at {t}","{d} از ساعت {t} باز هستیم","Apriamo {d} alle {t}","نفتح {d} الساعة {t}"],
+tomorrow:["morgen","tomorrow","فردا","domani","غداً"],
+todayW:["heute","today","امروز","oggi","اليوم"],
+yourName:["Ihr Vorname (für den Service)","Your first name (for our staff)","نام شما (برای گارسون)","Il tuo nome (per il personale)","اسمكم الأول (للنادل)"],
+send:["Bestellung senden","Send order","ارسال سفارش","Invia ordine","إرسال الطلب"],
+total:["Summe","Total","جمع","Totale","المجموع"],
+sent:["Danke! Der Service bestätigt Ihre Bestellung gleich.","Thank you! Our staff will confirm your order shortly.","ممنون! گارسون سفارشتون رو الان تأیید می‌کنه.","Grazie! Il personale confermerà a breve.","شكراً! سيؤكد النادل طلبكم خلال لحظات."],
+confirmInfo:["Ihre Bestellung wird vom Service bestätigt und geht dann direkt in die Küche.","Your order is confirmed by our staff and then goes straight to the kitchen.","سفارش شما توسط گارسون تأیید می‌شه و مستقیم به آشپزخانه می‌ره.","Il tuo ordine viene confermato dal personale e va subito in cucina.","يؤكد النادل طلبكم ثم يذهب مباشرة إلى المطبخ."],
+payInfo:["Bezahlt wird wie gewohnt beim Service.","Payment as usual with our staff.","پرداخت مثل همیشه با گارسون.","Il pagamento avviene come sempre al personale.","الدفع كالمعتاد لدى النادل."],
+st_pend:["Wird bestätigt…","Being confirmed…","در انتظار تأیید…","In conferma…","بانتظار التأكيد…"],
+st_ok:["Bestätigt","Confirmed","تأیید شد","Confermato","تم التأكيد"],
+st_cook:["In Zubereitung","Being prepared","در حال آماده‌سازی","In preparazione","قيد التحضير"],
+st_ready:["Kommt gleich!","Coming right up!","الان میاد!","Arriva subito!","في الطريق إليكم!"],
+st_done:["Serviert","Served","سرو شد","Servito","تم التقديم"],
+st_no:["Bitte Service fragen","Please ask our staff","لطفاً از گارسون بپرسید","Chiedi al personale","يرجى سؤال النادل"],
+cancel:["Stornieren","Cancel","لغو","Annulla","إلغاء"],
+reallyCancel:["Bestellung stornieren?","Cancel this order?","سفارش لغو بشه؟","Annullare l’ordine?","إلغاء هذا الطلب؟"],
+noOrders:["Noch keine Bestellung an diesem Tisch.","No orders at this table yet.","هنوز سفارشی برای این میز نیست.","Ancora nessun ordine a questo tavolo.","لا توجد طلبات على هذه الطاولة بعد."],
+me_:["Sie","You","شما","Tu","أنتم"],
+guest:["Gast","Guest","مهمان","Ospite","ضيف"],
+service:["Service","Service","گارسون","Servizio","الخدمة"],
+called:["Der Service kommt gleich zu Ihnen.","Our staff will be with you shortly.","گارسون الان میاد.","Il personale arriva subito.","سيأتي النادل إليكم حالاً."],
+billCalled:["Die Rechnung kommt gleich.","Your bill is on its way.","صورت‌حساب الان میاد.","Il conto arriva subito.","الحساب في الطريق إليكم."],
+wait:["Bitte einen Moment …","One moment please …","یک لحظه لطفاً …","Un momento …","لحظة من فضلكم …"],
+pairs:["Dazu passt perfekt","Goes perfectly with","عالی کنارش می‌چسبه","Perfetto insieme a","يتناسب معه تماماً"],
+noThanks:["Nein, danke","No, thanks","نه، ممنون","No, grazie","لا، شكراً"],
+age:["Ich bestätige, dass ich mindestens 18 Jahre alt bin.","I confirm that I am at least 18 years old.","تأیید می‌کنم که حداقل ۱۸ سال دارم.","Confermo di avere almeno 18 anni.","أؤكد أن عمري 18 عاماً على الأقل."],
+ageT:["Shisha nur ab 18","Shisha 18+ only","قلیان فقط بالای ۱۸ سال","Shisha solo per maggiorenni","الشيشة لمن هم فوق 18 عاماً فقط"],
+ok:["OK","OK","باشه","OK","حسناً"],
+thanks:["Danke für Ihren Besuch!","Thank you for your visit!","ممنون از حضورتون!","Grazie della visita!","شكراً لزيارتكم!"],
+thanksSub:["Hat es Ihnen geschmeckt? Ihre Bewertung hilft uns sehr.","Did you enjoy it? Your review helps us a lot.","خوشتون اومد؟ نظرتون خیلی به ما کمک می‌کنه.","Ti è piaciuto? La tua recensione ci aiuta molto.","هل أعجبكم الطعام؟ تقييمكم يساعدنا كثيراً."],
+rateGoogle:["Auf Google bewerten","Review on Google","امتیاز در گوگل","Recensisci su Google","قيّمونا على Google"],
+copy:["Kopieren","Copy","کپی","Copia","نسخ"],
+copied:["Kopiert","Copied","کپی شد","Copiato","تم النسخ"],
+net:["Netzwerk","Network","شبکه","Rete","الشبكة"],
+pw:["Passwort","Password","رمز","Password","كلمة المرور"],
+allergens:["Allergene","Allergens","آلرژن‌ها","Allergeni","مسببات الحساسية"],
+legend:["Allergene: ","Allergens: ","آلرژن‌ها: ","Allergeni: ","مسببات الحساسية: "],
+taxes:["Alle Preise in Euro inkl. Steuern.","All prices in euro incl. taxes.","همه‌ی قیمت‌ها به یورو و با مالیات.","Tutti i prezzi in euro IVA inclusa.","جميع الأسعار باليورو وتشمل الضرائب."],
+items:["Artikel","items","آیتم","articoli","أصناف"],
+tooFast:["Bitte kurz warten – der Service ist schon informiert.","Please wait a moment – our staff has been notified.","کمی صبر کنید – گارسون خبر داره.","Attendi un attimo – il personale è già avvisato.","يرجى الانتظار قليلاً – النادل على علم."],
+err:["Leider ein Fehler – bitte Service fragen.","Sorry, something went wrong – please ask our staff.","متأسفانه خطایی پیش اومد – از گارسون بپرسید.","Errore – chiedi al personale.","عذراً، حدث خطأ – يرجى سؤال النادل."],
+from12:["Ab {t} Uhr","From {t}","از ساعت {t}","Dalle {t}","ابتداءً من {t}"],
+kitchenBanner:["🍽️ Küche ab {t} Uhr · Getränke schon bestellbar","🍽️ Kitchen from {t} · drinks available now","🍽️ آشپزخانه از ساعت {t} · نوشیدنی همین حالا","🍽️ Cucina dalle {t} · bevande già ordinabili","🍽️ المطبخ يبدأ الساعة {t} · المشروبات متاحة الآن"]
+};const CAT={"vor":["Vorspeisen","Starters","پیش‌غذا","Antipasti","المقبلات"],"sup":["Suppen","Soups","سوپ‌ها","Zuppe","الشوربات"],"sal":["Salate","Salads","سالادها","Insalate","السلطات"],"per":["Persisch & Afghanisch","Persian & Afghan","ایرانی و افغانی","Persiano & Afghano","فارسي وأفغاني"],"gri":["Vom Grill","From the grill","کباب‌ها","Dalla griglia","المشاوي"],"oes":["Österreichisch","Austrian","اتریشی","Austriaco","نمساوي"],"piz":["Pizza","Pizza","پیتزا","Pizza","بيتزا"],"pas":["Pasta","Pasta","پاستا","Pasta","باستا"],"bur":["Burger","Burgers","برگر","Burger","برغر"],"bei":["Beilagen & Dips","Sides & dips","مخلفات","Contorni & salse","أطباق جانبية وصلصات"],"hei":["Heiße Getränke","Hot drinks","نوشیدنی گرم","Bevande calde","مشروبات ساخنة"],"alf":["Alkoholfrei","Soft drinks","نوشیدنی بدون الکل","Analcolici","مشروبات بدون كحول"],"bie":["Bier & Radler","Beer & shandy","آبجو و رادلر","Birra & Radler","بيرة ورادلر"],"ape":["Aperitif & Prosecco","Aperitif & prosecco","آپریتیف و پروسکو","Aperitivo & prosecco","أبريتيف وبروسيكو"],"coc":["Cocktails & Longdrinks","Cocktails & long drinks","کوکتل","Cocktail & long drink","كوكتيلات"],"wei":["Wein","Wine","شراب","Vino","نبيذ"],"sch":["Schnaps & Digestif","Schnapps & digestif","عرق و دیژستیف","Grappe & digestivi","مشروبات روحية وهاضمة"],"shi":["Shisha","Shisha","قلیان","Shisha","شيشة"]};
+const AL={"A":["Gluten","gluten","گلوتن","glutine","غلوتين"],"B":["Krebstiere","crustaceans","سخت‌پوستان","crostacei","قشريات"],"C":["Eier","eggs","تخم‌مرغ","uova","بيض"],"D":["Fisch","fish","ماهی","pesce","سمك"],"G":["Milch/Laktose","milk/lactose","شیر/لاکتوز","latte/lattosio","حليب/لاكتوز"],"H":["Schalenfrüchte","nuts","مغزها","frutta a guscio","مكسرات"],"L":["Sellerie","celery","کرفس","sedano","كرفس"],"M":["Senf","mustard","خردل","senape","خردل"],"O":["Sulfite","sulphites","سولفیت","solfiti","كبريتيت"],"R":["Weichtiere","molluscs","نرم‌تنان","molluschi","رخويات"]};
 let lang=LS.get('zbg_lang',null)||(()=>{for(const l of (navigator.languages||[navigator.language||'de'])){const k=String(l).slice(0,2).toLowerCase();if(LANGS.includes(k))return k}return 'en'})();
 const li=()=>LANGS.indexOf(lang);
 const tr=(k,v)=>{let s=(I[k]||[k])[li()]??I[k][1];if(v)for(const x in v)s=s.replace('{'+x+'}',v[x]);return s};
 const catName=c=>CAT[c.id]?CAT[c.id][li()]:c.name;
-const descOf=it=>{const d=DATA.desc[it.id];if(d)return lang==='de'?d[0]:d[1];if(it.d||it.e)return lang==='de'?(it.d||it.e):(it.e||it.d);return ''};
+const descOf=it=>{const d=DATA.desc[it.id];if(lang==='ar'&&DATA.ar&&DATA.ar[it.id])return DATA.ar[it.id];if(d)return lang==='de'?d[0]:d[1];if(it.d||it.e)return lang==='de'?(it.d||it.e):(it.e||it.d);return ''};
 const alOf=it=>(DATA.desc[it.id]||[])[2]||'';
 const flOf=it=>(DATA.desc[it.id]||[])[3]||'';
-const WDN=[['Sonntag','Sunday','یکشنبه','domenica'],['Montag','Monday','دوشنبه','lunedì'],['Dienstag','Tuesday','سه‌شنبه','martedì'],['Mittwoch','Wednesday','چهارشنبه','mercoledì'],['Donnerstag','Thursday','پنجشنبه','giovedì'],['Freitag','Friday','جمعه','venerdì'],['Samstag','Saturday','شنبه','sabato']];
+const WDN=[["Sonntag","Sunday","یکشنبه","domenica","الأحد"],["Montag","Monday","دوشنبه","lunedì","الاثنين"],["Dienstag","Tuesday","سه‌شنبه","martedì","الثلاثاء"],["Mittwoch","Wednesday","چهارشنبه","mercoledì","الأربعاء"],["Donnerstag","Thursday","پنجشنبه","giovedì","الخميس"],["Freitag","Friday","جمعه","venerdì","الجمعة"],["Samstag","Saturday","شنبه","sabato","السبت"]];
 function openMsg(){const n=nextOpen(conf);if(!n)return '';const d=n.inDays===0?tr('todayW'):n.inDays===1?tr('tomorrow'):(lang==='de'?'am ':lang==='it'?'':'')+WDN[n.d.getDay()][li()];return tr('opensAt',{d,t:n.o})}
 const storyOf=it=>{const s=DATA.story&&DATA.story[it.id];return s?s[li()]||s[1]:''};
 const cleanName=n=>String(n).replace(/\s*\(ca\. 30 Min\.\)/,'').replace(/\s*[🌱🌶★]/gu,'').trim();
@@ -246,7 +282,9 @@ const ui={view:'home',sheet:null,arg:null,flt:{v:false,s:false},thanks:false,coo
 
 const catOf=it=>conf.cats.find(c=>c.id===it.cat);
 const canOrder=()=>!!T&&!!conf&&isOpenNow(conf);
-function blockReason(it){const c=catOf(it);if(!isAvail(it,c,today))return 'notToday';if(c&&c.st==='shisha'&&T&&!isTerrace(T,conf))return 'terraceOnly';return null}
+const isKitchenIt=it=>isKitchenSt(stOf(it,catOf(it)));
+function blockReason(it){const c=catOf(it);if(!isAvail(it,c,today,conf.perm))return 'notToday';if(isShishaCat(c)&&T&&!isTerrace(T,conf))return 'terraceOnly';if(isKitchenIt(it)&&kitchenWaiting(conf))return 'from12';return null}
+const brLabel=br=>br==='from12'?tr('from12',{t:kitchenFrom(conf)}):tr(br);
 
 /* ============ Icons ============ */
 const IC={
@@ -262,7 +300,7 @@ const IC={
 
 /* ============ Rendering ============ */
 function render(){
-  document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';document.body.classList.toggle('fa',lang==='fa');
+  document.documentElement.lang=lang;document.documentElement.dir=RTL.includes(lang)?'rtl':'ltr';document.body.classList.toggle('fa',RTL.includes(lang));
   const a=document.activeElement;if(a&&/INPUT|TEXTAREA/.test(a.tagName)&&a.closest('#sheet')){renderNav();return}
   const oldV=document.querySelector('.hero video');
   $('#app').innerHTML=!conf?`<div class="hero">${heroInner()}</div>`:ui.view==='menu'?menuView():ui.view==='table'?tableView():homeView();
@@ -287,10 +325,10 @@ function heroInner(){
   <h1 class="serif">${tr('welcome')}</h1><p class="sub">${tr('tag')}</p>
   ${T?`<div class="pill">${tr('table')} <b>${esc(T)}</b>${z?` · ${esc(zoneLabel(z))}`:''}</div>`:''}
   ${conf?`<div class="openst ${open?'':'closed'}"><i></i>${open?tr('openUntil')+' '+esc(ct||''):(!dayHours(conf)?tr('restDay')+' · ':'')+esc(openMsg())}</div>`:''}`}
-function zoneLabel(z){if(!z)return '';const m={bar:['Bar','Bar','بار','Bar'],saal:['Hauptsaal','Main hall','سالن اصلی','Sala'],fenster:['Panorama-Fenster','Panorama window','کنار پنجره','Finestra panoramica'],neben:['Nebenraum','Side room','اتاق کناری','Saletta'],terr:['Dachterrasse','Roof terrace','تراس','Terrazza'],terr2:['Terrasse überdacht','Covered terrace','تراس سرپوشیده','Terrazza coperta'],togo:['To-go','To-go','بیرون‌بر','Asporto']};return m[z.id]&&conf&&Array.isArray(conf.zones)&&z.name!==m[z.id][0]?z.name:(m[z.id]||[z.name])[li()]||z.name}
+function zoneLabel(z){if(!z)return '';const m={"bar":["Bar","Bar","بار","Bar","البار"],"saal":["Hauptsaal","Main hall","سالن اصلی","Sala","الصالة الرئيسية"],"fenster":["Panorama-Fenster","Panorama window","کنار پنجره","Finestra panoramica","نافذة بانورامية"],"neben":["Nebenraum","Side room","اتاق کناری","Saletta","الغرفة الجانبية"],"terr":["Dachterrasse","Roof terrace","تراس","Terrazza","التراس"],"terr2":["Terrasse überdacht","Covered terrace","تراس سرپوشیده","Terrazza coperta","التراس المسقوف"],"togo":["To-go","To-go","بیرون‌بر","Asporto","سفري"]};return m[z.id]&&conf&&Array.isArray(conf.zones)&&z.name!==m[z.id][0]?z.name:(m[z.id]||[z.name])[li()]||z.name}
 function homeView(){
   const L=conf.links||{},w=conf.wifi||{};
-  const hi=conf.items.filter(i=>DATA.photo[i.id]&&!blockReason(i)).sort((a,b)=>(flOf(b).includes('h')-flOf(a).includes('h'))).slice(0,8);
+  const hi=conf.items.filter(i=>DATA.photo[i.id]&&(!blockReason(i)||blockReason(i)==='from12')).sort((a,b)=>(flOf(b).includes('h')-flOf(a).includes('h'))).slice(0,8);
   return `<section class="hero">${heroInner()}</section><div class="wrap">
   ${ui.thanks?`<div class="thx"><h2 class="serif">${tr('thanks')}</h2><p class="muted">${tr('thanksSub')}</p><div class="stars">★★★★★</div><a class="bigbtn btn" href="${esc(L.google||'#')}" target="_blank" rel="noopener">${tr('rateGoogle')}</a></div>`:''}
   <div class="tiles">
@@ -314,24 +352,38 @@ function photoCard(it){
    ${flagChips(it).length?`<div class="flags">${flagChips(it).map(x=>`<span>${x}</span>`).join('')}</div>`:''}${q?`<span class="qb">${q}</span>`:''}</div>
    <div class="bd"><h3 class="nm serif">${esc(cleanName(it.name))}</h3>${fa?`<div class="fan">${esc(fa)}</div>`:''}
    ${descOf(it)?`<p class="ds">${esc(descOf(it))}</p>`:''}${alOf(it)?`<div class="al">${alOf(it).split('').join(' · ')}</div>`:''}
-   ${br?`<span class="offl">${tr(br)}</span>`:''}
+   ${br?`<span class="offl">${brLabel(br)}</span>`:''}
    <div class="ft"><span class="pr">${it.price?eur(it.price):'—'}</span>${canOrder()?`<button class="add" data-a="quick" data-x="${it.id}" ${br?'disabled':''} aria-label="+">+</button>`:''}</div></div></div>`}
 function rowItem(it){
   const br=blockReason(it),q=qtyIn(it.id),fa=lang==='fa'&&DATA.fa[it.id],fl=flagChips(it);
   return `<div class="row ${br?'off':''}" data-a="item" data-x="${it.id}"><div class="f"><div class="nm serif">${esc(cleanName(it.name))}${fl.length?` <span style="font-size:13px">${fl.join(' ')}</span>`:''}</div>${fa?`<div class="fan">${esc(fa)}</div>`:''}
-   ${descOf(it)?`<div class="ds">${esc(descOf(it))}</div>`:''}${alOf(it)?`<div class="al">${alOf(it).split('').join(' · ')}</div>`:''}${br?`<span class="offl">${tr(br)}</span>`:''}</div>
-   <div style="text-align:end"><div class="pr">${it.price?eur(it.price):(lang==='de'?'gratis':lang==='fa'?'رایگان':lang==='it'?'gratis':'free')}</div></div>
+   ${descOf(it)?`<div class="ds">${esc(descOf(it))}</div>`:''}${alOf(it)?`<div class="al">${alOf(it).split('').join(' · ')}</div>`:''}${br?`<span class="offl">${brLabel(br)}</span>`:''}</div>
+   <div style="text-align:end"><div class="pr">${it.price?eur(it.price):(lang==='de'?'gratis':lang==='fa'?'رایگان':lang==='it'?'gratis':lang==='ar'?'مجاناً':'free')}</div></div>
    ${q?`<span class="qb">${q}</span>`:''}${canOrder()?`<button class="add" style="width:40px;height:40px;font-size:22px" data-a="quick" data-x="${it.id}" ${br?'disabled':''}>+</button>`:''}</div>`}
 function visible(it){const f=flOf(it),n=it.name;if(ui.flt.v&&!(f.includes('v')||n.includes('🌱')))return false;if(ui.flt.s&&!(f.includes('s')||n.includes('🌶')))return false;return true}
+const CATIMG={per:'b-persisch.webp',shi:'b-terrasse.webp'},DRINKIMG='b-bar.webp';
 function menuView(){
-  const cats=conf.cats.filter(c=>conf.items.some(i=>i.cat===c.id&&visible(i)));
+  const okI=i=>{const b=blockReason(i);return !b||b==='from12'};
+  const cats0=conf.cats.filter(c=>conf.items.some(i=>i.cat===c.id&&visible(i)));
+  const has=c=>conf.items.some(i=>i.cat===c.id&&visible(i)&&okI(i));
+  const cats=[...cats0.filter(has),...cats0.filter(c=>!has(c))];
+  const td=conf.items.filter(i=>isKitchenIt(i)&&visible(i)&&okI(i));
+  const tdP=td.filter(i=>DATA.photo[i.id]),tdR=td.filter(i=>!DATA.photo[i.id]);
+  const kw=kitchenWaiting(conf)&&isOpenNow(conf)&&td.length;
+  let drinkDone=false;
+  const head=c=>{let img=CATIMG[c.id];if(!img&&!drinkDone&&c.st==='bar'&&!isShishaCat(c)){img=DRINKIMG;drinkDone=true}
+    return img?`<div class="cban" style="background-image:url('${img}')"><h2 class="cath serif">${esc(catName(c))}</h2></div>`:`<h2 class="cath serif">${esc(catName(c))}</h2>`};
   return `<div class="mhead"><div class="wrap"><div class="mtop"><h1 class="serif">${tr('menu')}</h1>
     <button class="chip flt ${ui.flt.v?'on':''}" data-a="flt" data-x="v">🌱 ${tr('veg')}</button><button class="chip flt ${ui.flt.s?'on':''}" data-a="flt" data-x="s">🌶</button></div>
-    <div class="chips">${cats.map(c=>`<button class="chip" data-a="jump" data-x="${c.id}">${esc(catName(c))}</button>`).join('')}</div></div></div>
+    <div class="chips">${td.length?`<button class="chip" data-a="jump" data-x="today" style="border-color:var(--gold);color:var(--gold)">⭐ ${tr('todayFor')}</button>`:''}${cats.map(c=>`<button class="chip ${has(c)?'':'dim'}" data-a="jump" data-x="${c.id}">${esc(catName(c))}</button>`).join('')}</div></div></div>
   <div class="wrap">
   ${!T?`<div class="notice">📱 ${tr('scanToOrder')}</div>`:!isOpenNow(conf)?`<div class="notice">🕙 ${!dayHours(conf)?tr('restDay')+' – ':''}${esc(openMsg())}</div>`:''}
-  ${cats.map(c=>{const its=conf.items.filter(i=>i.cat===c.id&&visible(i));
-    return `<section class="catsec" id="c-${c.id}"><h2 class="cath serif">${esc(catName(c))}</h2>${its.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}</section>`}).join('')}
+  ${kw?`<div class="kban">${tr('kitchenBanner',{t:kitchenFrom(conf)})}</div>`:''}
+  ${td.length?`<section class="catsec" id="c-today"><h2 class="cath serif">⭐ ${tr('todayFor')}</h2><p class="secsub">${tr('todaySub')}</p>
+    ${tdP.length?`<div class="car">${tdP.map(photoCard).join('')}</div>`:''}${tdR.map(rowItem).join('')}</section>`:''}
+  ${cats.map(c=>{const its=conf.items.filter(i=>i.cat===c.id&&visible(i)),av=its.filter(okI),na=its.filter(i=>!okI(i));
+    return `<section class="catsec" id="c-${c.id}">${head(c)}${av.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}
+    ${na.length?`<div class="nahd">${tr('notToday')}</div><div class="nalist">${na.map(rowItem).join('')}</div>`:''}</section>`}).join('')}
   ${footer()}</div>`}
 function statusOf(o){if(o.cancelled)return['st_no','s-no'];if(o.status==='pending')return['st_pend','s-pend'];if(o.status==='declined')return['st_no','s-no'];
   const v=Object.values(o.st||{});if(v.length&&v.every(x=>x==='abgeholt'))return['st_done','s-done'];if(v.includes('fertig'))return['st_ready','s-ready'];if(v.includes('arbeit'))return['st_cook','s-cook'];return['st_ok','s-ok']}
@@ -361,7 +413,7 @@ function sheetView(){
     ${storyOf(it)?`<details class="story"><summary>📖 ${tr('story')}</summary><p>${esc(storyOf(it))}</p></details>`:''}
     ${al?`<div class="alist">${tr('allergens')}: ${al.split('').map(k=>k+' '+(AL[k]?AL[k][li()]:'')).join(' · ')}</div>`:''}
     <div class="tot"><span></span><span>${it.price?eur(it.price):''}</span></div>
-    ${br?`<span class="offl">${tr(br)}</span>`:canOrder()?`<div class="row" style="border:0;cursor:default"><div class="f"></div><div class="qty"><button data-a="dq" data-x="-1">−</button><span>${ui.dq}</span><button data-a="dq" data-x="1">+</button></div></div>
+    ${br?`<span class="offl">${brLabel(br)}</span>`:canOrder()?`<div class="row" style="border:0;cursor:default"><div class="f"></div><div class="qty"><button data-a="dq" data-x="-1">−</button><span>${ui.dq}</span><button data-a="dq" data-x="1">+</button></div></div>
     <input id="inote" placeholder="${esc(tr('note'))}" value="${esc(ui.dn||'')}">
     <button class="bigbtn" data-a="addD">${tr('add')} · ${eur(it.price*ui.dq)}</button>`:`<div class="notice">${!T?tr('scanToOrder'):esc(openMsg())}</div>`}`}
   if(ui.sheet==='cart'){const sum=cart.reduce((a,l)=>a+l.qty*l.price,0);
@@ -387,11 +439,11 @@ function sheetView(){
 function toast(msg,kind='',ms=3500){const d=document.createElement('div');d.className='toast '+kind;d.textContent=msg;$('#toast').appendChild(d);setTimeout(()=>d.remove(),ms)}
 const PAIR_FOR=['per','gri'],PAIR_NAMES=['Mast o Khiar','Persischer Safrantee'];
 function addToCart(it,qty,note){const c=catOf(it);
-  const l=cart.find(l=>l.itemId===it.id&&(l.note||'')===(note||''));if(l)l.qty+=qty;else cart.push({key:uid(),itemId:it.id,name:it.name,price:+it.price,st:c?.st||'kueche',qty,note:note||''});
+  const l=cart.find(l=>l.itemId===it.id&&(l.note||'')===(note||''));if(l)l.qty+=qty;else cart.push({key:uid(),itemId:it.id,name:it.name,price:+it.price,st:stOf(it,c),qty,note:note||''});
   saveCart();try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}
   if(PAIR_FOR.includes(it.cat)&&!LS.get('zbg_paired',false)){const ids=conf.items.filter(i=>PAIR_NAMES.includes(i.name)&&!blockReason(i)&&!qtyIn(i.id)).map(i=>i.id);
     if(ids.length){LS.set('zbg_paired',true);ui.sheet='pair';ui.arg=ids}}}
-function guardShisha(it,then){if(catOf(it)?.st==='shisha'&&!ui.ageOk){ui.sheet='age';ui.arg=then;render();return true}return false}
+function guardShisha(it,then){if(isShishaCat(catOf(it))&&!ui.ageOk){ui.sheet='age';ui.arg=then;render();return true}return false}
 const A={
   lang(x){lang=x;LS.set('zbg_lang',x);render()},
   go(x){ui.view=x;ui.sheet=null;render();scrollTo(0,0)},
@@ -431,7 +483,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
 /* ============ Start ============ */
 function join(s){if(joinedS===s)return;joinedS=s;unsubO&&unsubO();unsubO=Store.subCol('orders','session',s,l=>{orders=l.filter(o=>String(o.table)===String(T));render()})}
 async function start(){render();
-  Store=makeStore(cfg);
+  Store=makeStore(cfg,{app:'guest'});
   try{await Store.init()}catch(e){console.error(e);toast(tr('err'),'err',8000);return}
   Store.subDoc('config/main',c=>{if(c){conf=c;render()}});
   Store.subDoc('config/today',d=>{if(d!==undefined){today=d;render()}});
@@ -441,7 +493,7 @@ async function start(){render();
     else if(G.session&&s!==G.session){ if(G.had)ui.thanks=true; G={session:null,gid:null,name:G.name,had:false};saveG();orders=[];joinedS=null;unsubO&&unsubO();unsubO=null}
     render()});
 }
-setInterval(()=>{if(!ui.sheet)renderNav()},60000);
+let kwPrev=null;setInterval(()=>{if(conf){const k=kitchenWaiting(conf)+'|'+isOpenNow(conf);if(kwPrev!==null&&k!==kwPrev&&!ui.sheet){kwPrev=k;render();return}kwPrev=k}if(!ui.sheet)renderNav()},30000);
 let fadeQ=false;addEventListener('scroll',()=>{if(fadeQ)return;fadeQ=true;requestAnimationFrame(()=>{fadeQ=false;const im=document.querySelector('.hero .poster');if(!im)return;
   const h=im.parentElement.offsetHeight||500,p=Math.min(1,Math.max(0,scrollY/(h*.85)));im.style.opacity=String(1-p);im.style.transform='translateY('+(scrollY*.25)+'px) scale('+(1+p*.06)+')'})},{passive:true});
 start();
