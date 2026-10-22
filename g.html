@@ -148,6 +148,13 @@ label{display:block;color:var(--mu);font-size:13px;margin:12px 0 6px}
 .cban .cath{margin:0;text-shadow:0 2px 12px rgba(0,0,0,.6)}.cban .cath:after{display:none}
 .kban{background:rgba(214,176,106,.12);border:1px solid rgba(214,176,106,.55);color:var(--gold);border-radius:14px;padding:12px 14px;margin:16px 0 0;font-weight:600;font-size:15px;text-align:center}
 .langs button{padding:6px 8px}
+/* Reservierung */
+.rgrid{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.resform select,.resform input[type=date],.resform input[type=number]{font:inherit;color:var(--tx);background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;color-scheme:dark}
+.resform textarea{min-height:64px}
+.slots{display:flex;flex-wrap:wrap;gap:8px}
+.slot{border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-weight:600;color:var(--tx);background:var(--bg2)}
+.slot.act{background:var(--gold);color:#1a1406;border-color:var(--gold)}
 footer{color:var(--mu);font-size:13px;text-align:center;padding:30px 0 20px}
 footer a{color:var(--gold);text-decoration:none}
 .leg{font-size:12px;line-height:1.7;color:var(--mu);margin-top:26px;border-top:1px solid var(--line);padding-top:16px}
@@ -166,7 +173,7 @@ footer a{color:var(--gold);text-decoration:none}
 <div id="toast"></div>
 <script src="data.js"></script>
 <script type="module">
-import {DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift,stOf,isKitchenSt,isShishaCat,kitchenFrom,kitchenWaiting} from './store.js';
+import {dateOfDay,DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift,stOf,isKitchenSt,isShishaCat,kitchenFrom,kitchenWaiting} from './store.js';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur=n=>'<bdi>'+(Math.round((+n||0)*100)/100).toFixed(2).replace('.',',')+' €</bdi>';
@@ -257,7 +264,32 @@ items:["Artikel","items","آیتم","articoli","أصناف"],
 tooFast:["Bitte kurz warten – der Service ist schon informiert.","Please wait a moment – our staff has been notified.","کمی صبر کنید – گارسون خبر داره.","Attendi un attimo – il personale è già avvisato.","يرجى الانتظار قليلاً – النادل على علم."],
 err:["Leider ein Fehler – bitte Service fragen.","Sorry, something went wrong – please ask our staff.","متأسفانه خطایی پیش اومد – از گارسون بپرسید.","Errore – chiedi al personale.","عذراً، حدث خطأ – يرجى سؤال النادل."],
 from12:["Ab {t} Uhr","From {t}","از ساعت {t}","Dalle {t}","ابتداءً من {t}"],
-kitchenBanner:["🍽️ Küche ab {t} Uhr · Getränke schon bestellbar","🍽️ Kitchen from {t} · drinks available now","🍽️ آشپزخانه از ساعت {t} · نوشیدنی همین حالا","🍽️ Cucina dalle {t} · bevande già ordinabili","🍽️ المطبخ يبدأ الساعة {t} · المشروبات متاحة الآن"]
+kitchenBanner:["🍽️ Küche ab {t} Uhr · Getränke schon bestellbar","🍽️ Kitchen from {t} · drinks available now","🍽️ آشپزخانه از ساعت {t} · نوشیدنی همین حالا","🍽️ Cucina dalle {t} · bevande già ordinabili","🍽️ المطبخ يبدأ الساعة {t} · المشروبات متاحة الآن"],
+reserve:["Tisch reservieren", "Book a table", "رزرو میز", "Prenota un tavolo", "حجز طاولة"],
+resSub:["Online anfragen – wir bestätigen per Telefon/WhatsApp", "Request online – we confirm by phone/WhatsApp", "درخواست آنلاین – تأیید با تلفن/واتساپ", "Richiesta online – confermiamo via telefono/WhatsApp", "اطلب عبر الإنترنت – نؤكد عبر الهاتف/واتساب"],
+date:["Datum", "Date", "تاریخ", "Data", "التاريخ"],
+time:["Uhrzeit", "Time", "ساعت", "Ora", "الوقت"],
+persons:["Personen", "Guests", "تعداد نفرات", "Persone", "عدد الأشخاص"],
+phone:["Telefon (für die Bestätigung)", "Phone (for confirmation)", "تلفن (برای تأیید)", "Telefono (per la conferma)", "الهاتف (للتأكيد)"],
+email:["E-Mail (freiwillig)", "Email (optional)", "ایمیل (اختیاری)", "E-mail (facoltativa)", "البريد الإلكتروني (اختياري)"],
+wish:["Wunsch (z. B. Terrasse, Kinderstuhl, Geburtstag)", "Request (e.g. terrace, high chair, birthday)", "درخواست (مثلاً تراس، صندلی بچه، تولد)", "Richiesta (es. terrazza, seggiolone, compleanno)", "طلب خاص (مثل التراس، كرسي أطفال، عيد ميلاد)"],
+resName:["Name", "Name", "نام", "Nome", "الاسم"],
+privacy:["Ich bin einverstanden, dass meine Angaben nur für diese Reservierung gespeichert und danach gelöscht werden.", "I agree that my details are stored only for this reservation and deleted afterwards.", "موافقم که اطلاعاتم فقط برای این رزرو ذخیره و بعد پاک شود.", "Acconsento che i miei dati vengano salvati solo per questa prenotazione e poi cancellati.", "أوافق على حفظ بياناتي لهذا الحجز فقط ثم حذفها."],
+resSend:["Reservierung anfragen", "Request reservation", "ارسال درخواست رزرو", "Invia richiesta", "إرسال طلب الحجز"],
+resSent:["Danke! Wir melden uns mit der Bestätigung.", "Thank you! We will get back to you with a confirmation.", "ممنون! برای تأیید با شما تماس می‌گیریم.", "Grazie! Ti contatteremo con la conferma.", "شكراً! سنتواصل معك للتأكيد."],
+myRes:["Meine Reservierungen", "My reservations", "رزروهای من", "Le mie prenotazioni", "حجوزاتي"],
+rs_pending:["Angefragt – wird bestätigt", "Requested – awaiting confirmation", "درخواست شد – در انتظار تأیید", "Richiesta – in attesa di conferma", "تم الطلب – بانتظار التأكيد"],
+rs_ok:["Bestätigt ✓", "Confirmed ✓", "تأیید شد ✓", "Confermata ✓", "تم التأكيد ✓"],
+rs_declined:["Leider nicht möglich – bitte anrufen", "Unfortunately not possible – please call", "متأسفانه ممکن نیست – لطفاً تماس بگیرید", "Purtroppo non possibile – chiamaci", "للأسف غير ممكن – يرجى الاتصال"],
+rs_cancelled:["Storniert", "Cancelled", "لغو شد", "Annullata", "ملغى"],
+resClosed:["An diesem Tag haben wir Ruhetag.", "We are closed on this day.", "این روز تعطیل هستیم.", "In questo giorno siamo chiusi.", "نحن مغلقون في هذا اليوم."],
+resNoSlot:["Für heute ist online keine Reservierung mehr möglich – bitte anrufen.", "No more online reservations for today – please call.", "برای امروز دیگر رزرو آنلاین ممکن نیست – لطفاً تماس بگیرید.", "Per oggi non è più possibile prenotare online – chiamaci.", "لم يعد الحجز عبر الإنترنت ممكناً اليوم – يرجى الاتصال."],
+resMiss:["Bitte Name, Telefon, Datum, Uhrzeit und Personen angeben und zustimmen.", "Please enter name, phone, date, time and guests and agree.", "لطفاً نام، تلفن، تاریخ، ساعت و تعداد را وارد و تأیید کنید.", "Inserisci nome, telefono, data, ora e persone e acconsenti.", "يرجى إدخال الاسم والهاتف والتاريخ والوقت وعدد الأشخاص والموافقة."],
+resCancel:["Reservierung stornieren", "Cancel reservation", "لغو رزرو", "Annulla prenotazione", "إلغاء الحجز"],
+resCancelQ:["Reservierung wirklich stornieren?", "Really cancel the reservation?", "رزرو واقعاً لغو شود؟", "Annullare davvero la prenotazione?", "هل تريد إلغاء الحجز فعلاً؟"],
+resCall:["Lieber telefonisch?", "Prefer to call?", "ترجیح می‌دهید تلفنی؟", "Preferisci telefonare?", "تفضل الاتصال؟"],
+resTable:["Tisch", "Table", "میز", "Tavolo", "طاولة"],
+resNav:["Reservieren", "Reserve", "رزرو", "Prenota", "حجز"]
 };const CAT={"vor":["Vorspeisen","Starters","پیش‌غذا","Antipasti","المقبلات"],"sup":["Suppen","Soups","سوپ‌ها","Zuppe","الشوربات"],"sal":["Salate","Salads","سالادها","Insalate","السلطات"],"per":["Persisch & Afghanisch","Persian & Afghan","ایرانی و افغانی","Persiano & Afghano","فارسي وأفغاني"],"gri":["Vom Grill","From the grill","کباب‌ها","Dalla griglia","المشاوي"],"oes":["Österreichisch","Austrian","اتریشی","Austriaco","نمساوي"],"piz":["Pizza","Pizza","پیتزا","Pizza","بيتزا"],"pas":["Pasta","Pasta","پاستا","Pasta","باستا"],"bur":["Burger","Burgers","برگر","Burger","برغر"],"bei":["Beilagen & Dips","Sides & dips","مخلفات","Contorni & salse","أطباق جانبية وصلصات"],"hei":["Heiße Getränke","Hot drinks","نوشیدنی گرم","Bevande calde","مشروبات ساخنة"],"alf":["Alkoholfrei","Soft drinks","نوشیدنی بدون الکل","Analcolici","مشروبات بدون كحول"],"bie":["Bier & Radler","Beer & shandy","آبجو و رادلر","Birra & Radler","بيرة ورادلر"],"ape":["Aperitif & Prosecco","Aperitif & prosecco","آپریتیف و پروسکو","Aperitivo & prosecco","أبريتيف وبروسيكو"],"coc":["Cocktails & Longdrinks","Cocktails & long drinks","کوکتل","Cocktail & long drink","كوكتيلات"],"wei":["Wein","Wine","شراب","Vino","نبيذ"],"sch":["Schnaps & Digestif","Schnapps & digestif","عرق و دیژستیف","Grappe & digestivi","مشروبات روحية وهاضمة"],"shi":["Shisha","Shisha","قلیان","Shisha","شيشة"]};
 const AL={"A":["Gluten","gluten","گلوتن","glutine","غلوتين"],"B":["Krebstiere","crustaceans","سخت‌پوستان","crostacei","قشريات"],"C":["Eier","eggs","تخم‌مرغ","uova","بيض"],"D":["Fisch","fish","ماهی","pesce","سمك"],"G":["Milch/Laktose","milk/lactose","شیر/لاکتوز","latte/lattosio","حليب/لاكتوز"],"H":["Schalenfrüchte","nuts","مغزها","frutta a guscio","مكسرات"],"L":["Sellerie","celery","کرفس","sedano","كرفس"],"M":["Senf","mustard","خردل","senape","خردل"],"O":["Sulfite","sulphites","سولفیت","solfiti","كبريتيت"],"R":["Weichtiere","molluscs","نرم‌تنان","molluschi","رخويات"]};
 let lang=LS.get('zbg_lang',null)||(()=>{for(const l of (navigator.languages||[navigator.language||'de'])){const k=String(l).slice(0,2).toLowerCase();if(LANGS.includes(k))return k}return 'en'})();
@@ -295,15 +327,16 @@ const IC={
  star:'<svg viewBox="0 0 24 24"><path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z"/></svg>',
  cam:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r=".6"/></svg>',
  home:'<svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>',
- tab:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16" opacity=".35"/></svg>'
+ tab:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16" opacity=".35"/></svg>',
+ cal:'<svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>'
 };
 
 /* ============ Rendering ============ */
 function render(){
   document.documentElement.lang=lang;document.documentElement.dir=RTL.includes(lang)?'rtl':'ltr';document.body.classList.toggle('fa',RTL.includes(lang));
-  const a=document.activeElement;if(a&&/INPUT|TEXTAREA/.test(a.tagName)&&a.closest('#sheet')){renderNav();return}
+  const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.closest('#sheet,.resform')){renderNav();return}
   const oldV=document.querySelector('.hero video');
-  $('#app').innerHTML=!conf?`<div class="hero">${heroInner()}</div>`:ui.view==='menu'?menuView():ui.view==='table'?tableView():homeView();
+  $('#app').innerHTML=!conf?`<div class="hero">${heroInner()}</div>`:ui.view==='menu'?menuView():ui.view==='table'?tableView():ui.view==='res'?resView():homeView();
   renderNav();
   $('#sheet').innerHTML=ui.sheet?`<div class="sbg" data-a="close"><div class="sh" data-stop>${sheetView()}</div></div>`:'';
   const nv=document.querySelector('.hero video');if(oldV&&nv){nv.replaceWith(oldV)}
@@ -313,7 +346,8 @@ function renderNav(){
   const myN=orders.filter(o=>!o.cancelled&&o.status!=='declined'&&!allServed(o)).length;
   $('#nav').innerHTML=`<button data-a="go" data-x="home" class="${ui.view==='home'?'act':''}">${IC.home}${tr('start')}</button>
    <button data-a="go" data-x="menu" class="${ui.view==='menu'?'act':''}">${IC.menu}${tr('menu')}</button>
-   ${T?`<button data-a="go" data-x="table" class="${ui.view==='table'?'act':''}">${IC.tab}${tr('ourTable')}${myN?`<span class="bdg">${myN}</span>`:''}</button>`:''}`;
+   ${T?`<button data-a="go" data-x="table" class="${ui.view==='table'?'act':''}">${IC.tab}${tr('ourTable')}${myN?`<span class="bdg">${myN}</span>`:''}</button>`:''}
+   <button data-a="go" data-x="res" class="${ui.view==='res'?'act':''}">${IC.cal}${tr('resNav')}</button>`;
   const n=cart.reduce((a,l)=>a+l.qty,0),sum=cart.reduce((a,l)=>a+l.qty*l.price,0);
   $('#bar').innerHTML=n&&ui.view!=='home'&&!ui.sheet?`<div class="cartbar"><button data-a="openCart"><span>🧾 ${tr('cartBar')} · ${n}</span><span>${eur(sum)}</span></button></div>`:'';
 }
@@ -334,6 +368,7 @@ function homeView(){
   <div class="tiles">
    <button class="tile main" data-a="go" data-x="menu">${IC.menu}<div style="flex:1"><span class="serif" style="font-size:24px">${tr('menuOrder')}</span><br><small>${tr('menuSub')}</small></div><span style="color:var(--gold);font-size:22px">${lang==='fa'?'←':'→'}</span></button>
    ${T?`<button class="tile" data-a="callW" data-x="waiter">${IC.bell}<span>${tr('call')}</span></button><button class="tile" data-a="callW" data-x="bill">${IC.bill}<span>${tr('bill')}</span></button>`:''}
+   <button class="tile" data-a="go" data-x="res">${IC.cal}<span>${tr('reserve')}</span></button>
    ${w.ssid&&w.show?`<button class="tile" data-a="wifi">${IC.wifi}<span>${tr('wifi')}</span></button>`:''}
    <a class="tile btn" href="${esc(L.google||'#')}" target="_blank" rel="noopener">${IC.star}<span>${tr('review')}</span></a>
    <a class="tile btn" href="${esc(L.insta||'#')}" target="_blank" rel="noopener">${IC.cam}<span>${tr('insta')}</span><small>@restaurantamzirlerberg</small></a>
@@ -402,6 +437,41 @@ function tableView(){
   ${valid.length?`<div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div><p class="muted" style="color:var(--mu);font-size:13px">${tr('payInfo')}</p>`:''}
   <div class="tiles"><button class="tile" data-a="callW" data-x="waiter">${IC.bell}<span>${tr('call')}</span></button><button class="tile" data-a="callW" data-x="bill">${IC.bill}<span>${tr('bill')}</span></button></div>
   </div>`}
+
+
+/* ----- Reservierung (Anfrage; Bestätigung durch das Team) ----- */
+const pad2=n=>String(n).padStart(2,'0');
+const fmtResDayDe=day=>{const d=dateOfDay(day);return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+' '+pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'};
+const localDay=(d=new Date())=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+const RF=ui.rf={day:'',time:'',persons:2,name:'',phone:'',email:'',note:'',ok:false};
+let myRes=LS.get('zbg_res',[]),resDocs={},resSubs={};
+function resSlots(day){if(!day||!conf)return null;const d=dateOfDay(day);const h=dayHours(conf,d);if(!h)return null;
+  const toM=s=>{const [a,b]=s.split(':').map(Number);return a*60+b};let o=toM(h.o),c=toM(h.c);if(c<=o)c+=1440;const last=c-90;
+  const now=new Date(),isToday=day===localDay(now),nm=now.getHours()*60+now.getMinutes()+30;const out=[];
+  for(let m=Math.ceil(o/30)*30;m<=last;m+=30){if(isToday&&m<nm)continue;out.push(pad2(Math.floor(m/60)%24)+':'+pad2(m%60))}return out}
+function watchRes(){for(const id of myRes)if(!resSubs[id])resSubs[id]=Store.subDoc('res/'+id,d=>{if(d===undefined)return;resDocs[id]=d;if(ui.view==='res')render()},()=>{})}
+const fmtResDay=day=>{const d=dateOfDay(day);return WDN[d.getDay()][li()]+', '+pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'};
+function resView(){if(!RF.day)RF.day=localDay();const sl=resSlots(RF.day);if(sl&&sl.length&&!sl.includes(RF.time))RF.time=sl[0];
+  const mine=myRes.map(id=>resDocs[id]).filter(r=>r&&r.day>=localDay(new Date(Date.now()-864e5))).sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time));
+  const max=localDay(new Date(Date.now()+90*864e5));
+  return `<div class="mhead"><div class="wrap"><div class="mtop" style="padding-bottom:12px"><h1 class="serif">${tr('reserve')}</h1></div></div></div><div class="wrap" style="padding-top:14px">
+  ${mine.length?`<h2 class="sec serif" style="margin-top:4px">${tr('myRes')}</h2>${mine.map(r=>`<div class="oc"><div class="oh"><b>${esc(fmtResDay(r.day))} · ${esc(r.time)}</b><span class="stb ${r.status==='ok'?'s-ready':r.status==='pending'?'s-pend':'s-no'}">${tr('rs_'+r.status)}</span></div>
+    <div class="gname">👥 ${r.persons} · ${esc(r.name)}${r.table?` · ${tr('resTable')} ${esc(r.table)}`:''}</div>
+    ${r.status==='pending'||r.status==='ok'?`<button class="ghostbtn" style="padding:9px;margin-top:8px" data-a="resCancel" data-x="${esc(r.id)}">${tr('resCancel')}</button>`:''}</div>`).join('')}`:''}
+  <p class="secsub">${tr('resSub')}</p>
+  <div class="resform">
+  <div class="rgrid"><div><label>${tr('date')}</label><input type="date" data-r="day" value="${esc(RF.day)}" min="${localDay()}" max="${max}"></div>
+   <div><label>${tr('persons')}</label><input type="number" inputmode="numeric" min="1" data-r="persons" value="${esc(RF.persons)}"></div></div>
+  ${!sl?`<div class="notice">🌙 ${tr('resClosed')}</div>`:!sl.length?`<div class="notice">🕙 ${tr('resNoSlot')}</div>`:`<label>${tr('time')}</label><div class="slots">${sl.map(x=>`<button class="slot ${x===RF.time?'act':''}" data-a="resTime" data-x="${x}">${x}</button>`).join('')}</div>`}
+  <label>${tr('resName')}</label><input data-r="name" value="${esc(RF.name)}" autocomplete="name" maxlength="60">
+  <label>${tr('phone')}</label><input type="tel" data-r="phone" value="${esc(RF.phone)}" autocomplete="tel" maxlength="30" placeholder="+43 …">
+  <label>${tr('email')}</label><input type="email" data-r="email" value="${esc(RF.email)}" autocomplete="email" maxlength="80">
+  <label>${tr('wish')}</label><textarea data-r="note" maxlength="300" rows="2">${esc(RF.note)}</textarea>
+  <label class="chk"><input type="checkbox" data-r="ok" ${RF.ok?'checked':''}><span>${tr('privacy')}</span></label>
+  <button class="bigbtn" data-a="resSend" ${sl&&sl.length?'':'disabled'}>${tr('resSend')}</button></div>
+  <p style="text-align:center;color:var(--mu);font-size:14px;margin-top:14px">${tr('resCall')} <a style="color:var(--gold)" href="tel:+436764502361">+43 676 4502361</a></p>
+  ${footer()}</div>`}
+document.addEventListener('input',e=>{const el=e.target.closest('[data-r]');if(!el)return;const k=el.dataset.r;RF[k]=el.type==='checkbox'?el.checked:el.value;if(k==='day'){RF.time='';el.blur();render()}});
 
 /* ----- Sheets ----- */
 function sheetView(){
@@ -474,6 +544,17 @@ const A={
       pushShift(cfg,shifts,s=>s.role==='waiter',cfg.topic+'-service',(x==='bill'?'🧾 Rechnung':'🙋 Service')+' – Tisch '+T,'',['bell']);
       toast(x==='bill'?tr('billCalled'):tr('called'),'',5000)}catch(e){ui.cooldown=0;toast(tr('err'),'err')}},
   wifi(){ui.sheet='wifi';render()},
+  resTime(x){RF.time=x;render()},
+  async resSend(x,el){const name=RF.name.trim(),phone=RF.phone.trim(),persons=parseInt(RF.persons,10)||0,sl=resSlots(RF.day)||[];
+    if(!name||phone.replace(/\D/g,'').length<6||!persons||persons<1||!sl.includes(RF.time)||!RF.ok){toast(tr('resMiss'),'err',5000);return}
+    el.disabled=true;el.textContent=tr('wait');
+    try{const id=uid()+uid()+uid();const d={day:RF.day,time:RF.time,persons,name:name.slice(0,60),phone:phone.slice(0,30),email:RF.email.trim().slice(0,80),note:RF.note.trim().slice(0,300),lang,status:'pending',createdMs:Date.now(),by:Store.authUid(),src:T?'qr':'web'};
+      await Store.setDoc('res/'+id,d);myRes=[...myRes,id];LS.set('zbg_res',myRes);resDocs[id]={...d,id};watchRes();
+      const msg=fmtResDayDe(d.day)+' '+d.time+' · '+persons+' Pers. · '+d.name+(d.note?'\n'+d.note:'');
+      pushShift(cfg,shifts,s=>s.role==='waiter',null,'📅 Neue Reservierung',msg,['calendar']);push(cfg,cfg.topic+'-reserv','📅 Neue Reservierung',msg,['calendar']);
+      RF.note='';RF.ok=false;toast('✓ '+tr('resSent'),'',6000);render();scrollTo(0,0)}
+    catch(e){console.error(e);toast(tr('err'),'err',6000);el.disabled=false;el.textContent=tr('resSend')}},
+  resCancel(x){if(!confirm(tr('resCancelQ')))return;Store.updDoc('res/'+x,{status:'cancelled',cancelMs:Date.now()}).then(()=>push(cfg,cfg.topic+'-reserv','📅 Reservierung storniert',(resDocs[x]?fmtResDayDe(resDocs[x].day)+' '+resDocs[x].time+' · '+resDocs[x].name:''),['x'])).catch(()=>toast(tr('err'),'err'))},
   copy(x){navigator.clipboard?.writeText(x).then(()=>toast(tr('copied'))).catch(()=>{})}
 };
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b)return;
@@ -482,12 +563,14 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
 
 /* ============ Start ============ */
 function join(s){if(joinedS===s)return;joinedS=s;unsubO&&unsubO();unsubO=Store.subCol('orders','session',s,l=>{orders=l.filter(o=>String(o.table)===String(T));render()})}
+if(/^#?(reserv|res)/i.test(location.hash.slice(1))||P.get('r')!==null)ui.view='res';
 async function start(){render();
   Store=makeStore(cfg,{app:'guest'});
   try{await Store.init()}catch(e){console.error(e);toast(tr('err'),'err',8000);return}
   Store.subDoc('config/main',c=>{if(c){conf=c;render()}});
   Store.subDoc('config/today',d=>{if(d!==undefined){today=d;render()}});
   Store.subCol('shift','day',dayKey(),l=>{shifts=l},()=>{});
+  watchRes();
   if(T)Store.subDoc('tables/'+T,d=>{if(d===undefined)return;tableDoc=d;const s=d&&d.session;
     if(s&&G.session===s)join(s);
     else if(G.session&&s!==G.session){ if(G.had)ui.thanks=true; G={session:null,gid:null,name:G.name,had:false};saveG();orders=[];joinedS=null;unsubO&&unsubO();unsubO=null}
