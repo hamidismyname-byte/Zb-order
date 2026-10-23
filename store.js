@@ -80,7 +80,7 @@ export function makeStore(cfg,opt={}){return cfg&&cfg.mode==='fb'?fb(cfg,opt):de
 
 // ntfy-Push (kostenlos, ohne Konto)
 export function push(cfg,topic,title,message,tags){if(!cfg||!cfg.topic)return;
-  fetch((cfg.ntfy||'https://ntfy.sh').replace(/\/$/,'')+'/',{method:'POST',body:JSON.stringify({topic,title,message,tags,priority:5,click:location.origin+location.pathname.replace(/[^/]*$/,'')})}).catch(()=>{})}
+  fetch((cfg.ntfy||'https://ntfy.sh').replace(/\/$/,'')+'/',{method:'POST',body:JSON.stringify({topic,title,message,tags,priority:5,click:location.origin+location.pathname.replace(/[^/]*$/,'')+'team.html'})}).catch(()=>{})}
 
 // Stationen: zwei Küchen (Persisch/Afghanisch = 'kueche', Italienisch/Österreichisch = 'ital'), Bar, Shisha
 export const KST=['kueche','ital'];
