@@ -89,7 +89,10 @@ export const isKitchenSt=s=>KST.includes(s);
 export const stOf=(item,cat)=>(item&&item.st)||(cat&&cat.st)||'kueche';
 export const isShishaCat=c=>!!c&&(c.id==='shi'||c.shisha===true||c.st==='shisha');
 // Verfügbarkeit: Küchen-Gerichte nur wenn heute aktiviert; Bar/Shisha standardmäßig verfügbar (außer heute deaktiviert)
-export function isAvail(item,cat,today,perm){if(perm&&perm[item.id])return false;const fresh=today&&today.day===dayKey();
+// v14: Tagesplan im Voraus (config/plan.days[YYYY-MM-DD]={on,off}); gilt, solange config/today noch nicht für diesen Tag geschrieben ist
+export function dayAvail(today,plan,day=dayKey()){if(today&&today.day===day)return today;const p=plan&&plan.days&&plan.days[day];return p?{day,on:p.on||{},off:p.off||{}}:null}
+export const isLim=(conf,item,cat)=>!!(conf&&((conf.lim&&conf.lim[item.id])||(cat&&conf.limCat&&conf.limCat[cat.id])));
+export function isAvail(item,cat,today,perm,permCat,day){if(perm&&perm[item.id])return false;if(permCat&&cat&&permCat[cat.id])return false;const fresh=today&&today.day===(day||dayKey());
   if(isKitchenSt(stOf(item,cat)))return !!(fresh&&today.on&&today.on[item.id]);
   return !(fresh&&today.off&&today.off[item.id])}
 // Küche ab (Standard 12:00): vorher sind Küchengerichte sichtbar, aber nicht bestellbar

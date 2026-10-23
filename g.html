@@ -153,6 +153,12 @@ label{display:block;color:var(--mu);font-size:13px;margin:12px 0 6px}
 .resform select,.resform input[type=date],.resform input[type=number]{font:inherit;color:var(--tx);background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;color-scheme:dark}
 .resform textarea{min-height:64px}
 .slots{display:flex;flex-wrap:wrap;gap:8px}
+.slots.areas{display:grid;grid-template-columns:1fr 1fr;gap:8px}.slots.areas .slot{padding:10px 8px;font-size:14px}
+.rdish{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:14px 0 4px;background:var(--bg2)}
+.rdish b{color:var(--gold)}.rdish p{margin:6px 0 0;color:var(--mu);font-size:14px}
+.rdc{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin-top:10px}
+.rdl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.rdl span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:14px}
+.rejb{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}.rejm{color:#ffb4a8;font-size:14px;margin-top:4px}
 .slot{border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-weight:600;color:var(--tx);background:var(--bg2)}
 .slot.act{background:var(--gold);color:#1a1406;border-color:var(--gold)}
 footer{color:var(--mu);font-size:13px;text-align:center;padding:30px 0 20px}
@@ -163,6 +169,19 @@ footer a{color:var(--gold);text-decoration:none}
 .toast.err{background:var(--er);color:#fff}
 .chk{display:flex;gap:10px;align-items:flex-start;margin:14px 0}.chk input{width:22px;height:22px;flex:none;margin-top:2px}
 .wifi{font-family:ui-monospace,monospace;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+/* ---- Desktop: Reihen mit der Maus bedienbar machen ---- */
+@media (min-width: 820px){
+  .car .pc{flex:0 0 300px}
+  .car{scroll-snap-type:none}
+  .chips{flex-wrap:wrap;overflow-x:visible;margin:0;padding:10px 0 12px}
+}
+/* Scrollbalken auf Geräten mit Maus wieder zeigen */
+@media (hover: hover) and (pointer: fine){
+  .car{scrollbar-width:thin}
+  .car::-webkit-scrollbar{display:block;height:8px}
+  .car::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:4px}
+  .car::-webkit-scrollbar-track{background:transparent}
+}
 </style>
 </head>
 <body>
@@ -173,7 +192,7 @@ footer a{color:var(--gold);text-decoration:none}
 <div id="toast"></div>
 <script src="data.js"></script>
 <script type="module">
-import {dateOfDay,DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift,stOf,isKitchenSt,isShishaCat,kitchenFrom,kitchenWaiting} from './store.js';
+import {dateOfDay,DEFAULT_CFG,LS,uid,dayKey,makeStore,push,isAvail,isOpenNow,zoneOf,isTerrace,nextOpen,closeToday,dayHours,pushShift,stOf,isKitchenSt,isShishaCat,kitchenFrom,kitchenWaiting,dayAvail,isLim} from './store.js';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const eur=n=>'<bdi>'+(Math.round((+n||0)*100)/100).toFixed(2).replace('.',',')+' €</bdi>';
@@ -289,7 +308,18 @@ resCancel:["Reservierung stornieren", "Cancel reservation", "لغو رزرو", "
 resCancelQ:["Reservierung wirklich stornieren?", "Really cancel the reservation?", "رزرو واقعاً لغو شود؟", "Annullare davvero la prenotazione?", "هل تريد إلغاء الحجز فعلاً؟"],
 resCall:["Lieber telefonisch?", "Prefer to call?", "ترجیح می‌دهید تلفنی؟", "Preferisci telefonare?", "تفضل الاتصال؟"],
 resTable:["Tisch", "Table", "میز", "Tavolo", "طاولة"],
-resNav:["Reservieren", "Reserve", "رزرو", "Prenota", "حجز"]
+resNav:["Reservieren", "Reserve", "رزرو", "Prenota", "حجز"],
+resArea:["Wo möchten Sie sitzen?","Where would you like to sit?","کجا دوست دارید بنشینید؟","Dove preferite sedervi?","أين تفضّلون الجلوس؟"],
+ar_any:["Egal","No preference","فرقی ندارد","Indifferente","لا يهم"],
+ar_in:["Innen (Saal)","Inside (dining room)","داخل سالن","All’interno (sala)","في الداخل (القاعة)"],
+ar_tc:["Terrasse überdacht","Covered terrace","تراس سرپوشیده","Terrazza coperta","شرفة مغطاة"],
+ar_to:["Terrasse offen","Open terrace","تراس باز","Terrazza aperta","شرفة مفتوحة"],
+resAreaNote:["Ihr Wunsch – keine Garantie. Bei schlechtem Wetter setzen wir Sie gerne nach innen.","Your wish – not guaranteed. In bad weather we will happily seat you inside.","خواسته‌ی شماست و تضمین نیست. در هوای بد، داخل سالن جا می‌دهیم.","Un desiderio, non una garanzia. Con il maltempo vi sistemiamo volentieri all’interno.","هذه رغبتكم دون ضمان. في حال سوء الطقس نجلسكم في الداخل بكل سرور."],
+limited:["begrenzt verfügbar","limited availability","موجودی محدود","disponibilità limitata","كمية محدودة"],
+rejHd:["Leider heute nicht verfügbar – bitte wählen Sie etwas anderes. Entschuldigung!","Unfortunately not available today – please choose something else. Sorry!","متأسفانه امروز موجود نیست – لطفاً چیز دیگری انتخاب کنید. عذر می‌خواهیم!","Purtroppo oggi non disponibile – scegli qualcos’altro. Scusaci!","للأسف غير متوفر اليوم – يرجى اختيار شيء آخر. نعتذر!"],
+resDish:["An diesem Tag servieren wir","On this day we serve","این روز سرو می‌کنیم","In questo giorno serviamo","في هذا اليوم نقدّم"],
+resDishNo:["Die Auswahl der Gerichte für diesen Tag wird am Vortag festgelegt.","The dishes for this day are decided the day before.","انتخاب غذاهای این روز، یک روز قبل مشخص می‌شود.","La scelta dei piatti per questo giorno viene decisa il giorno prima.","يتم تحديد أطباق هذا اليوم في اليوم السابق."],
+resDrinks:["Getränke laut Karte.","Drinks as per menu.","نوشیدنی‌ها طبق منو.","Bevande come da menu.","المشروبات حسب القائمة."]
 };const CAT={"vor":["Vorspeisen","Starters","پیش‌غذا","Antipasti","المقبلات"],"sup":["Suppen","Soups","سوپ‌ها","Zuppe","الشوربات"],"sal":["Salate","Salads","سالادها","Insalate","السلطات"],"per":["Persisch & Afghanisch","Persian & Afghan","ایرانی و افغانی","Persiano & Afghano","فارسي وأفغاني"],"gri":["Vom Grill","From the grill","کباب‌ها","Dalla griglia","المشاوي"],"oes":["Österreichisch","Austrian","اتریشی","Austriaco","نمساوي"],"piz":["Pizza","Pizza","پیتزا","Pizza","بيتزا"],"pas":["Pasta","Pasta","پاستا","Pasta","باستا"],"bur":["Burger","Burgers","برگر","Burger","برغر"],"bei":["Beilagen & Dips","Sides & dips","مخلفات","Contorni & salse","أطباق جانبية وصلصات"],"hei":["Heiße Getränke","Hot drinks","نوشیدنی گرم","Bevande calde","مشروبات ساخنة"],"alf":["Alkoholfrei","Soft drinks","نوشیدنی بدون الکل","Analcolici","مشروبات بدون كحول"],"bie":["Bier & Radler","Beer & shandy","آبجو و رادلر","Birra & Radler","بيرة ورادلر"],"ape":["Aperitif & Prosecco","Aperitif & prosecco","آپریتیف و پروسکو","Aperitivo & prosecco","أبريتيف وبروسيكو"],"coc":["Cocktails & Longdrinks","Cocktails & long drinks","کوکتل","Cocktail & long drink","كوكتيلات"],"wei":["Wein","Wine","شراب","Vino","نبيذ"],"sch":["Schnaps & Digestif","Schnapps & digestif","عرق و دیژستیف","Grappe & digestivi","مشروبات روحية وهاضمة"],"shi":["Shisha","Shisha","قلیان","Shisha","شيشة"]};
 const AL={"A":["Gluten","gluten","گلوتن","glutine","غلوتين"],"B":["Krebstiere","crustaceans","سخت‌پوستان","crostacei","قشريات"],"C":["Eier","eggs","تخم‌مرغ","uova","بيض"],"D":["Fisch","fish","ماهی","pesce","سمك"],"G":["Milch/Laktose","milk/lactose","شیر/لاکتوز","latte/lattosio","حليب/لاكتوز"],"H":["Schalenfrüchte","nuts","مغزها","frutta a guscio","مكسرات"],"L":["Sellerie","celery","کرفس","sedano","كرفس"],"M":["Senf","mustard","خردل","senape","خردل"],"O":["Sulfite","sulphites","سولفیت","solfiti","كبريتيت"],"R":["Weichtiere","molluscs","نرم‌تنان","molluschi","رخويات"]};
 let lang=LS.get('zbg_lang',null)||(()=>{for(const l of (navigator.languages||[navigator.language||'de'])){const k=String(l).slice(0,2).toLowerCase();if(LANGS.includes(k))return k}return 'en'})();
@@ -308,14 +338,14 @@ const cleanName=n=>String(n).replace(/\s*\(ca\. 30 Min\.\)/,'').replace(/\s*[�
 const GK='zbg:'+(T||'-');
 let G=LS.get(GK,{session:null,gid:null,name:'',had:false});
 const saveG=()=>LS.set(GK,G);
-let shifts=[];let Store=null,conf=null,today=null,tableDoc=null,orders=[],unsubO=null,joinedS=null;
+let shifts=[];let Store=null,conf=null,today=null,plan=null,tableDoc=null,orders=[],unsubO=null,joinedS=null;
 let cart=LS.get('zbg_cart:'+(T||'-'),[]);const saveCart=()=>LS.set('zbg_cart:'+(T||'-'),cart);
 const ui={view:'home',sheet:null,arg:null,flt:{v:false,s:false},thanks:false,cooldown:0,ageOk:false};
 
 const catOf=it=>conf.cats.find(c=>c.id===it.cat);
 const canOrder=()=>!!T&&!!conf&&isOpenNow(conf);
 const isKitchenIt=it=>isKitchenSt(stOf(it,catOf(it)));
-function blockReason(it){const c=catOf(it);if(!isAvail(it,c,today,conf.perm))return 'notToday';if(isShishaCat(c)&&T&&!isTerrace(T,conf))return 'terraceOnly';if(isKitchenIt(it)&&kitchenWaiting(conf))return 'from12';return null}
+function blockReason(it){const c=catOf(it);if(!isAvail(it,c,dayAvail(today,plan),conf.perm,conf.permCat))return 'notToday';if(isShishaCat(c)&&T&&!isTerrace(T,conf))return 'terraceOnly';if(isKitchenIt(it)&&kitchenWaiting(conf))return 'from12';return null}
 const brLabel=br=>br==='from12'?tr('from12',{t:kitchenFrom(conf)}):tr(br);
 
 /* ============ Icons ============ */
@@ -379,7 +409,7 @@ function footer(){return `<div class="leg"><b>${tr('legend')}</b>${Object.entrie
   <footer><img src="logo.png" alt="" style="width:46px;opacity:.8"><br>ZIRLERBERG · Zirler Berg 1 · 6170 Zirl<br><a href="tel:+436764502361">+43 676 4502361</a></footer>`}
 function qtyIn(id){return cart.filter(l=>l.itemId===id).reduce((a,l)=>a+l.qty,0)}
 function flagChips(it){const f=flOf(it),n=it.name;const a=[];
-  if(f.includes('h')||n.includes('★'))a.push('★ '+tr('house'));if(f.includes('v')||n.includes('🌱'))a.push('🌱');if(f.includes('s')||n.includes('🌶'))a.push('🌶');if(f.includes('t')||/30 Min/.test(n))a.push('⏱ '+tr('min30'));return a}
+  if(f.includes('h')||n.includes('★'))a.push('★ '+tr('house'));if(f.includes('v')||n.includes('🌱'))a.push('🌱');if(f.includes('s')||n.includes('🌶'))a.push('🌶');if(f.includes('t')||/30 Min/.test(n))a.push('⏱ '+tr('min30'));if(isLim(conf,it,catOf(it))&&!blockReason(it))a.push(tr('limited'));return a}
 function photoCard(it){
   const br=blockReason(it),q=qtyIn(it.id),fa=lang==='fa'&&DATA.fa[it.id];
   return `<div class="pc ${br?'off':''}" data-a="item" data-x="${it.id}">
@@ -433,6 +463,7 @@ function tableView(){
   ${!list.length?`<div class="notice">${tr('noOrders')}</div>`:list.map(o=>{const [k,c]=statusOf(o),mine=o.guestId===G.gid;
     return `<div class="oc"><div class="oh"><span class="gname">👤 ${mine?tr('me_'):esc(o.guestName||(o.source==='staff'?tr('service'):tr('guest')+' '+(gn[o.guestId]||'')))} · ${new Date(o.createdMs).toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'})}</span><span class="stb ${c}">${tr(k)}</span></div>
     ${o.items.map(i=>`<div class="mini"><b>${i.qty}×</b><span style="flex:1">${esc(cleanName(i.name))}${i.note?` <span class="muted">(${esc(i.note)})</span>`:''}</span><span>${eur(i.qty*i.price)}</span></div>`).join('')}
+    ${Array.isArray(o.rej)&&o.rej.length?`<div class="rejb">${o.rej.map(r=>`<div class="mini" style="text-decoration:line-through;opacity:.7"><b>${r.qty}×</b><span style="flex:1">${esc(cleanName(r.name))}</span></div>`).join('')}<div class="rejm">✕ ${tr('rejHd')}</div></div>`:''}
     ${mine&&o.status==='pending'?`<button class="ghostbtn" style="padding:10px" data-a="cancelO" data-x="${o.id}">${tr('cancel')}</button>`:''}</div>`}).join('')}
   ${valid.length?`<div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div><p class="muted" style="color:var(--mu);font-size:13px">${tr('payInfo')}</p>`:''}
   <div class="tiles"><button class="tile" data-a="callW" data-x="waiter">${IC.bell}<span>${tr('call')}</span></button><button class="tile" data-a="callW" data-x="bill">${IC.bill}<span>${tr('bill')}</span></button></div>
@@ -443,7 +474,8 @@ function tableView(){
 const pad2=n=>String(n).padStart(2,'0');
 const fmtResDayDe=day=>{const d=dateOfDay(day);return ['So','Mo','Di','Mi','Do','Fr','Sa'][d.getDay()]+' '+pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'};
 const localDay=(d=new Date())=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
-const RF=ui.rf={day:'',time:'',persons:2,name:'',phone:'',email:'',note:'',ok:false};
+const RF=ui.rf={day:'',time:'',persons:2,name:'',phone:'',email:'',note:'',ok:false,area:'any'};
+const RAREAS=[['any','🤷'],['in','🏠'],['tc','⛱'],['to','☀️']];
 let myRes=LS.get('zbg_res',[]),resDocs={},resSubs={};
 function resSlots(day){if(!day||!conf)return null;const d=dateOfDay(day);const h=dayHours(conf,d);if(!h)return null;
   const toM=s=>{const [a,b]=s.split(':').map(Number);return a*60+b};let o=toM(h.o),c=toM(h.c);if(c<=o)c+=1440;const last=c-90;
@@ -451,18 +483,27 @@ function resSlots(day){if(!day||!conf)return null;const d=dateOfDay(day);const h
   for(let m=Math.ceil(o/30)*30;m<=last;m+=30){if(isToday&&m<nm)continue;out.push(pad2(Math.floor(m/60)%24)+':'+pad2(m%60))}return out}
 function watchRes(){for(const id of myRes)if(!resSubs[id])resSubs[id]=Store.subDoc('res/'+id,d=>{if(d===undefined)return;resDocs[id]=d;if(ui.view==='res')render()},()=>{})}
 const fmtResDay=day=>{const d=dateOfDay(day);return WDN[d.getDay()][li()]+', '+pad2(d.getDate())+'.'+pad2(d.getMonth()+1)+'.'};
+function resDishes(day){if(!conf||!day)return '';const dd=dayAvail(today,plan,day);
+  if(!dd)return `<div class="rdish"><b>🍽 ${tr('resDish')}</b><p>${tr('resDishNo')}</p></div>`;
+  const its=conf.items.filter(i=>{const c=catOf(i);return isKitchenIt(i)&&isAvail(i,c,dd,conf.perm,conf.permCat,day)});
+  if(!its.length)return `<div class="rdish"><b>🍽 ${tr('resDish')}</b><p>${tr('resDishNo')}</p></div>`;
+  const cats=conf.cats.filter(c=>its.some(i=>i.cat===c.id));
+  return `<div class="rdish"><b>🍽 ${tr('resDish')}</b>${cats.map(c=>`<div class="rdc">${esc(catName(c))}</div><div class="rdl">${its.filter(i=>i.cat===c.id).map(i=>`<span>${esc(cleanName(i.name))}${lang==='fa'&&DATA.fa[i.id]?` · ${esc(DATA.fa[i.id])}`:''}</span>`).join('')}</div>`).join('')}<p class="muted" style="margin:6px 0 0;font-size:13px">${tr('resDrinks')}</p></div>`}
 function resView(){if(!RF.day)RF.day=localDay();const sl=resSlots(RF.day);if(sl&&sl.length&&!sl.includes(RF.time))RF.time=sl[0];
   const mine=myRes.map(id=>resDocs[id]).filter(r=>r&&r.day>=localDay(new Date(Date.now()-864e5))).sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time));
   const max=localDay(new Date(Date.now()+90*864e5));
   return `<div class="mhead"><div class="wrap"><div class="mtop" style="padding-bottom:12px"><h1 class="serif">${tr('reserve')}</h1></div></div></div><div class="wrap" style="padding-top:14px">
   ${mine.length?`<h2 class="sec serif" style="margin-top:4px">${tr('myRes')}</h2>${mine.map(r=>`<div class="oc"><div class="oh"><b>${esc(fmtResDay(r.day))} · ${esc(r.time)}</b><span class="stb ${r.status==='ok'?'s-ready':r.status==='pending'?'s-pend':'s-no'}">${tr('rs_'+r.status)}</span></div>
-    <div class="gname">👥 ${r.persons} · ${esc(r.name)}${r.table?` · ${tr('resTable')} ${esc(r.table)}`:''}</div>
+    <div class="gname">👥 ${r.persons} · ${esc(r.name)}${r.area&&r.area!=='any'?` · ${tr('ar_'+r.area)}`:''}${r.table?` · ${tr('resTable')} ${esc(r.table)}`:''}</div>
     ${r.status==='pending'||r.status==='ok'?`<button class="ghostbtn" style="padding:9px;margin-top:8px" data-a="resCancel" data-x="${esc(r.id)}">${tr('resCancel')}</button>`:''}</div>`).join('')}`:''}
   <p class="secsub">${tr('resSub')}</p>
   <div class="resform">
   <div class="rgrid"><div><label>${tr('date')}</label><input type="date" data-r="day" value="${esc(RF.day)}" min="${localDay()}" max="${max}"></div>
    <div><label>${tr('persons')}</label><input type="number" inputmode="numeric" min="1" data-r="persons" value="${esc(RF.persons)}"></div></div>
+  <label>${tr('resArea')}</label><div class="slots areas">${RAREAS.map(([k,i])=>`<button class="slot ${RF.area===k?'act':''}" data-a="resArea" data-x="${k}">${i} ${tr('ar_'+k)}</button>`).join('')}</div>
+  ${RF.area!=='any'?`<p class="hint">${tr('resAreaNote')}</p>`:''}
   ${!sl?`<div class="notice">🌙 ${tr('resClosed')}</div>`:!sl.length?`<div class="notice">🕙 ${tr('resNoSlot')}</div>`:`<label>${tr('time')}</label><div class="slots">${sl.map(x=>`<button class="slot ${x===RF.time?'act':''}" data-a="resTime" data-x="${x}">${x}</button>`).join('')}</div>`}
+  ${resDishes(RF.day)}
   <label>${tr('resName')}</label><input data-r="name" value="${esc(RF.name)}" autocomplete="name" maxlength="60">
   <label>${tr('phone')}</label><input type="tel" data-r="phone" value="${esc(RF.phone)}" autocomplete="tel" maxlength="30" placeholder="+43 …">
   <label>${tr('email')}</label><input type="email" data-r="email" value="${esc(RF.email)}" autocomplete="email" maxlength="80">
@@ -471,6 +512,11 @@ function resView(){if(!RF.day)RF.day=localDay();const sl=resSlots(RF.day);if(sl&
   <button class="bigbtn" data-a="resSend" ${sl&&sl.length?'':'disabled'}>${tr('resSend')}</button></div>
   <p style="text-align:center;color:var(--mu);font-size:14px;margin-top:14px">${tr('resCall')} <a style="color:var(--gold)" href="tel:+436764502361">+43 676 4502361</a></p>
   ${footer()}</div>`}
+// Mausrad bewegt Foto-Reihen seitlich (delegiert, weil die Ansicht neu gerendert wird); am Ende scrollt wieder die Seite
+document.addEventListener('wheel',e=>{const el=e.target.closest&&e.target.closest('.car');if(!el)return;
+  if(Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;if(el.scrollWidth<=el.clientWidth)return;
+  const max=el.scrollWidth-el.clientWidth;if((e.deltaY<0&&el.scrollLeft<=0)||(e.deltaY>0&&el.scrollLeft>=max-1))return;
+  e.preventDefault();el.scrollLeft+=e.deltaY},{passive:false});
 document.addEventListener('input',e=>{const el=e.target.closest('[data-r]');if(!el)return;const k=el.dataset.r;RF[k]=el.type==='checkbox'?el.checked:el.value;if(k==='day'){RF.time='';el.blur();render()}});
 
 /* ----- Sheets ----- */
@@ -545,12 +591,13 @@ const A={
       toast(x==='bill'?tr('billCalled'):tr('called'),'',5000)}catch(e){ui.cooldown=0;toast(tr('err'),'err')}},
   wifi(){ui.sheet='wifi';render()},
   resTime(x){RF.time=x;render()},
+  resArea(x){RF.area=x;render()},
   async resSend(x,el){const name=RF.name.trim(),phone=RF.phone.trim(),persons=parseInt(RF.persons,10)||0,sl=resSlots(RF.day)||[];
     if(!name||phone.replace(/\D/g,'').length<6||!persons||persons<1||!sl.includes(RF.time)||!RF.ok){toast(tr('resMiss'),'err',5000);return}
     el.disabled=true;el.textContent=tr('wait');
-    try{const id=uid()+uid()+uid();const d={day:RF.day,time:RF.time,persons,name:name.slice(0,60),phone:phone.slice(0,30),email:RF.email.trim().slice(0,80),note:RF.note.trim().slice(0,300),lang,status:'pending',createdMs:Date.now(),by:Store.authUid(),src:T?'qr':'web'};
+    try{const id=uid()+uid()+uid();const d={day:RF.day,time:RF.time,persons,name:name.slice(0,60),phone:phone.slice(0,30),email:RF.email.trim().slice(0,80),note:RF.note.trim().slice(0,300),area:RF.area||'any',lang,status:'pending',createdMs:Date.now(),by:Store.authUid(),src:T?'qr':'web'};
       await Store.setDoc('res/'+id,d);myRes=[...myRes,id];LS.set('zbg_res',myRes);resDocs[id]={...d,id};watchRes();
-      const msg=fmtResDayDe(d.day)+' '+d.time+' · '+persons+' Pers. · '+d.name+(d.note?'\n'+d.note:'');
+      const msg=fmtResDayDe(d.day)+' '+d.time+' · '+persons+' Pers. · '+d.name+(d.area!=='any'?' · '+I['ar_'+d.area][0]:'')+(d.note?'\n'+d.note:'');
       pushShift(cfg,shifts,s=>s.role==='waiter',null,'📅 Neue Reservierung',msg,['calendar']);push(cfg,cfg.topic+'-reserv','📅 Neue Reservierung',msg,['calendar']);
       RF.note='';RF.ok=false;toast('✓ '+tr('resSent'),'',6000);render();scrollTo(0,0)}
     catch(e){console.error(e);toast(tr('err'),'err',6000);el.disabled=false;el.textContent=tr('resSend')}},
@@ -569,6 +616,7 @@ async function start(){render();
   try{await Store.init()}catch(e){console.error(e);toast(tr('err'),'err',8000);return}
   Store.subDoc('config/main',c=>{if(c){conf=c;render()}});
   Store.subDoc('config/today',d=>{if(d!==undefined){today=d;render()}});
+  Store.subDoc('config/plan',d=>{if(d!==undefined){plan=d;if(ui.view==='res'||ui.view==='menu')render()}},()=>{});
   Store.subCol('shift','day',dayKey(),l=>{shifts=l},()=>{});
   watchRes();
   if(T)Store.subDoc('tables/'+T,d=>{if(d===undefined)return;tableDoc=d;const s=d&&d.session;
