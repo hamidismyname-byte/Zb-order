@@ -406,7 +406,7 @@ function homeView(){
   ${hi.length?`<h2 class="sec serif">${tr('highlights')}</h2><p class="secsub">${tr('highSub')}</p><div class="car">${hi.map(i=>photoCard(i)).join('')}</div>`:''}
   ${footer()}</div>`}
 function footer(){return `<div class="leg"><b>${tr('legend')}</b>${Object.entries(AL).map(([k,v])=>`${k} ${v[li()]}`).join(' · ')}<br>🌱 ${tr('veg')} · 🌶 ${tr('spicy')} · ★ ${tr('house')}<br>${tr('taxes')}</div>
-  <footer><img src="logo.png" alt="" style="width:46px;opacity:.8"><br>ZIRLERBERG · Zirler Berg 1 · 6170 Zirl<br><a href="tel:+436764502361">+43 676 4502361</a></footer>`}
+  <footer><img src="logo.png" alt="" style="width:46px;opacity:.8"><br>ZIRLERBERG · Zirlerberg 1 · 6170 Zirl<br><a href="tel:+436764502361">+43 676 4502361</a><br><a href="recht.html">Impressum</a> · <a href="recht.html#datenschutz">Datenschutz</a></footer>`}
 function qtyIn(id){return cart.filter(l=>l.itemId===id).reduce((a,l)=>a+l.qty,0)}
 function flagChips(it){const f=flOf(it),n=it.name;const a=[];
   if(f.includes('h')||n.includes('★'))a.push('★ '+tr('house'));if(f.includes('v')||n.includes('🌱'))a.push('🌱');if(f.includes('s')||n.includes('🌶'))a.push('🌶');if(f.includes('t')||/30 Min/.test(n))a.push('⏱ '+tr('min30'));if(isLim(conf,it,catOf(it))&&!blockReason(it))a.push(tr('limited'));return a}
