@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Impressum & Datenschutz · Zirlerberg</title>
+<meta name="description" content="Impressum und Datenschutzerklärung – Restaurant Zirlerberg, Zirl">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#0a1430">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a1430;--bg2:#0f1b3d;--card:#13224a;--card2:#182a57;--line:#24366a;--gold:#d6b06a;--gold2:#b8914c;--tx:#f4efe4;--mu:#a7afc6;--ok:#5fd39a;--wa:#f0b44c;--er:#ef7b7b;--r:18px}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+html,body{margin:0;color:var(--tx);font:16px/1.5 Manrope,system-ui,sans-serif}
+body.fa{font-family:Vazirmatn,Manrope,system-ui,sans-serif}
+body{background:var(--bg);padding-bottom:calc(84px + env(safe-area-inset-bottom));overscroll-behavior-y:none}
+.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;letter-spacing:.2px}
+body.fa .serif{font-family:Vazirmatn,sans-serif;font-weight:700;letter-spacing:0}
+button,.btn{font:inherit;color:inherit;border:0;background:none;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+button:active,.btn:active{transform:scale(.97)}
+input,textarea{font:inherit;color:var(--tx);background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%}
+input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+.wrap{max-width:720px;margin:0 auto;padding:0 18px}
+/* Hero */
+.hero{position:relative;min-height:max(440px,64vh);display:flex;flex-direction:column;align-items:center;justify-content:flex-end;text-align:center;padding:0 18px 34px;overflow:hidden}
+.hero video,.hero .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .poster{filter:saturate(.88) contrast(.92) brightness(.92);transform-origin:50% 30%;will-change:opacity,transform}
+.story{margin-top:14px;border:1px solid rgba(214,176,106,.35);border-radius:14px;background:rgba(214,176,106,.06)}
+.story summary{list-style:none;cursor:pointer;padding:12px 14px;color:var(--gold);font-weight:600;display:flex;justify-content:space-between}
+.story summary::-webkit-details-marker{display:none}
+.story summary:after{content:'+';font-size:20px;line-height:1}
+.story[open] summary:after{content:'–'}
+.story p{margin:0;padding:0 14px 14px;color:var(--tx);font-size:15px;line-height:1.65}
+.hint{font-size:12px;color:var(--mu);margin-top:6px}
+.chip.dim{opacity:.5}
+.nahd{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin:18px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
+.nalist .row{padding:8px 0}.nalist .row .nm{font-size:16px}.nalist .ds,.nalist .al,.nalist .offl,.nalist .add{display:none}
+.hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,48,.35) 0%,rgba(10,20,48,.15) 35%,rgba(10,20,48,.8) 75%,rgba(10,20,48,.86) 100%)}
+.hero>*:not(video):not(.shade):not(.poster){position:relative}
+.langs{position:absolute!important;top:calc(14px + env(safe-area-inset-top));inset-inline-end:14px;display:flex;gap:4px;background:rgba(10,20,48,.55);backdrop-filter:blur(8px);border-radius:999px;padding:4px}
+.langs button{font-size:12px;font-weight:700;padding:6px 10px;border-radius:999px;color:var(--mu)}
+.langs button.act{background:var(--gold);color:#1a1406}
+.logo{width:124px;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45));margin-bottom:8px}
+.hero h1{font-size:44px;line-height:1.05;margin:4px 0 2px}
+.hero .sub{color:var(--mu);letter-spacing:2.5px;font-size:12px;text-transform:uppercase;margin:0 0 16px}
+body.fa .hero .sub{letter-spacing:0;font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(214,176,106,.55);background:rgba(10,20,48,.5);backdrop-filter:blur(8px);padding:8px 16px;border-radius:999px;font-weight:600}
+.pill b{color:var(--gold)}
+.openst{margin-top:10px;font-size:13px;color:var(--mu)}.openst i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-inline-end:6px}
+.openst.closed i{background:var(--er)}
+/* Kacheln */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-height:96px;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:start}
+.tile svg{width:28px;height:28px;stroke:var(--gold);fill:none;stroke-width:1.6}
+.tile span{font-weight:600}
+.tile small{color:var(--mu);font-size:12px;font-weight:500}
+.tile.main{grid-column:1/-1;background:linear-gradient(135deg,#1b2d5e,#13224a);border-color:rgba(214,176,106,.5);flex-direction:row;align-items:center;min-height:84px}
+.tile.main span{font-size:20px}
+.tile:disabled{opacity:.45}
+h2.sec{font-size:30px;margin:26px 0 4px}
+.secsub{color:var(--mu);margin:0 0 14px;font-size:14px}
+/* Karussell */
+.car{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 18px 10px;margin:0 -18px;scrollbar-width:none}
+.car::-webkit-scrollbar{display:none}
+.car .pc{flex:0 0 78%;scroll-snap-align:center}
+/* Speisekarte */
+.mhead{position:sticky;top:0;z-index:10;background:rgba(10,20,48,.92);backdrop-filter:blur(10px);padding:calc(10px + env(safe-area-inset-top)) 0 0;border-bottom:1px solid var(--line)}
+.mtop{display:flex;align-items:center;gap:10px}
+.mtop h1{flex:1;font-size:28px;margin:0}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 18px 12px;margin:0 -18px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;padding:8px 14px;border-radius:999px;border:1px solid var(--line);font-size:14px;color:var(--mu)}
+.chip.act{background:var(--gold);color:#1a1406;border-color:var(--gold);font-weight:700}
+.flt{font-size:13px;padding:6px 12px}
+.flt.on{border-color:var(--gold);color:var(--gold)}
+.catsec{scroll-margin-top:130px}
+.cath{font-size:28px;margin:30px 0 12px;display:flex;align-items:baseline;gap:10px}
+.cath:after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(214,176,106,.5),transparent)}
+body.fa .cath:after{background:linear-gradient(270deg,rgba(214,176,106,.5),transparent)}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px;position:relative;cursor:pointer}
+.pc .ph{position:relative;aspect-ratio:4/3;background:#0d1838}
+.pc .ph img{width:100%;height:100%;object-fit:cover;display:block}
+.sym{position:absolute;bottom:8px;inset-inline-start:8px;font-size:10px;letter-spacing:.5px;color:#fff;background:rgba(0,0,0,.45);padding:2px 7px;border-radius:6px;backdrop-filter:blur(4px)}
+.flags{position:absolute;top:10px;inset-inline-start:10px;display:flex;gap:6px}
+.flags span{background:rgba(10,20,48,.75);backdrop-filter:blur(6px);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600}
+.pc .bd{padding:14px 16px 16px}
+.nm{font-size:23px;line-height:1.15;margin:0}
+.fan{font-family:Vazirmatn,sans-serif;color:var(--gold);font-size:15px;margin-top:2px}
+.ds{color:var(--mu);font-size:14px;margin:6px 0 0}
+.al{font-size:11px;color:var(--mu);letter-spacing:1px;margin-top:6px}
+.ft{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.pr{color:var(--gold);font-weight:700;font-size:19px}
+.add{width:46px;height:46px;border-radius:50%;background:var(--gold);color:#1a1406;font-size:26px;font-weight:600;line-height:1;flex:none}
+.add[disabled]{background:var(--line);color:var(--mu)}
+.qb{position:absolute;top:10px;inset-inline-end:10px;background:var(--gold);color:#1a1406;font-weight:800;border-radius:999px;min-width:30px;height:30px;display:grid;place-items:center;padding:0 8px;z-index:2}
+.row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);position:relative;cursor:pointer}
+.row .f{flex:1;min-width:0}
+.row .nm{font-size:19px}
+.row .qb{position:static}
+.off{opacity:.5}
+.offl{display:inline-block;font-size:12px;color:var(--er);border:1px solid rgba(239,123,123,.5);border-radius:999px;padding:2px 10px;margin-top:8px}
+.notice{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:14px 0;font-size:14px;color:var(--mu)}
+.notice b{color:var(--tx)}
+/* Leiste & Sheets */
+.cartbar{position:fixed;left:0;right:0;bottom:calc(72px + env(safe-area-inset-bottom));padding:0 14px;z-index:30;max-width:720px;margin:0 auto}
+.cartbar button{width:100%;background:var(--gold);color:#1a1406;font-weight:700;border-radius:16px;padding:16px;justify-content:space-between;box-shadow:0 12px 30px rgba(0,0,0,.45);font-size:16px}
+nav.bn{position:fixed;bottom:0;left:0;right:0;z-index:31;display:flex;background:rgba(10,20,48,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav.bn button{flex:1;flex-direction:column;gap:2px;min-height:64px;font-size:12px;color:var(--mu);position:relative}
+nav.bn button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.6}
+nav.bn button.act{color:var(--gold)}
+nav.bn .bdg{position:absolute;top:8px;inset-inline-start:calc(50% + 6px);background:var(--gold);color:#1a1406;border-radius:999px;font-size:11px;font-weight:800;min-width:18px;height:18px;display:grid;place-items:center;padding:0 5px}
+.sbg{position:fixed;inset:0;background:rgba(3,8,22,.7);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fi .2s}
+.sh{background:var(--bg2);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:24px 24px 0 0;border-top:1px solid var(--line);padding:18px 18px calc(22px + env(safe-area-inset-bottom));animation:su .25s ease}
+@keyframes su{from{transform:translateY(40px);opacity:.4}}@keyframes fi{from{opacity:0}}
+.sh .ph{margin:-18px -18px 14px;aspect-ratio:4/3;position:relative}
+.sh .ph img{width:100%;height:100%;object-fit:cover;border-radius:24px 24px 0 0}
+.x{position:absolute;top:12px;inset-inline-end:12px;width:40px;height:40px;border-radius:50%;background:rgba(10,20,48,.7);font-size:20px;z-index:3}
+.shh{display:flex;align-items:center;gap:10px;margin-bottom:10px}.shh h2{flex:1;margin:0;font-size:28px}
+.shh .x{position:static;background:var(--card)}
+.qty{display:flex;align-items:center;gap:6px}
+.qty button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);font-size:20px}
+.qty span{min-width:28px;text-align:center;font-weight:700}
+.bigbtn{width:100%;background:var(--gold);color:#1a1406;font-weight:700;border-radius:16px;padding:16px;font-size:17px;margin-top:14px}
+.bigbtn:disabled{opacity:.5}
+.ghostbtn{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:10px;color:var(--mu)}
+.line{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
+.line .f{flex:1}
+.tot{display:flex;justify-content:space-between;font-size:22px;font-weight:700;margin:16px 0 4px}
+.tot span:last-child{color:var(--gold)}
+label{display:block;color:var(--mu);font-size:13px;margin:12px 0 6px}
+.alist{font-size:13px;color:var(--mu);margin-top:10px}
+/* Tisch */
+.oc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px}
+.oh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px}
+.stb{font-size:12px;font-weight:700;border-radius:999px;padding:4px 10px;white-space:nowrap}
+.s-pend{background:rgba(240,180,76,.15);color:var(--wa)}.s-ok{background:rgba(214,176,106,.15);color:var(--gold)}.s-cook{background:rgba(240,180,76,.15);color:var(--wa)}
+.s-ready{background:rgba(95,211,154,.18);color:var(--ok)}.s-done{background:rgba(167,175,198,.12);color:var(--mu)}.s-no{background:rgba(239,123,123,.15);color:var(--er)}
+.gname{font-size:14px;color:var(--mu)}
+.mini{font-size:14px;display:flex;gap:8px;padding:3px 0}.mini b{color:var(--gold);min-width:26px}
+.thx{text-align:center;padding:30px 18px;background:linear-gradient(180deg,rgba(10,20,48,.55),rgba(10,20,48,.9)),url('s-panorama.webp') center/cover;border:1px solid rgba(214,176,106,.5);border-radius:var(--r);margin:22px 0}
+.thx h2{font-size:30px;margin:0 0 6px}
+.stars{font-size:30px;color:var(--gold);letter-spacing:4px;margin:8px 0}
+/* v12 */
+.cban{height:150px;border-radius:18px;background-size:cover;background-position:center;display:flex;align-items:flex-end;padding:12px 16px;margin:30px 0 14px;box-shadow:inset 0 -90px 70px -30px rgba(10,20,48,.95);border:1px solid var(--line)}
+.cban .cath{margin:0;text-shadow:0 2px 12px rgba(0,0,0,.6)}.cban .cath:after{display:none}
+.kban{background:rgba(214,176,106,.12);border:1px solid rgba(214,176,106,.55);color:var(--gold);border-radius:14px;padding:12px 14px;margin:16px 0 0;font-weight:600;font-size:15px;text-align:center}
+.langs button{padding:6px 8px}
+/* Reservierung */
+.rgrid{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.resform select,.resform input[type=date],.resform input[type=number]{font:inherit;color:var(--tx);background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%;color-scheme:dark}
+.resform textarea{min-height:64px}
+.slots{display:flex;flex-wrap:wrap;gap:8px}
+.slots.areas{display:grid;grid-template-columns:1fr 1fr;gap:8px}.slots.areas .slot{padding:10px 8px;font-size:14px}
+.rdish{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:14px 0 4px;background:var(--bg2)}
+.rdish b{color:var(--gold)}.rdish p{margin:6px 0 0;color:var(--mu);font-size:14px}
+.rdc{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin-top:10px}
+.rdl{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.rdl span{border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:14px}
+.rejb{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}.rejm{color:#ffb4a8;font-size:14px;margin-top:4px}
+.slot{border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-weight:600;color:var(--tx);background:var(--bg2)}
+.slot.act{background:var(--gold);color:#1a1406;border-color:var(--gold)}
+footer{color:var(--mu);font-size:13px;text-align:center;padding:30px 0 20px}
+footer a{color:var(--gold);text-decoration:none}
+.leg{font-size:12px;line-height:1.7;color:var(--mu);margin-top:26px;border-top:1px solid var(--line);padding-top:16px}
+#toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;width:min(92vw,460px);pointer-events:none}
+.toast{background:var(--gold);color:#1a1406;font-weight:700;padding:14px 16px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:auto}
+.toast.err{background:var(--er);color:#fff}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:14px 0}.chk input{width:22px;height:22px;flex:none;margin-top:2px}
+.wifi{font-family:ui-monospace,monospace;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+/* ---- Desktop: Reihen mit der Maus bedienbar machen ---- */
+@media (min-width: 820px){
+  .car .pc{flex:0 0 300px}
+  .car{scroll-snap-type:none}
+  .chips{flex-wrap:wrap;overflow-x:visible;margin:0;padding:10px 0 12px}
+}
+/* Scrollbalken auf Geräten mit Maus wieder zeigen */
+@media (hover: hover) and (pointer: fine){
+  .car{scrollbar-width:thin}
+  .car::-webkit-scrollbar{display:block;height:8px}
+  .car::-webkit-scrollbar-thumb{background:rgba(255,255,255,.25);border-radius:4px}
+  .car::-webkit-scrollbar-track{background:transparent}
+}
+</style>
+<style>
+/* ---- recht.html ---- */
+body{padding-bottom:calc(28px + env(safe-area-inset-bottom))}
+.lwrap{max-width:720px;margin:0 auto;padding:0 18px}
+.ltop{display:flex;align-items:center;gap:12px;padding:18px 0 6px}
+.ltop .back{color:var(--gold);font-size:15px;text-decoration:none}
+.lsw{margin-inline-start:auto;display:flex;gap:6px}
+.lsw button{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;color:var(--mu);background:var(--bg2)}
+.lsw button.act{background:var(--gold);color:#17202e;border-color:var(--gold);font-weight:700}
+.ldoc h1{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(30px,7vw,40px);margin:14px 0 2px}
+.ldoc h2{font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;margin:26px 0 6px;color:var(--tx)}
+.ldoc h3{font-size:15px;letter-spacing:.6px;text-transform:uppercase;color:var(--gold);margin:22px 0 6px}
+.ldoc p{margin:0 0 10px;color:var(--tx);font-size:15px;line-height:1.65}
+.ldoc a{color:var(--gold)}
+.lsub{color:var(--mu);font-size:14px;margin:0 0 4px}
+.lnote{color:var(--mu);font-size:13px}
+.ltab{width:100%;border-collapse:collapse;margin:6px 0 4px;font-size:14px}
+.ltab td{border-top:1px solid var(--line);padding:8px 0;vertical-align:top}
+.ltab td:first-child{color:var(--mu);width:46%;padding-inline-end:12px}
+.ldiv{height:1px;background:var(--line);margin:34px 0 0}
+html[data-l="de"] [lang="en"]{display:none}
+html[data-l="en"] [lang="de"]{display:none}
+</style>
+</head>
+<body>
+<div class="lwrap">
+ <div class="ltop">
+  <a class="back" href="g.html">&#8592; <span lang="de">Zur&uuml;ck zur Speisekarte</span><span lang="en">Back to the menu</span></a>
+  <div class="lsw"><button data-l="de">DE</button><button data-l="en">EN</button></div>
+ </div>
+
+ <article class="ldoc" id="impressum">
+  <h1>Impressum</h1>
+  <p class="lsub"><span lang="de">Offenlegung gem&auml;&szlig; &sect; 5 ECG und &sect; 25 MedienG</span><span lang="en">Information pursuant to &sect; 5 ECG and &sect; 25 MedienG (Austria)</span></p>
+
+  <h3><span lang="de">Medieninhaberin und Betreiberin</span><span lang="en">Owner and operator</span></h3>
+  <p>Niloofar Gholami<br>
+   <span lang="de">Einzelunternehmerin</span><span lang="en">Sole trader</span><br>
+   <span lang="de">Etablissementbezeichnung:</span><span lang="en">Establishment name:</span> Zirlerberg Restaurant</p>
+
+  <h3><span lang="de">Anschrift</span><span lang="en">Address</span></h3>
+  <p>Zirlerberg 1<br>6170 Zirl, Tirol<br><span lang="de">&Ouml;sterreich</span><span lang="en">Austria</span></p>
+
+  <h3><span lang="de">Kontakt</span><span lang="en">Contact</span></h3>
+  <p><span lang="de">Telefon:</span><span lang="en">Phone:</span> <a href="tel:+436764502361">+43 676 4502361</a><br>
+   <span lang="de">E-Mail:</span><span lang="en">E-mail:</span> <a href="mailto:Management@restaurant-am-zirlerberg.at">Management@restaurant-am-zirlerberg.at</a></p>
+
+  <h3><span lang="de">Unternehmensdaten</span><span lang="en">Company details</span></h3>
+  <table class="ltab">
+   <tr><td><span lang="de">Unternehmensgegenstand</span><span lang="en">Business purpose</span></td><td><span lang="de">Gastgewerbe</span><span lang="en">Hospitality</span></td></tr>
+   <tr><td>GISA-Zahl</td><td>39838704</td></tr>
+   <tr><td><span lang="de">UID-Nummer</span><span lang="en">VAT ID</span></td><td>ATU80205859</td></tr>
+   <tr><td><span lang="de">Gewerbebeh&ouml;rde</span><span lang="en">Trade authority</span></td><td>Bezirkshauptmannschaft Innsbruck</td></tr>
+   <tr><td><span lang="de">Kammerzugeh&ouml;rigkeit</span><span lang="en">Chamber membership</span></td><td><span lang="de">Wirtschaftskammer Tirol, Fachgruppe Gastronomie</span><span lang="en">Tyrol Economic Chamber, hospitality division</span></td></tr>
+   <tr><td><span lang="de">Anwendbare Vorschrift</span><span lang="en">Applicable law</span></td><td><span lang="de">Gewerbeordnung</span><span lang="en">Austrian Trade Act</span> &ndash; <a href="https://www.ris.bka.gv.at" target="_blank" rel="noopener">ris.bka.gv.at</a></td></tr>
+  </table>
+  <p class="lnote"><span lang="de">Das Unternehmen ist nicht im Firmenbuch eingetragen.</span><span lang="en">The business is not entered in the Austrian commercial register (Firmenbuch).</span></p>
+
+  <h3><span lang="de">Haftung f&uuml;r Inhalte und Links</span><span lang="en">Liability for content and links</span></h3>
+  <p><span lang="de">Die Inhalte dieser Anwendung wurden mit Sorgfalt erstellt. F&uuml;r die Richtigkeit, Vollst&auml;ndigkeit und Aktualit&auml;t kann keine Gew&auml;hr &uuml;bernommen werden. F&uuml;r die Inhalte verlinkter externer Seiten sind ausschlie&szlig;lich deren Betreiber verantwortlich.</span><span lang="en">The content of this application was prepared with care. No guarantee is given for its accuracy, completeness or timeliness. The operators of linked external sites are solely responsible for their content.</span></p>
+
+  <h3><span lang="de">Urheberrecht</span><span lang="en">Copyright</span></h3>
+  <p><span lang="de">Texte, Fotos und Grafiken dieser Anwendung sind urheberrechtlich gesch&uuml;tzt. Eine Verwendung au&szlig;erhalb der gesetzlichen Schranken bedarf der schriftlichen Zustimmung.</span><span lang="en">Texts, photographs and graphics in this application are protected by copyright. Any use beyond the statutory limits requires written consent.</span></p>
+  <p class="lnote"><span lang="de">Speisenfotos sind Symbolfotos.</span><span lang="en">Dish photographs are illustrative.</span></p>
+ </article>
+
+ <div class="ldiv"></div>
+
+ <article class="ldoc" id="datenschutz">
+  <h1><span lang="de">Datenschutzerkl&auml;rung</span><span lang="en">Privacy policy</span></h1>
+  <p class="lsub"><span lang="de">Information gem&auml;&szlig; Art. 13 DSGVO f&uuml;r die digitale Speisekarte und Reservierung</span><span lang="en">Information pursuant to Art. 13 GDPR for the digital menu and reservation service</span></p>
+
+  <h3><span lang="de">Verantwortliche</span><span lang="en">Controller</span></h3>
+  <p>Niloofar Gholami, Zirlerberg 1, 6170 Zirl, Tirol<br>
+   <a href="mailto:Management@restaurant-am-zirlerberg.at">Management@restaurant-am-zirlerberg.at</a> &middot; <a href="tel:+436764502361">+43 676 4502361</a></p>
+
+  <h3><span lang="de">Tischreservierung</span><span lang="en">Table reservation</span></h3>
+  <p><span lang="de">Wenn Sie das Reservierungsformular absenden, verarbeiten wir: Name, Telefonnummer, auf Wunsch E-Mail-Adresse, Datum, Uhrzeit, Personenzahl, gew&uuml;nschten Bereich und Ihre Anmerkung. Diese Daten sind erforderlich, um die Reservierung zu pr&uuml;fen und zu best&auml;tigen (Art. 6 Abs. 1 lit. b DSGVO, vorvertragliche Ma&szlig;nahme); die Einwilligung im Formular dokumentiert Ihr Einverst&auml;ndnis.</span><span lang="en">When you submit the reservation form we process: name, telephone number, optionally your e-mail address, date, time, number of guests, preferred area and your note. This data is needed to check and confirm the reservation (Art. 6(1)(b) GDPR, pre-contractual measure); the consent box in the form records your agreement.</span></p>
+  <p><span lang="de">Damit unser Service die Anfrage sofort sieht, wird eine Benachrichtigung &uuml;ber den Push-Dienst ntfy.sh versendet. Sie enth&auml;lt Datum, Uhrzeit, Personenzahl, Ihren Namen, den gew&uuml;nschten Bereich und Ihre Anmerkung. Telefonnummer und E-Mail-Adresse werden nicht &uuml;bertragen.</span><span lang="en">So that our staff see the request immediately, a notification is sent via the push service ntfy.sh. It contains the date, time, number of guests, your name, the preferred area and your note. Telephone number and e-mail address are not transmitted.</span></p>
+  <p><span lang="de">Reservierungsdaten werden sp&auml;testens 30 Tage nach dem Reservierungstag automatisch gel&ouml;scht. Sie k&ouml;nnen eine Reservierung jederzeit selbst stornieren oder uns anrufen.</span><span lang="en">Reservation data is deleted automatically no later than 30 days after the reservation date. You can cancel a reservation yourself at any time or call us.</span></p>
+
+  <h3><span lang="de">Bestellung am Tisch</span><span lang="en">Ordering at the table</span></h3>
+  <p><span lang="de">Bestellen ist nur m&ouml;glich, wenn Sie den QR-Code an Ihrem Tisch scannen. Verarbeitet werden: Tischnummer, bestellte Artikel, Zeitpunkt und &ndash; freiwillig &ndash; Ihr Vorname, damit die Bestellung zugeordnet werden kann (Art. 6 Abs. 1 lit. b DSGVO). Dasselbe gilt, wenn Sie &bdquo;Service rufen&ldquo; oder &bdquo;Rechnung bitte&ldquo; verwenden.</span><span lang="en">Ordering is only possible if you scan the QR code at your table. We process: table number, items ordered, time and &ndash; voluntarily &ndash; your first name so that the order can be assigned (Art. 6(1)(b) GDPR). The same applies if you use &ldquo;call waiter&rdquo; or &ldquo;bill, please&rdquo;.</span></p>
+
+  <h3><span lang="de">Speicherung auf Ihrem Ger&auml;t</span><span lang="en">Storage on your device</span></h3>
+  <p><span lang="de">Wir setzen keine Cookies und keine Analyse- oder Tracking-Werkzeuge. Im lokalen Speicher Ihres Browsers merkt sich die Anwendung Ihre Sprachwahl, Ihren aktuellen Warenkorb und die Nummern Ihrer eigenen Reservierungen, damit Sie deren Status sehen. Diese Angaben verlassen Ihr Ger&auml;t nicht und k&ouml;nnen von Ihnen jederzeit &uuml;ber die Browsereinstellungen gel&ouml;scht werden.</span><span lang="en">We use no cookies and no analytics or tracking tools. In your browser&rsquo;s local storage the application remembers your language choice, your current cart and the reference numbers of your own reservations so that you can see their status. This information does not leave your device and you can delete it at any time in your browser settings.</span></p>
+  <p><span lang="de">F&uuml;r die technische Verbindung zur Datenbank wird eine anonyme Kennung vergeben. Sie enth&auml;lt keine personenbezogenen Angaben und wird nicht zur Wiedererkennung verwendet.</span><span lang="en">An anonymous identifier is issued for the technical connection to the database. It contains no personal details and is not used to recognise you.</span></p>
+
+  <h3><span lang="de">Auftragsverarbeiter</span><span lang="en">Processors</span></h3>
+  <p><span lang="de">Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland &ndash; Datenbank und Authentifizierung (Firebase). Die Daten werden in Rechenzentren innerhalb der Europ&auml;ischen Union gespeichert.</span><span lang="en">Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Ireland &ndash; database and authentication (Firebase). Data is stored in data centres within the European Union.</span></p>
+  <p><span lang="de">GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA &ndash; Auslieferung der Programmdateien. Dabei fallen technische Zugriffsdaten wie IP-Adresse, Zeitpunkt und Browsertyp an.</span><span lang="en">GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA &ndash; delivery of the application files. Technical access data such as IP address, time and browser type arises in the process.</span></p>
+  <p><span lang="de">Mit den eingesetzten Dienstleistern bestehen Vertr&auml;ge zur Auftragsverarbeitung nach Art. 28 DSGVO.</span><span lang="en">Data processing agreements under Art. 28 GDPR are in place with the service providers used.</span></p>
+
+  <h3><span lang="de">Ihre Rechte</span><span lang="en">Your rights</span></h3>
+  <p><span lang="de">Sie haben das Recht auf Auskunft, Berichtigung, L&ouml;schung, Einschr&auml;nkung der Verarbeitung, Daten&uuml;bertragbarkeit und Widerspruch. Wenden Sie sich dafür an die oben genannte Adresse. Au&szlig;erdem k&ouml;nnen Sie sich bei der &ouml;sterreichischen Datenschutzbeh&ouml;rde beschweren:</span><span lang="en">You have the right to information, rectification, erasure, restriction of processing, data portability and objection. Please contact us at the address above. You may also lodge a complaint with the Austrian Data Protection Authority:</span> <a href="https://www.dsb.gv.at" target="_blank" rel="noopener">dsb.gv.at</a></p>
+
+  <p class="lnote"><span lang="de">Stand:</span><span lang="en">Last updated:</span> <span id="ldate">10/2026</span></p>
+ </article>
+
+ <footer style="margin-top:28px"><img src="logo.png" alt="" style="width:46px;opacity:.8"><br>ZIRLERBERG &middot; Zirlerberg 1 &middot; 6170 Zirl<br><a href="tel:+436764502361">+43 676 4502361</a><br><a href="https://restaurant-am-zirlerberg.at/" style="color:var(--gold)">restaurant-am-zirlerberg.at</a></footer>
+</div>
+<script>
+(function(){
+ var L=(function(){try{var v=JSON.parse(localStorage.getItem('zbg_lang'));if(v==='de')return 'de'}catch(e){}
+   var n=(navigator.language||'de').slice(0,2).toLowerCase();return n==='de'?'de':'en'})();
+ function set(l){L=l;document.documentElement.setAttribute('data-l',l);document.documentElement.lang=l;
+   document.querySelectorAll('.lsw button').forEach(function(b){b.classList.toggle('act',b.dataset.l===l)})}
+ document.querySelectorAll('.lsw button').forEach(function(b){b.addEventListener('click',function(){set(b.dataset.l)})});
+ set(L);
+ var d=document.getElementById('ldate'),n=new Date();
+ if(d)d.textContent=(n.getMonth()+1<10?'0':'')+(n.getMonth()+1)+'/'+n.getFullYear();
+ if(location.hash==='#datenschutz')document.getElementById('datenschutz').scrollIntoView();
+})();
+</script>
+</body>
+</html>
