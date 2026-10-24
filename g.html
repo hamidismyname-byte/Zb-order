@@ -37,7 +37,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .hint{font-size:12px;color:var(--mu);margin-top:6px}
 .chip.dim{opacity:.5}
 .nahd{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin:18px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
-.nalist .row{padding:8px 0}.nalist .row .nm{font-size:16px}.nalist .ds,.nalist .al,.nalist .offl,.nalist .add{display:none}
+.nalist .row{padding:8px 0}.nalist .row .nm{font-size:16px}.nalist .row .ds,.nalist .row .al,.nalist .row .offl,.nalist .add{display:none}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,48,.35) 0%,rgba(10,20,48,.15) 35%,rgba(10,20,48,.8) 75%,rgba(10,20,48,.86) 100%)}
 .hero>*:not(video):not(.shade):not(.poster){position:relative}
 .langs{position:absolute!important;top:calc(14px + env(safe-area-inset-top));inset-inline-end:14px;display:flex;gap:4px;background:rgba(10,20,48,.55);backdrop-filter:blur(8px);border-radius:999px;padding:4px}
@@ -448,7 +448,7 @@ function menuView(){
     ${tdP.length?`<div class="car">${tdP.map(photoCard).join('')}</div>`:''}${tdR.map(rowItem).join('')}</section>`:''}
   ${cats.map(c=>{const its=conf.items.filter(i=>i.cat===c.id&&visible(i)),av=its.filter(okI),na=its.filter(i=>!okI(i));
     return `<section class="catsec" id="c-${c.id}">${head(c)}${av.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}
-    ${na.length?`<div class="nahd">${tr('notToday')}</div><div class="nalist">${na.map(rowItem).join('')}</div>`:''}</section>`}).join('')}
+    ${na.length?`<div class="nahd">${tr('notToday')}</div><div class="nalist">${na.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}</div>`:''}</section>`}).join('')}
   ${footer()}</div>`}
 function statusOf(o){if(o.cancelled)return['st_no','s-no'];if(o.status==='pending')return['st_pend','s-pend'];if(o.status==='declined')return['st_no','s-no'];
   const v=Object.values(o.st||{});if(v.length&&v.every(x=>x==='abgeholt'))return['st_done','s-done'];if(v.includes('fertig'))return['st_ready','s-ready'];if(v.includes('arbeit'))return['st_cook','s-cook'];return['st_ok','s-ok']}
