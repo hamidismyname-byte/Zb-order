@@ -16,7 +16,7 @@ function demo(){
   addEventListener('storage',e=>{if(e.key&&e.key.startsWith('zbd:'))emit(e.key.slice(4))});
   const sub=s=>{subs.push(s);setTimeout(()=>emit(s.col));return()=>{const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)}};
   return{
-    mode:'demo',async init(){},
+    mode:'demo',async init(){},async ensureAuth(){return this.authUid()},async kick(){},watchConn(cb){cb(true);return ()=>{}},
     authUid(){let u=null;try{u=sessionStorage.getItem('zbd_uid')}catch(e){}if(!u){u='demo-'+uid();try{sessionStorage.setItem('zbd_uid',u)}catch(e){}}return u},
     isAnon(){return false},authEmail(){return null},
     async login(){throw new Error('Demo')},async logout(){},async linkAccount(){return this.authUid()},
@@ -49,8 +49,14 @@ function fb(cfg,opt){
       try{db=fs.initializeFirestore(app,{localCache:fs.persistentLocalCache({tabManager:fs.persistentMultipleTabManager()})})}catch(e){db=fs.getFirestore(app)}
       au=Au.getAuth(app);
       try{await au.authStateReady()}catch(e){await new Promise(r=>{const un=Au.onAuthStateChanged(au,()=>{un();r()})})}
-      if(!au.currentUser)await Au.signInAnonymously(au);
+      // v1.0: anonyme Anmeldung darf beim Start scheitern (schlechtes Netz) – wird vor dem Senden nachgeholt
+      if(!au.currentUser){try{await Au.signInAnonymously(au)}catch(e){console.warn('anon',e)}}
     },
+    async ensureAuth(){if(!au.currentUser)await Au0.signInAnonymously(au);return au.currentUser.uid},
+    // Verbindung neu aufbauen (nach Sperrbildschirm / Netzwechsel)
+    async kick(){try{await f.disableNetwork(db);await f.enableNetwork(db)}catch(e){}},
+    // true = mit dem Server synchron, false = nur Cache (keine Verbindung)
+    watchConn(cb){return f.onSnapshot(f.doc(db,'config/main'),{includeMetadataChanges:true},s=>cb(!s.metadata.fromCache),()=>{})},
     // cb(null) = existiert sicher nicht; undefined = noch unbekannt (Cache)
     authUid(){return au&&au.currentUser?au.currentUser.uid:null},
     isAnon(){return !au||!au.currentUser||au.currentUser.isAnonymous},
@@ -73,14 +79,18 @@ function fb(cfg,opt){
     updDoc(path,patch){return f.updateDoc(f.doc(db,path),patch)},
     batchUpd(list){const b=f.writeBatch(db);for(const [p,patch] of list)b.update(f.doc(db,p),patch);return b.commit()},
     batchSet(list){const b=f.writeBatch(db);for(const [p,d] of list)b.set(f.doc(db,p),d);return b.commit()},
+    // Bestellung schreiben; resolved erst mit Server-Bestätigung (offline: wartet, Firestore sendet automatisch nach)
     claimSession(t){const ref=f.doc(db,'tables/'+t);return f.runTransaction(db,async tx=>{const s=await tx.get(ref);if(s.exists()&&s.data().session)return s.data().session;const ns=uid();tx.set(ref,{session:ns,openedMs:Date.now()},{merge:true});return ns})}
   };
 }
 export function makeStore(cfg,opt={}){return cfg&&cfg.mode==='fb'?fb(cfg,opt):demo()}
 
 // ntfy-Push (kostenlos, ohne Konto)
-export function push(cfg,topic,title,message,tags){if(!cfg||!cfg.topic)return;
-  fetch((cfg.ntfy||'https://ntfy.sh').replace(/\/$/,'')+'/',{method:'POST',body:JSON.stringify({topic,title,message,tags,priority:5,click:location.origin+location.pathname.replace(/[^/]*$/,'')+'team.html'})}).catch(()=>{})}
+// v1.0: pushHooks.limit(topic) wird gerufen, wenn ntfy das Gratis-Limit meldet (HTTP 429)
+export const pushHooks={limit:null,count:0};
+export function push(cfg,topic,title,message,tags){if(!cfg||!cfg.topic)return Promise.resolve(false);pushHooks.count++;
+  return fetch((cfg.ntfy||'https://ntfy.sh').replace(/\/$/,'')+'/',{method:'POST',body:JSON.stringify({topic,title,message,tags,priority:5,click:location.origin+location.pathname.replace(/[^/]*$/,'')+'team.html'})})
+    .then(r=>{if(r.status===429&&pushHooks.limit)pushHooks.limit(topic);return r.ok}).catch(()=>false)}
 
 // Stationen: zwei Küchen (Persisch/Afghanisch = 'kueche', Italienisch/Österreichisch = 'ital'), Bar, Shisha
 export const KST=['kueche','ital'];
@@ -135,9 +145,11 @@ export const isTerrace=(t,conf)=>{const z=zoneOf(t,conf);return !!z&&(z.shisha==
 const hash=s=>{let h=5381;for(const c of String(s))h=(((h<<5)+h)^c.codePointAt(0))>>>0;return h.toString(36)};
 export const personalTopic=(cfg,name)=>cfg.topic+'-p-'+hash(String(name||'').trim().toLowerCase());
 // Push an alle Eingeloggten einer Rolle/Station; wenn niemand im Dienst: Sammel-Topic als Reserve
+// v1.0: reine Stations-Tablets (role 'kitchen') bekommen KEIN ntfy (Bildschirm an, Alarm in der App) -> spart das Gratis-Limit.
+// Reserve-Kanal nur, wenn wirklich niemand passend im Dienst ist.
 export function pushShift(cfg,shifts,filter,fallback,title,msg,tags){if(!cfg||!cfg.topic)return;
-  const tps=[...new Set((shifts||[]).filter(filter).map(s=>s.topic).filter(Boolean))];
-  if(!tps.length&&fallback)tps.push(fallback);for(const tp of tps)push(cfg,tp,title,msg,tags)}
+  const m=(shifts||[]).filter(filter);const tps=[...new Set(m.filter(s=>s.role!=='kitchen').map(s=>s.topic).filter(Boolean))];
+  if(!m.length&&fallback)tps.push(fallback);for(const tp of tps)push(cfg,tp,title,msg,tags)}
 
 // ---------- Arbeitszeit ----------
 export const hmToMin=s=>{const [h,m]=String(s||'0:0').split(':').map(Number);return h*60+(m||0)};

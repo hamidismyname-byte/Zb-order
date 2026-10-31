@@ -37,7 +37,7 @@ input:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .hint{font-size:12px;color:var(--mu);margin-top:6px}
 .chip.dim{opacity:.5}
 .nahd{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--mu);margin:18px 0 0;padding-top:10px;border-top:1px dashed var(--line)}
-.nalist .row{padding:8px 0}.nalist .row .nm{font-size:16px}.nalist .row .ds,.nalist .row .al,.nalist .row .offl,.nalist .add{display:none}
+.nalist .row{padding:8px 0}.nalist .row .nm{font-size:16px}.nalist .ds,.nalist .al,.nalist .offl,.nalist .add{display:none}
 .hero .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(10,20,48,.35) 0%,rgba(10,20,48,.15) 35%,rgba(10,20,48,.8) 75%,rgba(10,20,48,.86) 100%)}
 .hero>*:not(video):not(.shade):not(.poster){position:relative}
 .langs{position:absolute!important;top:calc(14px + env(safe-area-inset-top));inset-inline-end:14px;display:flex;gap:4px;background:rgba(10,20,48,.55);backdrop-filter:blur(8px);border-radius:999px;padding:4px}
@@ -154,6 +154,10 @@ label{display:block;color:var(--mu);font-size:13px;margin:12px 0 6px}
 .resform textarea{min-height:64px}
 .slots{display:flex;flex-wrap:wrap;gap:8px}
 .slots.areas{display:grid;grid-template-columns:1fr 1fr;gap:8px}.slots.areas .slot{padding:10px 8px;font-size:14px}
+.pbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0;padding:8px 10px;border:1px solid var(--gold);border-radius:14px;background:var(--bg2);font-size:14px;color:var(--mu)}
+.pchip{border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:14px;color:var(--tx);background:var(--card)}.pchip.on{background:var(--gold);color:#1a1406;border-color:var(--gold);font-weight:700}
+.pgh{display:flex;justify-content:space-between;margin:14px 0 4px;font-weight:700;color:var(--gold)}.pq{background:#f0b44c;color:#1a1406;border-radius:999px;padding:2px 10px;font-weight:700}
+.pin{display:flex;gap:8px;align-items:center;margin:8px 0}.pin input{flex:1}
 .rdish{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:14px 0 4px;background:var(--bg2)}
 .rdish b{color:var(--gold)}.rdish p{margin:6px 0 0;color:var(--mu);font-size:14px}
 .rdc{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin-top:10px}
@@ -309,6 +313,23 @@ resCancelQ:["Reservierung wirklich stornieren?", "Really cancel the reservation?
 resCall:["Lieber telefonisch?", "Prefer to call?", "ترجیح می‌دهید تلفنی؟", "Preferisci telefonare?", "تفضل الاتصال؟"],
 resTable:["Tisch", "Table", "میز", "Tavolo", "طاولة"],
 resNav:["Reservieren", "Reserve", "رزرو", "Prenota", "حجز"],
+who:["Wer bestellt?","Who is ordering?","چه کسی سفارش می‌دهد؟","Chi ordina?","من يطلب؟"],
+whoSub:["Vornamen eintragen – so bringen wir jedem das Richtige und getrenntes Zahlen geht ganz leicht.","Enter first names – so we bring everyone the right dish and paying separately is easy.","اسم کوچک را وارد کنید – تا غذای هر نفر را درست بیاوریم و حساب جداگانه راحت باشد.","Inserite i nomi – così portiamo a ognuno il piatto giusto e pagare separatamente è facile.","أدخلوا الأسماء الأولى – لنقدّم لكل شخص طبقه الصحيح ويسهل الدفع المنفصل."],
+person:["Person","Person","نفر","Persona","شخص"],
+addPerson:["+ weitere Person","+ another person","+ نفر بعدی","+ altra persona","+ شخص آخر"],
+goOn:["Weiter","Continue","ادامه","Continua","متابعة"],
+forWho:["Für:","For:","برای:","Per:","لـ:"],
+nameQ:["✎ Name?","✎ Name?","✎ اسم؟","✎ Nome?","✎ الاسم؟"],
+namesQ:["Namen ergänzen?","Add the names?","اسم‌ها را کامل کنید؟","Aggiungere i nomi?","إضافة الأسماء؟"],
+namesSub:["Dann wissen wir genau, welcher Teller zu wem gehört.","Then we know exactly which plate belongs to whom.","تا بدانیم هر بشقاب مال کیست.","Così sappiamo esattamente a chi va ogni piatto.","حتى نعرف تماماً لمن كل طبق."],
+sendAnyway:["Ohne Namen senden","Send without names","بدون اسم ارسال کن","Invia senza nomi","إرسال بدون أسماء"],
+queued:["⏳ Wird gesendet, sobald Internet da ist – nichts tun.","⏳ Will be sent as soon as you are online – nothing to do.","⏳ به‌محض وصل شدن اینترنت ارسال می‌شود – کاری لازم نیست.","⏳ Verrà inviato appena c’è internet – non fare nulla.","⏳ سيتم الإرسال فور توفر الإنترنت – لا داعي لأي شيء."],
+sentLate:["✓ Bestellung ist angekommen.","✓ Your order has arrived.","✓ سفارش رسید.","✓ Ordine arrivato.","✓ وصل طلبك."],
+errNet:["Keine Internetverbindung. Bitte mit unserem WLAN verbinden und nochmal senden – Ihr Warenkorb bleibt erhalten.","No internet connection. Please connect to our Wi-Fi and send again – your cart is kept.","اینترنت وصل نیست. لطفاً به وای‌فای ما وصل شوید و دوباره بفرستید – سبد شما می‌ماند.","Nessuna connessione. Collegati al nostro Wi-Fi e invia di nuovo – il carrello resta.","لا يوجد اتصال بالإنترنت. يرجى الاتصال بشبكة الواي فاي لدينا والإرسال مجدداً – تبقى سلتك محفوظة."],
+retry:["Nochmal senden","Send again","دوباره ارسال کن","Invia di nuovo","إرسال مرة أخرى"],
+wifiSteps:["1) Passwort kopieren  2) WLAN-Einstellungen öffnen  3) Netz wählen  4) Passwort einfügen","1) Copy password  2) Open Wi-Fi settings  3) Choose the network  4) Paste password","۱) رمز را کپی کنید  ۲) تنظیمات وای‌فای را باز کنید  ۳) شبکه را انتخاب کنید  ۴) رمز را بچسبانید","1) Copia la password  2) Apri le impostazioni Wi-Fi  3) Scegli la rete  4) Incolla la password","١) انسخ كلمة المرور  ٢) افتح إعدادات الواي فاي  ٣) اختر الشبكة  ٤) الصق كلمة المرور"],
+wifiIos:["iPhone: Einstellungen → WLAN","iPhone: Settings → Wi-Fi","آیفون: Settings ← Wi-Fi","iPhone: Impostazioni → Wi-Fi","آيفون: الإعدادات ← Wi-Fi"],
+wifiOpen:["WLAN-Einstellungen öffnen","Open Wi-Fi settings","باز کردن تنظیمات وای‌فای","Apri impostazioni Wi-Fi","فتح إعدادات الواي فاي"],
 resArea:["Wo möchten Sie sitzen?","Where would you like to sit?","کجا دوست دارید بنشینید؟","Dove preferite sedervi?","أين تفضّلون الجلوس؟"],
 ar_any:["Egal","No preference","فرقی ندارد","Indifferente","لا يهم"],
 ar_in:["Innen (Saal)","Inside (dining room)","داخل سالن","All’interno (sala)","في الداخل (القاعة)"],
@@ -341,6 +362,11 @@ const saveG=()=>LS.set(GK,G);
 let shifts=[];let Store=null,conf=null,today=null,plan=null,tableDoc=null,orders=[],unsubO=null,joinedS=null;
 let cart=LS.get('zbg_cart:'+(T||'-'),[]);const saveCart=()=>LS.set('zbg_cart:'+(T||'-'),cart);
 const ui={view:'home',sheet:null,arg:null,flt:{v:false,s:false},thanks:false,cooldown:0,ageOk:false};
+// v1.0: Personen am Tisch (ein Handy bestellt für mehrere)
+let PP=LS.get('zbg_pp:'+(T||'-'),null)||{list:[],cur:null};const savePP=()=>LS.set('zbg_pp:'+(T||'-'),PP);
+const pName=p=>p?(p.name||'').trim()||tr('person')+' '+(PP.list.indexOf(p)+1):'';
+const curP=()=>PP.list.find(p=>p.id===PP.cur)||PP.list[0]||null;
+const wifiOk=()=>!!(T&&conf&&conf.wifi&&conf.wifi.ssid&&conf.wifi.show);
 
 const catOf=it=>conf.cats.find(c=>c.id===it.cat);
 const canOrder=()=>!!T&&!!conf&&isOpenNow(conf);
@@ -399,14 +425,14 @@ function homeView(){
    <button class="tile main" data-a="go" data-x="menu">${IC.menu}<div style="flex:1"><span class="serif" style="font-size:24px">${tr('menuOrder')}</span><br><small>${tr('menuSub')}</small></div><span style="color:var(--gold);font-size:22px">${lang==='fa'?'←':'→'}</span></button>
    ${T?`<button class="tile" data-a="callW" data-x="waiter">${IC.bell}<span>${tr('call')}</span></button><button class="tile" data-a="callW" data-x="bill">${IC.bill}<span>${tr('bill')}</span></button>`:''}
    <button class="tile" data-a="go" data-x="res">${IC.cal}<span>${tr('reserve')}</span></button>
-   ${w.ssid&&w.show?`<button class="tile" data-a="wifi">${IC.wifi}<span>${tr('wifi')}</span></button>`:''}
+   ${wifiOk()?`<button class="tile" data-a="wifi">${IC.wifi}<span>${tr('wifi')}</span></button>`:''}
    <a class="tile btn" href="${esc(L.google||'#')}" target="_blank" rel="noopener">${IC.star}<span>${tr('review')}</span></a>
    <a class="tile btn" href="${esc(L.insta||'#')}" target="_blank" rel="noopener">${IC.cam}<span>${tr('insta')}</span><small>@restaurantamzirlerberg</small></a>
   </div>
   ${hi.length?`<h2 class="sec serif">${tr('highlights')}</h2><p class="secsub">${tr('highSub')}</p><div class="car">${hi.map(i=>photoCard(i)).join('')}</div>`:''}
   ${footer()}</div>`}
 function footer(){return `<div class="leg"><b>${tr('legend')}</b>${Object.entries(AL).map(([k,v])=>`${k} ${v[li()]}`).join(' · ')}<br>🌱 ${tr('veg')} · 🌶 ${tr('spicy')} · ★ ${tr('house')}<br>${tr('taxes')}</div>
-  <footer><img src="logo.png" alt="" style="width:46px;opacity:.8"><br>ZIRLERBERG · Zirlerberg 1 · 6170 Zirl<br><a href="tel:+436764502361">+43 676 4502361</a><br><a href="recht.html">Impressum</a> · <a href="recht.html#datenschutz">Datenschutz</a></footer>`}
+  <footer><img src="logo.png" alt="" style="width:46px;opacity:.8"><br>ZIRLERBERG · Zirler Berg 1 · 6170 Zirl<br><a href="tel:+436764502361">+43 676 4502361</a></footer>`}
 function qtyIn(id){return cart.filter(l=>l.itemId===id).reduce((a,l)=>a+l.qty,0)}
 function flagChips(it){const f=flOf(it),n=it.name;const a=[];
   if(f.includes('h')||n.includes('★'))a.push('★ '+tr('house'));if(f.includes('v')||n.includes('🌱'))a.push('🌱');if(f.includes('s')||n.includes('🌶'))a.push('🌶');if(f.includes('t')||/30 Min/.test(n))a.push('⏱ '+tr('min30'));if(isLim(conf,it,catOf(it))&&!blockReason(it))a.push(tr('limited'));return a}
@@ -438,17 +464,18 @@ function menuView(){
   let drinkDone=false;
   const head=c=>{let img=CATIMG[c.id];if(!img&&!drinkDone&&c.st==='bar'&&!isShishaCat(c)){img=DRINKIMG;drinkDone=true}
     return img?`<div class="cban" style="background-image:url('${img}')"><h2 class="cath serif">${esc(catName(c))}</h2></div>`:`<h2 class="cath serif">${esc(catName(c))}</h2>`};
-  return `<div class="mhead"><div class="wrap"><div class="mtop"><h1 class="serif">${tr('menu')}</h1>
+  return `<div class="mhead"><div class="wrap"><div class="mtop"><h1 class="serif">${tr('menu')}</h1>${wifiOk()?`<button class="chip flt" data-a="wifi">📶</button>`:''}
     <button class="chip flt ${ui.flt.v?'on':''}" data-a="flt" data-x="v">🌱 ${tr('veg')}</button><button class="chip flt ${ui.flt.s?'on':''}" data-a="flt" data-x="s">🌶</button></div>
     <div class="chips">${td.length?`<button class="chip" data-a="jump" data-x="today" style="border-color:var(--gold);color:var(--gold)">⭐ ${tr('todayFor')}</button>`:''}${cats.map(c=>`<button class="chip ${has(c)?'':'dim'}" data-a="jump" data-x="${c.id}">${esc(catName(c))}</button>`).join('')}</div></div></div>
   <div class="wrap">
+  ${T&&PP.list.length>1?`<div class="pbar"><span>${tr('forWho')}</span>${PP.list.map(p=>`<button class="pchip ${curP()===p?'on':''}" data-a="ppCur" data-x="${p.id}">${esc(pName(p))}</button>`).join('')}<button class="pchip" data-a="ppEdit">＋</button></div>`:''}
   ${!T?`<div class="notice">📱 ${tr('scanToOrder')}</div>`:!isOpenNow(conf)?`<div class="notice">🕙 ${!dayHours(conf)?tr('restDay')+' – ':''}${esc(openMsg())}</div>`:''}
   ${kw?`<div class="kban">${tr('kitchenBanner',{t:kitchenFrom(conf)})}</div>`:''}
   ${td.length?`<section class="catsec" id="c-today"><h2 class="cath serif">⭐ ${tr('todayFor')}</h2><p class="secsub">${tr('todaySub')}</p>
     ${tdP.length?`<div class="car">${tdP.map(photoCard).join('')}</div>`:''}${tdR.map(rowItem).join('')}</section>`:''}
   ${cats.map(c=>{const its=conf.items.filter(i=>i.cat===c.id&&visible(i)),av=its.filter(okI),na=its.filter(i=>!okI(i));
     return `<section class="catsec" id="c-${c.id}">${head(c)}${av.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}
-    ${na.length?`<div class="nahd">${tr('notToday')}</div><div class="nalist">${na.map(i=>DATA.photo[i.id]?photoCard(i):rowItem(i)).join('')}</div>`:''}</section>`}).join('')}
+    ${na.length?`<div class="nahd">${tr('notToday')}</div><div class="nalist">${na.map(rowItem).join('')}</div>`:''}</section>`}).join('')}
   ${footer()}</div>`}
 function statusOf(o){if(o.cancelled)return['st_no','s-no'];if(o.status==='pending')return['st_pend','s-pend'];if(o.status==='declined')return['st_no','s-no'];
   const v=Object.values(o.st||{});if(v.length&&v.every(x=>x==='abgeholt'))return['st_done','s-done'];if(v.includes('fertig'))return['st_ready','s-ready'];if(v.includes('arbeit'))return['st_cook','s-cook'];return['st_ok','s-ok']}
@@ -517,6 +544,7 @@ document.addEventListener('wheel',e=>{const el=e.target.closest&&e.target.closes
   if(Math.abs(e.deltaY)<=Math.abs(e.deltaX))return;if(el.scrollWidth<=el.clientWidth)return;
   const max=el.scrollWidth-el.clientWidth;if((e.deltaY<0&&el.scrollLeft<=0)||(e.deltaY>0&&el.scrollLeft>=max-1))return;
   e.preventDefault();el.scrollLeft+=e.deltaY},{passive:false});
+document.addEventListener('input',e=>{const pp=e.target.closest&&e.target.closest('[data-pp]');if(pp){const p=PP.list.find(x=>x.id===pp.dataset.pp);if(p){p.name=pp.value.slice(0,20);savePP()}return}});
 document.addEventListener('input',e=>{const el=e.target.closest('[data-r]');if(!el)return;const k=el.dataset.r;RF[k]=el.type==='checkbox'?el.checked:el.value;if(k==='day'){RF.time='';el.blur();render()}});
 
 /* ----- Sheets ----- */
@@ -535,10 +563,11 @@ function sheetView(){
   if(ui.sheet==='cart'){const sum=cart.reduce((a,l)=>a+l.qty*l.price,0);
     return `<div class="shh"><h2 class="serif">${tr('cart')}</h2><button class="x" data-a="close">✕</button></div>
     <div class="notice" style="margin-top:0">${tr('table')} <b>${esc(T)}</b> · ${tr('confirmInfo')}</div>
-    ${cart.map(l=>`<div class="line"><div class="f"><b>${esc(cleanName(l.name))}</b>${l.note?`<div class="muted" style="color:var(--mu);font-size:13px">${esc(l.note)}</div>`:''}<div style="color:var(--gold);font-size:14px">${eur(l.price*l.qty)}</div></div>
-      <div class="qty"><button data-a="cq" data-x="${l.key}:-1">−</button><span>${l.qty}</span><button data-a="cq" data-x="${l.key}:1">+</button></div></div>`).join('')}
+    ${cartGroups().map(([p,ls])=>`${p?`<div class="pgh"><span>👤 ${p.name?esc(p.name):`<button class="pq" data-a="ppName" data-x="${p.id}">${tr('nameQ')}</button> <span style="color:var(--mu)">${tr('person')} ${PP.list.indexOf(p)+1}</span>`}</span><span>${eur(ls.reduce((a,l)=>a+l.price*l.qty,0))}</span></div>`:''}
+    ${ls.map(l=>`<div class="line"><div class="f"><b>${esc(cleanName(l.name))}</b>${l.note?`<div class="muted" style="color:var(--mu);font-size:13px">${esc(l.note)}</div>`:''}<div style="color:var(--gold);font-size:14px">${eur(l.price*l.qty)}${PP.list.length>1?` <button class="pchip" data-a="cper" data-x="${l.key}">→ ${esc(pName(PP.list.find(x=>x.id===l.per)||PP.list[0]))}</button>`:''}</div></div>
+      <div class="qty"><button data-a="cq" data-x="${l.key}:-1">−</button><span>${l.qty}</span><button data-a="cq" data-x="${l.key}:1">+</button></div></div>`).join('')}`).join('')}
     <div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div>
-    <label>${tr('yourName')}</label><input id="gname" value="${esc(G.name||'')}" autocomplete="given-name" maxlength="24"><div class="hint">💡 ${tr('nameHint')}</div>
+    <button class="ghostbtn" data-a="ppEdit">👥 ${tr('who')}</button>
     <button class="bigbtn" data-a="sendO" ${cart.length&&canOrder()?'':'disabled'}>${tr('send')}</button>
     <p style="color:var(--mu);font-size:13px;text-align:center">${tr('payInfo')}</p>`}
   if(ui.sheet==='pair'){const its=ui.arg.map(id=>conf.items.find(i=>i.id===id)).filter(Boolean);
@@ -548,18 +577,37 @@ function sheetView(){
     <label class="chk"><input type="checkbox" id="agechk"><span>${tr('age')}</span></label><button class="bigbtn" data-a="ageOk">${tr('ok')}</button>`;
   if(ui.sheet==='wifi'){const w=conf.wifi||{};return `<div class="shh"><h2 class="serif">📶 ${tr('wifi')}</h2><button class="x" data-a="close">✕</button></div>
     <label>${tr('net')}</label><div class="wifi"><span>${esc(w.ssid)}</span></div>
-    <label>${tr('pw')}</label><div class="wifi"><span>${esc(w.pass)}</span><button data-a="copy" data-x="${esc(w.pass)}" style="color:var(--gold)">${tr('copy')}</button></div>`}
+    <label>${tr('pw')}</label><div class="wifi"><span>${esc(w.pass)}</span><button data-a="copy" data-x="${esc(w.pass)}" style="color:var(--gold)">${tr('copy')}</button></div>
+    <p class="hint" style="font-size:14px;margin-top:12px">${tr('wifiSteps')}</p>
+    ${/Android/i.test(navigator.userAgent)?`<a class="bigbtn btn" style="text-align:center" href="intent:#Intent;action=android.settings.WIFI_SETTINGS;end">${tr('wifiOpen')}</a>`:`<p class="hint">${tr('wifiIos')}</p>`}`}
+  if(ui.sheet==='senderr')return `<div class="shh"><h2 class="serif">⚠</h2><button class="x" data-a="close">✕</button></div>
+    <div class="notice" style="margin-top:0">${ui.arg==='net'?tr('errNet'):tr('err')}</div>
+    ${wifiOk()?`<button class="ghostbtn" data-a="wifi">📶 ${tr('wifi')}</button>`:''}
+    <button class="bigbtn" data-a="openCart">${tr('retry')}</button>`;
+  if(ui.sheet==='who'||ui.sheet==='names'){if(!PP.list.length)PP.list.push({id:uid(),name:G.name||''});
+    return `<div class="shh"><h2 class="serif">👋 ${tr(ui.sheet==='who'?'who':'namesQ')}</h2><button class="x" data-a="${ui.sheet==='who'?'close':'openCart'}">✕</button></div>
+    <p class="hint" style="font-size:14px">${tr(ui.sheet==='who'?'whoSub':'namesSub')}</p>
+    ${PP.list.map((p,i)=>`<div class="pin"><span>👤</span><input data-pp="${p.id}" value="${esc(p.name||'')}" placeholder="${tr('person')} ${i+1}" maxlength="20" autocomplete="off"></div>`).join('')}
+    <button class="ghostbtn" data-a="ppAdd">${tr('addPerson')}</button>
+    <button class="bigbtn" data-a="${ui.sheet==='who'?'close':'sendO'}">${ui.sheet==='who'?tr('goOn'):tr('send')}</button>
+    ${ui.sheet==='names'?`<button class="ghostbtn" data-a="sendO" data-x="force">${tr('sendAnyway')}</button>`:''}`}
   return ''}
 
 /* ============ Aktionen ============ */
 function toast(msg,kind='',ms=3500){const d=document.createElement('div');d.className='toast '+kind;d.textContent=msg;$('#toast').appendChild(d);setTimeout(()=>d.remove(),ms)}
 const PAIR_FOR=['per','gri'],PAIR_NAMES=['Mast o Khiar','Persischer Safrantee'];
-function addToCart(it,qty,note){const c=catOf(it);
-  const l=cart.find(l=>l.itemId===it.id&&(l.note||'')===(note||''));if(l)l.qty+=qty;else cart.push({key:uid(),itemId:it.id,name:it.name,price:+it.price,st:stOf(it,c),qty,note:note||''});
+function cartGroups(){if(PP.list.length<2)return [[PP.list[0]||null,cart]];const g=PP.list.map(p=>[p,cart.filter(l=>(l.per||PP.list[0].id)===p.id)]);return g.filter(x=>x[1].length)}
+function addToCart(it,qty,note){const c=catOf(it);const per=curP()?curP().id:null;const first=!cart.length&&!PP.list.length;
+  const l=cart.find(l=>l.itemId===it.id&&(l.note||'')===(note||'')&&(l.per||null)===per);if(l)l.qty+=qty;else cart.push({key:uid(),itemId:it.id,name:it.name,price:+it.price,st:stOf(it,c),qty,note:note||'',per});
+  if(PP.list.length>1)toast('→ '+pName(curP()),'',1400);
+  if(first){PP.list=[{id:uid(),name:G.name||''}];PP.cur=PP.list[0].id;cart.forEach(x=>{if(!x.per)x.per=PP.cur});savePP();saveCart();ui.sheet='who';return}
   saveCart();try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}
   if(PAIR_FOR.includes(it.cat)&&!LS.get('zbg_paired',false)){const ids=conf.items.filter(i=>PAIR_NAMES.includes(i.name)&&!blockReason(i)&&!qtyIn(i.id)).map(i=>i.id);
     if(ids.length){LS.set('zbg_paired',true);ui.sheet='pair';ui.arg=ids}}}
 function guardShisha(it,then){if(isShishaCat(catOf(it))&&!ui.ageOk){ui.sheet='age';ui.arg=then;render();return true}return false}
+// v1.0: Fehlerbericht an den Admin-Kanal (ohne Personendaten)
+function report(e,stage){try{const ua=navigator.userAgent,dev=/iPhone|iPad/.test(ua)?'iPhone':/Android/.test(ua)?'Android':'Desktop';
+  push(cfg,cfg.topic+'-err','⚠ Gast-Fehler Tisch '+T,stage+' · '+String(e&&(e.code||e.message)||e).slice(0,120)+' · '+dev+' · online:'+navigator.onLine+' · '+new Date().toLocaleTimeString('de-AT'))}catch(x){}}
 const A={
   lang(x){lang=x;LS.set('zbg_lang',x);render()},
   go(x){ui.view=x;ui.sheet=null;render();scrollTo(0,0)},
@@ -574,16 +622,33 @@ const A={
     if(guardShisha(it,()=>{addToCart(it,q,note);render()}))return;addToCart(it,q,note);render()},
   ageOk(){if(!$('#agechk').checked)return;ui.ageOk=true;const f=ui.arg;ui.sheet=null;f&&f();if(!ui.sheet)render()},
   openCart(){ui.sheet='cart';render()},
+  ppAdd(){PP.list.push({id:uid(),name:''});savePP();render();setTimeout(()=>{const a=document.querySelectorAll('[data-pp]');a[a.length-1]?.focus()},50)},
+  ppEdit(){ui.sheet='who';render()},
+  ppName(){ui.sheet='names';render()},
+  ppCur(x){PP.cur=x;savePP();render()},
+  cper(x){const l=cart.find(l=>l.key===x);if(!l||PP.list.length<2)return;const i=PP.list.findIndex(p=>p.id===(l.per||PP.list[0].id));l.per=PP.list[(i+1)%PP.list.length].id;saveCart();render()},
   cq(x){const [k,d]=x.split(':');const l=cart.find(l=>l.key===k);if(!l)return;l.qty+=+d;if(l.qty<=0)cart=cart.filter(c=>c!==l);saveCart();if(!cart.length)ui.sheet=null;render()},
-  async sendO(x,el){if(!cart.length||!canOrder())return;const name=($('#gname')?.value||'').trim().slice(0,24);G.name=name;saveG();
-    el.disabled=true;el.textContent=tr('wait');
-    try{const s=await Store.claimSession(T);if(G.session!==s){G.session=s;G.gid=uid()}G.had=true;saveG();join(s);
-      const items=cart.map(({name,price,qty,note,st,itemId})=>({name,price,qty,note,st,itemId}));
-      const o={id:uid(),day:dayKey(),createdMs:Date.now(),table:T,session:s,guestId:G.gid,guestName:name||'',source:'guest',status:'pending',note:'',cancelled:false,st:{},items,by:Store.authUid()};
-      await Store.setDoc('orders/'+o.id,o);
-      pushShift(cfg,shifts,s=>s.role==='waiter',cfg.topic+'-service','🧾 Gastbestellung – Tisch '+T,(name?name+': ':'')+items.map(i=>i.qty+'× '+i.name+(i.note?' ('+i.note+')':'')).join('\n'),['bell']);
-      cart=[];saveCart();ui.sheet=null;ui.view='table';render();scrollTo(0,0);toast('✓ '+tr('sent'),'',5000)}
-    catch(e){console.error(e);toast(tr('err'),'err',6000);el.disabled=false;el.textContent=tr('send')}},
+  async sendO(x,el){if(!cart.length||!canOrder())return;
+    if(x!=='force'&&PP.list.length>1&&PP.list.some(p=>!(p.name||'').trim())&&ui.sheet!=='names'){ui.sheet='names';render();return}
+    const p0=PP.list[0];G.name=p0?(p0.name||'').trim():G.name;saveG();
+    if(el){el.disabled=true;el.textContent=tr('wait')}
+    const pers=l=>{if(PP.list.length<2)return '';return pName(PP.list.find(p=>p.id===l.per)||PP.list[0])};
+    const items=cart.map(l=>({name:l.name,price:l.price,qty:l.qty,note:l.note,st:l.st,itemId:l.itemId,...(pers(l)?{pers:pers(l)}:{})}));
+    const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+    const tryN=async(fn,n=3)=>{let e0;for(let k=0;k<n;k++){try{return await fn()}catch(e){e0=e;await sleep(1200*(k+1))}}throw e0};
+    let stage='auth';
+    try{await tryN(()=>Store.ensureAuth());stage='session';
+      let s=tableDoc&&tableDoc.session;if(!s)s=await tryN(()=>Store.claimSession(T));
+      if(G.session!==s){G.session=s;G.gid=uid()}G.had=true;saveG();join(s);stage='write';
+      const o={id:uid(),day:dayKey(),createdMs:Date.now(),table:T,session:s,guestId:G.gid,guestName:G.name||'',source:'guest',status:'pending',note:'',cancelled:false,st:{},items,by:Store.authUid()};
+      const w=Store.setDoc('orders/'+o.id,o);
+      const notify=()=>pushShift(cfg,shifts,s=>s.role==='waiter',cfg.topic+'-service','🧾 Gastbestellung – Tisch '+T,items.map(i=>(i.pers?i.pers+': ':'')+i.qty+'× '+i.name+(i.note?' ('+i.note+')':'')).join('\n'),['bell']);
+      const r=await Promise.race([w.then(()=>'ok'),sleep(6000).then(()=>'wait')]);
+      cart=[];saveCart();ui.sheet=null;ui.view='table';render();scrollTo(0,0);
+      if(r==='ok'){notify();toast('✓ '+tr('sent'),'',5000)}
+      else{toast(tr('queued'),'',8000);w.then(()=>{notify();toast(tr('sentLate'),'',5000)}).catch(e=>{report(e,'late');toast(tr('err'),'err',8000)})}}
+    catch(e){console.error(e);report(e,stage);const net=!navigator.onLine||/unavailable|offline|network|failed-precondition|deadline/i.test(String(e&&(e.code||e.message)));
+      ui.sheet='senderr';ui.arg=net?'net':'err';render()}},
   cancelO(x){if(confirm(tr('reallyCancel')))Store.updDoc('orders/'+x,{cancelled:true}).catch(()=>toast(tr('err'),'err'))},
   async callW(x){if(!T)return;if(Date.now()<ui.cooldown){toast(tr('tooFast'));return}ui.cooldown=Date.now()+60000;
     try{const id=uid();await Store.setDoc('calls/'+id,{table:T,type:x,day:dayKey(),createdMs:Date.now(),done:false,session:G.session||null,by:Store.authUid()});
