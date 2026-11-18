@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Marketing Expansion Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#d8b46a; --gold-hi:#f3dfa8; --gold-lo:#8a6a2c;
+    --ink:#060606; --paper:#f4efe4; --muted:rgba(244,239,228,.62);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1200px;height:1800px;background:var(--ink)}
+  .poster{position:relative;width:1200px;height:1800px;overflow:hidden;color:var(--paper);font-family:Inter,sans-serif}
+  .bg{position:absolute;inset:0;background:url(bg.png) center 46%/cover no-repeat;filter:saturate(1.05) contrast(1.05)}
+  .veil{position:absolute;inset:0;background:
+      linear-gradient(180deg,rgba(6,6,6,.92) 0%,rgba(6,6,6,.35) 22%,rgba(6,6,6,0) 36%,rgba(6,6,6,.25) 50%,rgba(6,6,6,.88) 62%,#060606 74%)}
+  .grain{position:absolute;inset:0;opacity:.08;mix-blend-mode:overlay;
+      background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+  .frame{position:absolute;inset:36px;border:1px solid rgba(216,180,106,.38);pointer-events:none}
+  .frame::before,.frame::after{content:"";position:absolute;width:22px;height:22px;border:1px solid var(--gold)}
+  .frame::before{top:-6px;left:-6px;border-right:none;border-bottom:none}
+  .frame::after{bottom:-6px;right:-6px;border-left:none;border-top:none}
+
+  .top{position:absolute;top:78px;left:96px;right:96px;display:flex;justify-content:space-between;align-items:center;
+      font-size:13px;letter-spacing:.42em;text-transform:uppercase;color:var(--muted)}
+  .mark{display:flex;align-items:center;gap:14px;color:var(--gold-hi)}
+  .mark i{width:30px;height:30px;border:1px solid var(--gold);transform:rotate(45deg);display:grid;place-items:center}
+  .mark i::after{content:"";width:8px;height:8px;background:var(--gold)}
+
+  .hero{position:absolute;top:150px;left:96px;right:96px}
+  .eyebrow{font-size:14px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:18px}
+  .eyebrow::before{content:"";width:56px;height:1px;background:var(--gold)}
+  h1{font-family:"Cormorant Garamond",serif;font-weight:300;font-size:132px;line-height:.9;letter-spacing:-.02em;margin-top:26px}
+  h1 em{font-style:italic;font-weight:300;
+      background:linear-gradient(100deg,var(--gold-lo) 0%,var(--gold-hi) 38%,var(--gold) 60%,var(--gold-lo) 100%);
+      -webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .lower{position:absolute;left:96px;right:96px;top:1080px}
+  .pillars{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:46px}
+  .pillar{padding:26px 28px;border:1px solid rgba(216,180,106,.3);
+      background:linear-gradient(160deg,rgba(216,180,106,.10),rgba(255,255,255,.015));backdrop-filter:blur(6px)}
+  .pillar .k{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--gold);font-size:26px}
+  .pillar h3{font-weight:500;font-size:21px;margin:6px 0 8px;letter-spacing:.01em}
+  .pillar p{font-size:15px;line-height:1.55;color:var(--muted);font-weight:300}
+
+  .sec-title{display:flex;align-items:center;gap:18px;font-size:13px;letter-spacing:.45em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+  .sec-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(216,180,106,.6),transparent)}
+  .depts{list-style:none;border-top:1px solid rgba(244,239,228,.12)}
+  .depts li{display:grid;grid-template-columns:70px 330px 1fr;align-items:baseline;padding:15px 0;border-bottom:1px solid rgba(244,239,228,.12)}
+  .depts .n{font-family:"Cormorant Garamond",serif;font-size:24px;color:var(--gold)}
+  .depts .t{font-size:19px;font-weight:500}
+  .depts .d{font-size:14.5px;color:var(--muted);font-weight:300;line-height:1.5}
+
+  .foot{position:absolute;left:96px;right:96px;bottom:74px;display:flex;justify-content:space-between;align-items:flex-end;
+      font-size:12px;letter-spacing:.4em;text-transform:uppercase;color:var(--muted)}
+  .foot b{font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:400;letter-spacing:.02em;text-transform:none;font-size:30px;color:var(--gold-hi)}
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="bg"></div><div class="veil"></div><div class="grain"></div><div class="frame"></div>
+
+  <div class="top">
+    <div class="mark"><i></i>Strategie 2027</div>
+    <div>Marketing · Design · Technologie</div>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">Expansionsvision</div>
+    <h1>Das Marketing<br>von <em>morgen.</em></h1>
+  </div>
+
+  <div class="lower">
+    <div class="pillars">
+      <div class="pillar">
+        <div class="k">I.</div>
+        <h3>Dezentrales Talent-Netzwerk</h3>
+        <p>Talentierte Köpfe – remote vereint als freies Design- und Arbeitsteam auf Freelancer-Basis.</p>
+      </div>
+      <div class="pillar">
+        <div class="k">II.</div>
+        <h3>Digital Signage im Abo</h3>
+        <p>Installation von Werbedisplays inklusive Content-Erstellung, Ausstrahlung und monatlichem Abonnement.</p>
+      </div>
+    </div>
+
+    <div class="sec-title">Fünf Abteilungen</div>
+    <ul class="depts">
+      <li><span class="n">01</span><span class="t">Marketing &amp; Akquise</span><span class="d">Hohe Ausdrucks- und Überzeugungskraft</span></li>
+      <li><span class="n">02</span><span class="t">Social Video</span><span class="d">Videobearbeitung für Instagram &amp; TikTok</span></li>
+      <li><span class="n">03</span><span class="t">Webdesign</span><span class="d">Digitale Auftritte mit Wirkung</span></li>
+      <li><span class="n">04</span><span class="t">Digitale Dienstleistungen</span><span class="d">Drohnenaufnahmen, digitale Einladungen, Visitenkarten &amp; Werbeplakate – digital und physisch</span></li>
+      <li><span class="n">05</span><span class="t">Software nach Maß</span><span class="d">Individuelle Softwareentwicklung für Unternehmen</span></li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    <b>Ein Netzwerk. Unbegrenzte Wirkung.</b>
+    <div>Est. MMXXVI</div>
+  </div>
+</div>
+</body>
+</html>
