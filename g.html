@@ -347,12 +347,17 @@ let lang=LS.get('zbg_lang',null)||(()=>{for(const l of (navigator.languages||[na
 const li=()=>LANGS.indexOf(lang);
 const tr=(k,v)=>{let s=(I[k]||[k])[li()]??I[k][1];if(v)for(const x in v)s=s.replace('{'+x+'}',v[x]);return s};
 const catName=c=>CAT[c.id]?CAT[c.id][li()]:c.name;
-const descOf=it=>{const d=DATA.desc[it.id];if(lang==='ar'&&DATA.ar&&DATA.ar[it.id])return DATA.ar[it.id];if(d)return lang==='de'?d[0]:d[1];if(it.d||it.e)return lang==='de'?(it.d||it.e):(it.e||it.d);return ''};
+const descOf=it=>{if(DATA.dl&&DATA.dl[it.id]&&DATA.dl[it.id][lang])return DATA.dl[it.id][lang];const d=DATA.desc[it.id];if(lang==='ar'&&DATA.ar&&DATA.ar[it.id])return DATA.ar[it.id];if(d)return lang==='de'?d[0]:d[1];if(it.d||it.e)return lang==='de'?(it.d||it.e):(it.e||it.d);return ''};
 const alOf=it=>(DATA.desc[it.id]||[])[2]||'';
 const flOf=it=>(DATA.desc[it.id]||[])[3]||'';
 const WDN=[["Sonntag","Sunday","یکشنبه","domenica","الأحد"],["Montag","Monday","دوشنبه","lunedì","الاثنين"],["Dienstag","Tuesday","سه‌شنبه","martedì","الثلاثاء"],["Mittwoch","Wednesday","چهارشنبه","mercoledì","الأربعاء"],["Donnerstag","Thursday","پنجشنبه","giovedì","الخميس"],["Freitag","Friday","جمعه","venerdì","الجمعة"],["Samstag","Saturday","شنبه","sabato","السبت"]];
 function openMsg(){const n=nextOpen(conf);if(!n)return '';const d=n.inDays===0?tr('todayW'):n.inDays===1?tr('tomorrow'):(lang==='de'?'am ':lang==='it'?'':'')+WDN[n.d.getDay()][li()];return tr('opensAt',{d,t:n.o})}
 const storyOf=it=>{const s=DATA.story&&DATA.story[it.id];return s?s[li()]||s[1]:''};
+// Daten (Foto/Text) auch finden, wenn ein Gericht neu angelegt wurde (andere ID, gleicher Name)
+function dataAlias(items){const nm=DATA.nm||{};for(const it of items){if(DATA.photo[it.id]||DATA.desc[it.id])continue;const n=cleanName(it.name).toLowerCase();const k=Object.keys(nm).find(k=>nm[k]===n);if(!k)continue;
+  for(const f of ['desc','photo','fa','story','ar','tl','dl','pos'])if(DATA[f]&&DATA[f][k]!==undefined&&DATA[f][it.id]===undefined)DATA[f][it.id]=DATA[f][k]}}
+const tlOf=id=>DATA.tl&&DATA.tl[id]&&DATA.tl[id][lang]||'';
+const nmOf=(n,id)=>tlOf(id)||cleanName(n);
 const cleanName=n=>String(n).replace(/\s*\(ca\. 30 Min\.\)/,'').replace(/\s*[🌱🌶★]/gu,'').trim();
 
 /* ============ State ============ */
@@ -437,17 +442,17 @@ function qtyIn(id){return cart.filter(l=>l.itemId===id).reduce((a,l)=>a+l.qty,0)
 function flagChips(it){const f=flOf(it),n=it.name;const a=[];
   if(f.includes('h')||n.includes('★'))a.push('★ '+tr('house'));if(f.includes('v')||n.includes('🌱'))a.push('🌱');if(f.includes('s')||n.includes('🌶'))a.push('🌶');if(f.includes('t')||/30 Min/.test(n))a.push('⏱ '+tr('min30'));if(isLim(conf,it,catOf(it))&&!blockReason(it))a.push(tr('limited'));return a}
 function photoCard(it){
-  const br=blockReason(it),q=qtyIn(it.id),fa=lang==='fa'&&DATA.fa[it.id];
+  const br=blockReason(it),q=qtyIn(it.id),fa=lang==='fa'&&!tlOf(it.id)&&DATA.fa[it.id];
   return `<div class="pc ${br?'off':''}" data-a="item" data-x="${it.id}">
-   <div class="ph"><img loading="lazy" src="${esc(DATA.photo[it.id])}" alt="${esc(cleanName(it.name))}"><span class="sym">${tr('sym')}</span>
+   <div class="ph"><img loading="lazy" src="${esc(DATA.photo[it.id])}" style="object-position:${(DATA.pos&&DATA.pos[it.id])||'50% 50%'}" alt="${esc(nmOf(it.name,it.id))}"><span class="sym">${tr('sym')}</span>
    ${flagChips(it).length?`<div class="flags">${flagChips(it).map(x=>`<span>${x}</span>`).join('')}</div>`:''}${q?`<span class="qb">${q}</span>`:''}</div>
-   <div class="bd"><h3 class="nm serif">${esc(cleanName(it.name))}</h3>${fa?`<div class="fan">${esc(fa)}</div>`:''}
+   <div class="bd"><h3 class="nm serif">${esc(nmOf(it.name,it.id))}</h3>${fa?`<div class="fan">${esc(fa)}</div>`:''}
    ${descOf(it)?`<p class="ds">${esc(descOf(it))}</p>`:''}${alOf(it)?`<div class="al">${alOf(it).split('').join(' · ')}</div>`:''}
    ${br?`<span class="offl">${brLabel(br)}</span>`:''}
    <div class="ft"><span class="pr">${it.price?eur(it.price):'—'}</span>${canOrder()?`<button class="add" data-a="quick" data-x="${it.id}" ${br?'disabled':''} aria-label="+">+</button>`:''}</div></div></div>`}
 function rowItem(it){
-  const br=blockReason(it),q=qtyIn(it.id),fa=lang==='fa'&&DATA.fa[it.id],fl=flagChips(it);
-  return `<div class="row ${br?'off':''}" data-a="item" data-x="${it.id}"><div class="f"><div class="nm serif">${esc(cleanName(it.name))}${fl.length?` <span style="font-size:13px">${fl.join(' ')}</span>`:''}</div>${fa?`<div class="fan">${esc(fa)}</div>`:''}
+  const br=blockReason(it),q=qtyIn(it.id),fa=lang==='fa'&&!tlOf(it.id)&&DATA.fa[it.id],fl=flagChips(it);
+  return `<div class="row ${br?'off':''}" data-a="item" data-x="${it.id}"><div class="f"><div class="nm serif">${esc(nmOf(it.name,it.id))}${fl.length?` <span style="font-size:13px">${fl.join(' ')}</span>`:''}</div>${fa?`<div class="fan">${esc(fa)}</div>`:''}
    ${descOf(it)?`<div class="ds">${esc(descOf(it))}</div>`:''}${alOf(it)?`<div class="al">${alOf(it).split('').join(' · ')}</div>`:''}${br?`<span class="offl">${brLabel(br)}</span>`:''}</div>
    <div style="text-align:end"><div class="pr">${it.price?eur(it.price):(lang==='de'?'gratis':lang==='fa'?'رایگان':lang==='it'?'gratis':lang==='ar'?'مجاناً':'free')}</div></div>
    ${q?`<span class="qb">${q}</span>`:''}${canOrder()?`<button class="add" style="width:40px;height:40px;font-size:22px" data-a="quick" data-x="${it.id}" ${br?'disabled':''}>+</button>`:''}</div>`}
@@ -489,8 +494,8 @@ function tableView(){
   return `<div class="mhead"><div class="wrap"><div class="mtop" style="padding-bottom:12px"><h1 class="serif">${tr('ourTable')} · ${esc(T)}</h1></div></div></div><div class="wrap" style="padding-top:16px">
   ${!list.length?`<div class="notice">${tr('noOrders')}</div>`:list.map(o=>{const [k,c]=statusOf(o),mine=o.guestId===G.gid;
     return `<div class="oc"><div class="oh"><span class="gname">👤 ${mine?tr('me_'):esc(o.guestName||(o.source==='staff'?tr('service'):tr('guest')+' '+(gn[o.guestId]||'')))} · ${new Date(o.createdMs).toLocaleTimeString('de-AT',{hour:'2-digit',minute:'2-digit'})}</span><span class="stb ${c}">${tr(k)}</span></div>
-    ${o.items.map(i=>`<div class="mini"><b>${i.qty}×</b><span style="flex:1">${esc(cleanName(i.name))}${i.note?` <span class="muted">(${esc(i.note)})</span>`:''}</span><span>${eur(i.qty*i.price)}</span></div>`).join('')}
-    ${Array.isArray(o.rej)&&o.rej.length?`<div class="rejb">${o.rej.map(r=>`<div class="mini" style="text-decoration:line-through;opacity:.7"><b>${r.qty}×</b><span style="flex:1">${esc(cleanName(r.name))}</span></div>`).join('')}<div class="rejm">✕ ${tr('rejHd')}</div></div>`:''}
+    ${o.items.map(i=>`<div class="mini"><b>${i.qty}×</b><span style="flex:1">${esc(nmOf(i.name,i.itemId))}${i.note?` <span class="muted">(${esc(i.note)})</span>`:''}</span><span>${eur(i.qty*i.price)}</span></div>`).join('')}
+    ${Array.isArray(o.rej)&&o.rej.length?`<div class="rejb">${o.rej.map(r=>`<div class="mini" style="text-decoration:line-through;opacity:.7"><b>${r.qty}×</b><span style="flex:1">${esc(nmOf(r.name,r.itemId))}</span></div>`).join('')}<div class="rejm">✕ ${tr('rejHd')}</div></div>`:''}
     ${mine&&o.status==='pending'?`<button class="ghostbtn" style="padding:10px" data-a="cancelO" data-x="${o.id}">${tr('cancel')}</button>`:''}</div>`}).join('')}
   ${valid.length?`<div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div><p class="muted" style="color:var(--mu);font-size:13px">${tr('payInfo')}</p>`:''}
   <div class="tiles"><button class="tile" data-a="callW" data-x="waiter">${IC.bell}<span>${tr('call')}</span></button><button class="tile" data-a="callW" data-x="bill">${IC.bill}<span>${tr('bill')}</span></button></div>
@@ -515,7 +520,7 @@ function resDishes(day){if(!conf||!day)return '';const dd=dayAvail(today,plan,da
   const its=conf.items.filter(i=>{const c=catOf(i);return isKitchenIt(i)&&isAvail(i,c,dd,conf.perm,conf.permCat,day)});
   if(!its.length)return `<div class="rdish"><b>🍽 ${tr('resDish')}</b><p>${tr('resDishNo')}</p></div>`;
   const cats=conf.cats.filter(c=>its.some(i=>i.cat===c.id));
-  return `<div class="rdish"><b>🍽 ${tr('resDish')}</b>${cats.map(c=>`<div class="rdc">${esc(catName(c))}</div><div class="rdl">${its.filter(i=>i.cat===c.id).map(i=>`<span>${esc(cleanName(i.name))}${lang==='fa'&&DATA.fa[i.id]?` · ${esc(DATA.fa[i.id])}`:''}</span>`).join('')}</div>`).join('')}<p class="muted" style="margin:6px 0 0;font-size:13px">${tr('resDrinks')}</p></div>`}
+  return `<div class="rdish"><b>🍽 ${tr('resDish')}</b>${cats.map(c=>`<div class="rdc">${esc(catName(c))}</div><div class="rdl">${its.filter(i=>i.cat===c.id).map(i=>`<span>${esc(nmOf(i.name,i.id))}${lang==='fa'&&!tlOf(i.id)&&DATA.fa[i.id]?` · ${esc(DATA.fa[i.id])}`:''}</span>`).join('')}</div>`).join('')}<p class="muted" style="margin:6px 0 0;font-size:13px">${tr('resDrinks')}</p></div>`}
 function resView(){if(!RF.day)RF.day=localDay();const sl=resSlots(RF.day);if(sl&&sl.length&&!sl.includes(RF.time))RF.time=sl[0];
   const mine=myRes.map(id=>resDocs[id]).filter(r=>r&&r.day>=localDay(new Date(Date.now()-864e5))).sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time));
   const max=localDay(new Date(Date.now()+90*864e5));
@@ -549,9 +554,9 @@ document.addEventListener('input',e=>{const el=e.target.closest('[data-r]');if(!
 
 /* ----- Sheets ----- */
 function sheetView(){
-  if(ui.sheet==='item'){const it=conf.items.find(i=>i.id===ui.arg);if(!it)return '';const br=blockReason(it),fa=lang==='fa'&&DATA.fa[it.id],al=alOf(it);
+  if(ui.sheet==='item'){const it=conf.items.find(i=>i.id===ui.arg);if(!it)return '';const br=blockReason(it),fa=lang==='fa'&&!tlOf(it.id)&&DATA.fa[it.id],al=alOf(it);
     return `${DATA.photo[it.id]?`<div class="ph"><img src="${esc(DATA.photo[it.id])}" alt=""><span class="sym">${tr('sym')}</span><button class="x" data-a="close">✕</button></div>`:`<div class="shh"><span style="flex:1"></span><button class="x" data-a="close">✕</button></div>`}
-    <h2 class="serif" style="font-size:32px;margin:0">${esc(cleanName(it.name))}</h2>${fa?`<div class="fan" style="font-size:17px">${esc(fa)}</div>`:''}
+    <h2 class="serif" style="font-size:32px;margin:0">${esc(nmOf(it.name,it.id))}</h2>${fa?`<div class="fan" style="font-size:17px">${esc(fa)}</div>`:''}
     ${flagChips(it).length?`<div style="margin-top:6px;color:var(--gold);font-size:14px">${flagChips(it).join(' · ')}</div>`:''}
     ${descOf(it)?`<p class="ds" style="font-size:16px">${esc(descOf(it))}</p>`:''}
     ${storyOf(it)?`<details class="story"><summary>📖 ${tr('story')}</summary><p>${esc(storyOf(it))}</p></details>`:''}
@@ -564,7 +569,7 @@ function sheetView(){
     return `<div class="shh"><h2 class="serif">${tr('cart')}</h2><button class="x" data-a="close">✕</button></div>
     <div class="notice" style="margin-top:0">${tr('table')} <b>${esc(T)}</b> · ${tr('confirmInfo')}</div>
     ${cartGroups().map(([p,ls])=>`${p?`<div class="pgh"><span>👤 ${p.name?esc(p.name):`<button class="pq" data-a="ppName" data-x="${p.id}">${tr('nameQ')}</button> <span style="color:var(--mu)">${tr('person')} ${PP.list.indexOf(p)+1}</span>`}</span><span>${eur(ls.reduce((a,l)=>a+l.price*l.qty,0))}</span></div>`:''}
-    ${ls.map(l=>`<div class="line"><div class="f"><b>${esc(cleanName(l.name))}</b>${l.note?`<div class="muted" style="color:var(--mu);font-size:13px">${esc(l.note)}</div>`:''}<div style="color:var(--gold);font-size:14px">${eur(l.price*l.qty)}${PP.list.length>1?` <button class="pchip" data-a="cper" data-x="${l.key}">→ ${esc(pName(PP.list.find(x=>x.id===l.per)||PP.list[0]))}</button>`:''}</div></div>
+    ${ls.map(l=>`<div class="line"><div class="f"><b>${esc(nmOf(l.name,l.itemId))}</b>${l.note?`<div class="muted" style="color:var(--mu);font-size:13px">${esc(l.note)}</div>`:''}<div style="color:var(--gold);font-size:14px">${eur(l.price*l.qty)}${PP.list.length>1?` <button class="pchip" data-a="cper" data-x="${l.key}">→ ${esc(pName(PP.list.find(x=>x.id===l.per)||PP.list[0]))}</button>`:''}</div></div>
       <div class="qty"><button data-a="cq" data-x="${l.key}:-1">−</button><span>${l.qty}</span><button data-a="cq" data-x="${l.key}:1">+</button></div></div>`).join('')}`).join('')}
     <div class="tot"><span>${tr('total')}</span><span>${eur(sum)}</span></div>
     <button class="ghostbtn" data-a="ppEdit">👥 ${tr('who')}</button>
@@ -679,7 +684,7 @@ if(/^#?(reserv|res)/i.test(location.hash.slice(1))||P.get('r')!==null)ui.view='r
 async function start(){render();
   Store=makeStore(cfg,{app:'guest'});
   try{await Store.init()}catch(e){console.error(e);toast(tr('err'),'err',8000);return}
-  Store.subDoc('config/main',c=>{if(c){conf=c;render()}});
+  Store.subDoc('config/main',c=>{if(c){conf={...c,items:(c.items||[]).filter(i=>!i.needPrice)};dataAlias(conf.items);render()}});
   Store.subDoc('config/today',d=>{if(d!==undefined){today=d;render()}});
   Store.subDoc('config/plan',d=>{if(d!==undefined){plan=d;if(ui.view==='res'||ui.view==='menu')render()}},()=>{});
   Store.subCol('shift','day',dayKey(),l=>{shifts=l},()=>{});
